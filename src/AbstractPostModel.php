@@ -305,6 +305,7 @@ abstract class AbstractPostModel extends AbstractModel {
 			$object->post_mime_type        = $this->mime_type;
 			$object->comment_count         = $this->comment_count;
 			$object->filter                = 'raw';
+			$object = new WP_Post( $object );
 		} elseif ( $object instanceof WP_Post ) {
 			$object = get_post( $object->ID );
 		} elseif ( isset( $object->id ) ) {
