@@ -73,6 +73,10 @@ abstract class AbstractModel {
 				}
 			}
 
+			if ( isset( $this->$name ) ) {
+				$props[ $name ]['default'] = $this->$name;
+			}
+
 			if ( empty( $props[ $name ]['source_name'] ) ) {
 				$props[ $name ]['source_name'] = $name;
 			}
@@ -107,8 +111,8 @@ abstract class AbstractModel {
 	/**
 	 * Refreshes the data in the instance
 	 */
-	public function refresh() {
-		$this->object = $this->object( $this->object );
+	public function refresh( $object = null ) {
+		$this->object = $this->object( ! empty( $object ) ? $object : $this->object );
 		$this->data   = array();
 	}
 
@@ -164,12 +168,20 @@ abstract class AbstractModel {
 				$source_name = $prop['source_name'];
 
 				if ( $prop['source'] === 'object' ) {
-					$this->data[ $key ] = $this->object->$source_name;
+					if ( isset( $this->object->$source_name ) ) {
+						$this->data[ $key ] = $this->object->$source_name;
+					} elseif ( isset( $prop['default'] ) ) {
+						$this->data[ $key ] = $prop['default'];
+					} else {
+						$this->data[ $key ] = null;
+					}
 				} elseif ( $prop['source'] === 'meta' ) {
 					$this->data[ $key ] = $this->get_meta( $source_name );
 				} elseif ( $prop['source'] === 'getter' ) {
 					$getter             = $prop['getter'];
 					$this->data[ $key ] = $this->$getter();
+				} elseif ( isset( $prop['default'] ) ) {
+					$this->data[ $key ] = $prop['default'];
 				} else {
 					$this->data[ $key ] = $this->$key;
 				}

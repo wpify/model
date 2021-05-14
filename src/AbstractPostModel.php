@@ -212,9 +212,7 @@ abstract class AbstractPostModel extends AbstractModel {
 	 * @return bool
 	 */
 	public function save() {
-		$object_data = array(
-			'meta_input' => array(),
-		);
+		$object_data = array();
 
 		foreach ( $this->get_props() as $key => $prop ) {
 			$source_name = $prop['source_name'];
@@ -222,15 +220,22 @@ abstract class AbstractPostModel extends AbstractModel {
 			if ( $prop['source'] === 'object' ) {
 				$object_data[ $source_name ] = $this->$key;
 			} elseif ( $prop['source'] === 'meta' ) {
+				if ( ! isset( $object_data['meta_input'] ) ) {
+					$object_data['meta_input'] = array();
+				}
+
 				$object_data['meta_input'][ $source_name ] = $this->$key;
 			}
 		}
 
-		$result = wp_update_post( $object_data );
+		if ( $this->id > 0 ) {
+			$result = wp_update_post( $object_data, true );
+		} else {
+			$result = wp_insert_post( $object_data, true );
+		}
 
 		if ( ! is_wp_error( $result ) ) {
-			$this->id = $result;
-			$this->refresh();
+			$this->refresh( $result );
 		}
 
 		return $result;
@@ -275,16 +280,34 @@ abstract class AbstractPostModel extends AbstractModel {
 	 */
 	protected function object( $object ) {
 		if ( is_null( $object ) ) {
-			$object                = new stdClass();
-			$object->ID            = 0;
-			$object->post_author   = get_current_user_id();
-			$object->post_date     = current_time( 'mysql' );
-			$object->post_date_gmt = current_time( 'mysql', 1 );
-			$object->post_type     = $this->post_type;
-			$object->filter        = 'raw';
+			$object                        = new stdClass();
+			$object->ID                    = null;
+			$object->post_author           = get_current_user_id();
+			$object->post_date             = current_time( 'mysql' );
+			$object->post_date_gmt         = current_time( 'mysql', 1 );
+			$object->post_content          = $this->content;
+			$object->post_title            = $this->title;
+			$object->post_excerpt          = $this->excerpt;
+			$object->post_status           = $this->status;
+			$object->comment_status        = $this->comment_status;
+			$object->ping_status           = $this->ping_status;
+			$object->post_password         = $this->password;
+			$object->post_name             = $this->slug;
+			$object->to_ping               = $this->to_ping;
+			$object->pinged                = $this->pinged;
+			$object->post_modified         = $this->modified_at;
+			$object->post_modified_gmt     = $this->modified_at_gmt;
+			$object->post_content_filtered = $this->content_filtered;
+			$object->post_parent           = $this->parent_id;
+			$object->guid                  = $this->guid;
+			$object->menu_order            = $this->menu_order;
+			$object->post_type             = $this->post_type;
+			$object->post_mime_type        = $this->mime_type;
+			$object->comment_count         = $this->comment_count;
+			$object->filter                = 'raw';
 		} elseif ( $object instanceof WP_Post ) {
 			$object = get_post( $object->ID );
-		} elseif ( $object instanceof AbstractPostModel ) {
+		} elseif ( isset( $object->id ) ) {
 			$object = get_post( $object->id );
 		} else {
 			$object = get_post( $object );
