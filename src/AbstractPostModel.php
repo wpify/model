@@ -7,8 +7,7 @@ use WP_Post;
 
 /**
  * Class AbstractPostModel
- *
- * @package WpifyPlugin\ModelPoC
+ * @package WpifyModel
  */
 abstract class AbstractPostModel extends AbstractModel {
 	/**

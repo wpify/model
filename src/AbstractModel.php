@@ -6,9 +6,8 @@ use ReflectionClass;
 use ReflectionProperty;
 
 /**
- * Class AbstractPostModel
- *
- * @package WpifyPlugin\ModelPoC
+ * Class AbstractModel
+ * @package WpifyModel
  */
 abstract class AbstractModel {
 	/** @var int */
