@@ -1,0 +1,11 @@
+{
+    "name": "wpify/model",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Daniel Mejta",
+            "email": "daniel@mejta.net"
+        }
+    ],
+    "require": {}
+}
