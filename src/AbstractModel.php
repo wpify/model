@@ -2,6 +2,9 @@
 
 namespace WpifyModel;
 
+use ArrayAccess;
+use ArrayIterator;
+use IteratorAggregate;
 use ReflectionClass;
 use ReflectionProperty;
 
@@ -9,7 +12,7 @@ use ReflectionProperty;
  * Class AbstractModel
  * @package WpifyModel
  */
-abstract class AbstractModel {
+abstract class AbstractModel implements ModelInterface, IteratorAggregate, ArrayAccess {
 	/** @var int */
 	public $id;
 
@@ -36,10 +39,21 @@ abstract class AbstractModel {
 		$this->initialize();
 	}
 
-	abstract protected function object( $object );
+	/**
+	 * @param null $object
+	 *
+	 * @return mixed
+	 */
+	abstract protected function object( $object = null );
 
+	/**
+	 * @return mixed
+	 */
 	abstract protected function meta_type();
 
+	/**
+	 * Initialize the object
+	 */
 	private function initialize() {
 		$reflection = new ReflectionClass( $this );
 		$properties = $reflection->getProperties( ReflectionProperty::IS_PUBLIC );
@@ -102,6 +116,65 @@ abstract class AbstractModel {
 	}
 
 	/**
+	 * @return ArrayIterator
+	 */
+	public function getIterator() {
+		return new ArrayIterator( $this->to_array() );
+	}
+
+	/**
+	 * @param array $props
+	 *
+	 * @return array
+	 */
+	public function to_array( array $props = array() ): array {
+		if ( empty( $props ) ) {
+			$props = array_keys( $this->props );
+		}
+
+		$data = array();
+
+		foreach ( $props as $prop ) {
+			$data[ $prop ] = $this->$prop;
+		}
+
+		return $data;
+	}
+
+	/**
+	 * @param mixed $offset
+	 * @param mixed $value
+	 */
+	public function offsetSet( $offset, $value ) {
+		$this->data[ $offset ] = $value;
+	}
+
+	/**
+	 * @param mixed $offset
+	 *
+	 * @return bool
+	 */
+	public function offsetExists( $offset ) {
+		return isset( $this->props[ $offset ] );
+	}
+
+	/**
+	 * @param mixed $offset
+	 */
+	public function offsetUnset( $offset ) {
+		unset( $this->data[ $offset ] );
+	}
+
+	/**
+	 * @param mixed $offset
+	 *
+	 * @return array|false|mixed|null
+	 */
+	public function offsetGet( $offset ) {
+		return isset( $this->props[ $offset ] ) ? $this->$offset : null;
+	}
+
+	/**
 	 * Saves data from instance
 	 *
 	 * @return mixed
@@ -136,13 +209,7 @@ abstract class AbstractModel {
 	 * @return array
 	 */
 	public function __serialize() {
-		$data = array();
-
-		foreach ( array_keys( $this->props ) as $prop ) {
-			$data[ $prop ] = $this->$prop;
-		}
-
-		return $data;
+		return $this->to_array();
 	}
 
 	/**
@@ -234,21 +301,21 @@ abstract class AbstractModel {
 	/**
 	 * @return array
 	 */
-	protected function get_props() {
+	protected function get_props(): array {
 		return $this->props;
 	}
 
 	/**
 	 * @return object
 	 */
-	protected function get_object() {
+	protected function get_object(): object {
 		return $this->object;
 	}
 
 	/**
 	 * @return array
 	 */
-	protected function get_data() {
+	protected function get_data(): array {
 		return $this->data;
 	}
 }

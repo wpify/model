@@ -2,7 +2,7 @@
 
 namespace WpifyModel;
 
-use stdClass;
+use WP_Error;
 use WP_Post;
 
 /**
@@ -209,7 +209,7 @@ abstract class AbstractPostModel extends AbstractModel {
 	public $filter;
 
 	/**
-	 * @return bool
+	 * @return int|WP_Error
 	 */
 	public function save() {
 		$object_data = array();
@@ -276,44 +276,49 @@ abstract class AbstractPostModel extends AbstractModel {
 	/**
 	 * @param $object
 	 *
-	 * @return array|stdClass|WP_Post|null
+	 * @return ?WP_Post
+	 * @throws NotFoundException
 	 */
-	protected function object( $object ) {
-		if ( is_null( $object ) ) {
-			$object                        = new stdClass();
-			$object->ID                    = null;
-			$object->post_author           = get_current_user_id();
-			$object->post_date             = current_time( 'mysql' );
-			$object->post_date_gmt         = current_time( 'mysql', 1 );
-			$object->post_content          = $this->content;
-			$object->post_title            = $this->title;
-			$object->post_excerpt          = $this->excerpt;
-			$object->post_status           = $this->status;
-			$object->comment_status        = $this->comment_status;
-			$object->ping_status           = $this->ping_status;
-			$object->post_password         = $this->password;
-			$object->post_name             = $this->slug;
-			$object->to_ping               = $this->to_ping;
-			$object->pinged                = $this->pinged;
-			$object->post_modified         = $this->modified_at;
-			$object->post_modified_gmt     = $this->modified_at_gmt;
-			$object->post_content_filtered = $this->content_filtered;
-			$object->post_parent           = $this->parent_id;
-			$object->guid                  = $this->guid;
-			$object->menu_order            = $this->menu_order;
-			$object->post_type             = $this->post_type;
-			$object->post_mime_type        = $this->mime_type;
-			$object->comment_count         = $this->comment_count;
-			$object->filter                = 'raw';
-			$object = new WP_Post( $object );
-		} elseif ( $object instanceof WP_Post ) {
-			$object = get_post( $object->ID );
+	protected function object( $object = null ) {
+		if ( $object instanceof WP_Post ) {
+			$new_object = $object;
+		} elseif ( is_null( $object ) ) {
+			$new_object = new WP_Post( (object) array(
+				'ID'                    => null,
+				'post_author'           => get_current_user_id(),
+				'post_date'             => current_time( 'mysql' ),
+				'post_date_gmt'         => current_time( 'mysql', 1 ),
+				'post_content'          => $this->content,
+				'post_title'            => $this->title,
+				'post_excerpt'          => $this->excerpt,
+				'post_status'           => $this->status,
+				'comment_status'        => $this->comment_status,
+				'ping_status'           => $this->ping_status,
+				'post_password'         => $this->password,
+				'post_name'             => $this->slug,
+				'to_ping'               => $this->to_ping,
+				'pinged'                => $this->pinged,
+				'post_modified'         => $this->modified_at,
+				'post_modified_gmt'     => $this->modified_at_gmt,
+				'post_content_filtered' => $this->content_filtered,
+				'post_parent'           => $this->parent_id,
+				'guid'                  => $this->guid,
+				'menu_order'            => $this->menu_order,
+				'post_type'             => $this->post_type,
+				'post_mime_type'        => $this->mime_type,
+				'comment_count'         => $this->comment_count,
+				'filter'                => 'raw',
+			) );
 		} elseif ( isset( $object->id ) ) {
-			$object = get_post( $object->id );
+			$new_object = get_post( $object->id );
 		} else {
-			$object = get_post( $object );
+			$new_object = get_post( $object );
 		}
 
-		return $object;
+		if ( ! is_object( $new_object ) ) {
+			throw new NotFoundException( 'The post was not found' );
+		}
+
+		return $new_object;
 	}
 }
