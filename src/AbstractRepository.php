@@ -7,7 +7,7 @@ namespace WpifyModel;
  *
  * @package WpifyModel
  */
-abstract class AbstractRepository implements RepositoryInterface {
+abstract class AbstractRepository extends Base implements RepositoryInterface {
 	protected $post_type;
 
 	/**
@@ -15,12 +15,9 @@ abstract class AbstractRepository implements RepositoryInterface {
 	 */
 	public function __construct() {
 		$this->post_type = $this->post_type();
+		$this->initialize();
+		$this->setup();
 	}
-
-	/**
-	 * @param $object
-	 */
-	abstract protected function factory( $object );
 
 	/**
 	 * @return string
@@ -47,4 +44,9 @@ abstract class AbstractRepository implements RepositoryInterface {
 	 * @return mixed
 	 */
 	abstract public function delete( ModelInterface $model );
+
+	/**
+	 * @param $object
+	 */
+	abstract protected function factory( $object );
 }

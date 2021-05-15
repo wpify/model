@@ -12,7 +12,7 @@ use ReflectionProperty;
  * Class AbstractModel
  * @package WpifyModel
  */
-abstract class AbstractModel implements ModelInterface, IteratorAggregate, ArrayAccess {
+abstract class AbstractModel extends Base implements ModelInterface, IteratorAggregate, ArrayAccess {
 	/** @var int */
 	public $id;
 
@@ -37,6 +37,7 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 		$this->object    = $this->object( $object );
 		$this->meta_type = $this->meta_type();
 		$this->initialize();
+		$this->setup();
 	}
 
 	/**
@@ -54,7 +55,7 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 	/**
 	 * Initialize the object
 	 */
-	private function initialize() {
+	protected function initialize() {
 		$reflection = new ReflectionClass( $this );
 		$properties = $reflection->getProperties( ReflectionProperty::IS_PUBLIC );
 		$props      = $this->props( $this->props );
