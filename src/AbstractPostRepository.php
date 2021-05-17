@@ -2,25 +2,49 @@
 
 namespace WpifyModel;
 
-use WP_Post;
+use Doctrine\Common\Collections\ArrayCollection;
+use WP_Query;
 
 abstract class AbstractPostRepository extends AbstractRepository {
 	/**
-	 * @return string
+	 * @param array $args
+	 *
+	 * @return ArrayCollection
 	 */
-	protected function post_type(): string {
-		return 'post';
+	public function all( array $args = array() ): ArrayCollection {
+		$defaults = array( 'posts_per_page' => - 1 );
+		$args     = wp_parse_args( $args, $defaults );
+
+		return $this->find( $args );
 	}
 
 	/**
 	 * @param array $args
 	 *
-	 * @return array|mixed
+	 * @return ArrayCollection
 	 */
-	public function find( array $args = array() ) {
-		$args['post_type'] = $this->post_type();
+	public function find( array $args = array() ): ArrayCollection {
+		$defaults   = array( 'post_type' => $this->post_type() );
+		$args       = wp_parse_args( $args, $defaults );
+		$query      = new WP_Query( $args );
+		$collection = new ArrayCollection();
 
-		return array_map( array( $this, 'factory' ), get_posts( $args ) );
+		while ( $query->have_posts() ) {
+			$query->the_post();
+			global $post;
+			$collection->add( $this->factory( $post ) );
+		}
+
+		wp_reset_postdata();
+
+		return $collection;
+	}
+
+	/**
+	 * @return string
+	 */
+	protected function post_type(): string {
+		return 'post';
 	}
 
 	/**
@@ -37,9 +61,18 @@ abstract class AbstractPostRepository extends AbstractRepository {
 	/**
 	 * @param ModelInterface $model
 	 *
-	 * @return array|false|WP_Post|null
+	 * @return mixed
 	 */
 	public function delete( ModelInterface $model ) {
 		return wp_delete_post( $model->id, true );
+	}
+
+	/**
+	 * @param ModelInterface $model
+	 *
+	 * @return mixed
+	 */
+	public function save( ModelInterface $model ) {
+		return $model->save();
 	}
 }

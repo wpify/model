@@ -23,6 +23,13 @@ interface RepositoryInterface {
 	public function get( $object = null );
 
 	/**
+	 * @param array $args
+	 *
+	 * @return mixed
+	 */
+	public function all( array $args = array() );
+
+	/**
 	 * @param AbstractModel $model
 	 *
 	 * @return mixed

@@ -32,6 +32,13 @@ abstract class AbstractRepository extends Base implements RepositoryInterface {
 	abstract public function find( array $args = array() );
 
 	/**
+	 * @param array $args
+	 *
+	 * @return mixed
+	 */
+	abstract public function all( array $args = array() );
+
+	/**
 	 * @param mixed $object
 	 *
 	 * @return mixed
@@ -44,6 +51,13 @@ abstract class AbstractRepository extends Base implements RepositoryInterface {
 	 * @return mixed
 	 */
 	abstract public function delete( ModelInterface $model );
+
+	/**
+	 * @param ModelInterface $model
+	 *
+	 * @return mixed
+	 */
+	abstract public function save( ModelInterface $model );
 
 	/**
 	 * @param $object

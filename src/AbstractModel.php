@@ -70,7 +70,9 @@ abstract class AbstractModel extends Base implements ModelInterface, IteratorAgg
 			}
 
 			if ( empty( $props[ $name ]['type'] ) ) {
-				$props[ $name ]['type'] = $property->getType();
+				$props[ $name ]['type'] = method_exists( $property, 'getType' )
+					? $property->getType()
+					: null;
 			}
 
 			$object_vars = is_object( $this->object )
@@ -119,7 +121,7 @@ abstract class AbstractModel extends Base implements ModelInterface, IteratorAgg
 	/**
 	 * @return ArrayIterator
 	 */
-	public function getIterator() {
+	public function getIterator(): ArrayIterator {
 		return new ArrayIterator( $this->to_array() );
 	}
 
@@ -155,7 +157,7 @@ abstract class AbstractModel extends Base implements ModelInterface, IteratorAgg
 	 *
 	 * @return bool
 	 */
-	public function offsetExists( $offset ) {
+	public function offsetExists( $offset ): bool {
 		return isset( $this->props[ $offset ] );
 	}
 
