@@ -53,6 +53,7 @@ abstract class AbstractRepository extends Base implements RepositoryInterface {
 
 	/**
 	 * @param $object
+	 * @throws NotFoundException
 	 */
 	abstract protected function factory( $object );
 }

@@ -22,9 +22,6 @@ abstract class AbstractModel extends Base implements ModelInterface, IteratorAgg
 	/** @var array */
 	private $props = array();
 
-	/** @var string */
-	private $meta_type;
-
 	/** @var array */
 	private $data = array();
 
@@ -35,7 +32,6 @@ abstract class AbstractModel extends Base implements ModelInterface, IteratorAgg
 	 */
 	public function __construct( $object = null ) {
 		$this->object    = $this->object( $object );
-		$this->meta_type = $this->meta_type();
 		$this->initialize();
 		$this->setup();
 	}
@@ -220,7 +216,6 @@ abstract class AbstractModel extends Base implements ModelInterface, IteratorAgg
 	 */
 	public function __unserialize( $data ) {
 		$this->object    = $this->object( $data['id'] ?? null );
-		$this->meta_type = $this->meta_type();
 		$this->data      = $data;
 		$this->initialize();
 	}
@@ -288,7 +283,7 @@ abstract class AbstractModel extends Base implements ModelInterface, IteratorAgg
 	 * @return array|false|mixed
 	 */
 	public function get_meta( $key ) {
-		return get_metadata( $this->meta_type, $this->id, $key, true );
+		return get_metadata( $this->meta_type(), $this->id, $key, true );
 	}
 
 	/**
@@ -298,7 +293,7 @@ abstract class AbstractModel extends Base implements ModelInterface, IteratorAgg
 	 * @return bool|int
 	 */
 	public function set_meta( $key, $value ) {
-		return update_metadata( $this->meta_type, $this->id, $key, $value );
+		return update_metadata( $this->meta_type(), $this->id, $key, $value );
 	}
 
 	/**
