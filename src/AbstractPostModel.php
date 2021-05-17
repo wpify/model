@@ -178,7 +178,7 @@ abstract class AbstractPostModel extends AbstractModel {
 	 * @since 3.5.0
 	 * @var string
 	 */
-	public $post_type = 'post';
+	public $post_type;
 
 	/**
 	 * An attachment's mime type.
@@ -249,6 +249,11 @@ abstract class AbstractPostModel extends AbstractModel {
 	}
 
 	/**
+	 * @return string
+	 */
+	abstract protected function post_type(): string;
+
+	/**
 	 * @param array $props
 	 *
 	 * @return array
@@ -304,7 +309,7 @@ abstract class AbstractPostModel extends AbstractModel {
 				'post_parent'           => $this->parent_id,
 				'guid'                  => $this->guid,
 				'menu_order'            => $this->menu_order,
-				'post_type'             => $this->post_type,
+				'post_type'             => $this->post_type(),
 				'post_mime_type'        => $this->mime_type,
 				'comment_count'         => $this->comment_count,
 				'filter'                => 'raw',

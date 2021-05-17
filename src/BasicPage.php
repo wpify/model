@@ -7,5 +7,10 @@ namespace WpifyModel;
  * @package WpifyModel
  */
 final class BasicPage extends AbstractPostModel {
-	public $post_type = 'page';
+	/**
+	 * @return string
+	 */
+	protected function post_type(): string {
+		return 'page';
+	}
 }
