@@ -43,9 +43,7 @@ abstract class AbstractPostRepository extends AbstractRepository {
 	/**
 	 * @return string
 	 */
-	protected function post_type(): string {
-		return 'post';
-	}
+	abstract protected function post_type(): string;
 
 	/**
 	 * @param null $object

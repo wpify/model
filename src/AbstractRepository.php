@@ -8,21 +8,13 @@ namespace WpifyModel;
  * @package WpifyModel
  */
 abstract class AbstractRepository extends Base implements RepositoryInterface {
-	protected $post_type;
-
 	/**
 	 * AbstractRepository constructor.
 	 */
 	public function __construct() {
-		$this->post_type = $this->post_type();
 		$this->initialize();
 		$this->setup();
 	}
-
-	/**
-	 * @return string
-	 */
-	abstract protected function post_type(): string;
 
 	/**
 	 * @param array $args

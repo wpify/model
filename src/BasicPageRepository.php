@@ -17,4 +17,8 @@ final class BasicPageRepository extends AbstractPostRepository {
 	protected function factory( $object ): BasicPage {
 		return new BasicPage( $object );
 	}
+
+	protected function post_type(): string {
+		return 'page';
+	}
 }

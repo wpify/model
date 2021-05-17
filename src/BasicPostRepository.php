@@ -17,4 +17,8 @@ final class BasicPostRepository extends AbstractPostRepository {
 	protected function factory( $object ): BasicPost {
 		return new BasicPost( $object );
 	}
+
+	protected function post_type(): string {
+		return 'post';
+	}
 }
