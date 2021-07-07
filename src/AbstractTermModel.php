@@ -67,7 +67,7 @@ abstract class AbstractTermModel extends AbstractModel implements ModelInterface
 	 * @since 4.4.0
 	 * @var int
 	 */
-	public $parent_id = 0;
+	public $parent_id;
 
 	/**
 	 * Parent term

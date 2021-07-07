@@ -74,10 +74,10 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 				if ( method_exists( $this, 'get_' . $name ) ) {
 					$props[ $name ]['source'] = 'getter';
 					$props[ $name ]['getter'] = 'get_' . $name;
-				} elseif ( array_key_exists( $name, $object_vars ) ) {
-					$props[ $name ]['source'] = 'object';
 				} elseif ( ! empty( $this->relations[ $name ] ) ) {
 					$props[ $name ]['source'] = 'relation';
+				} elseif ( array_key_exists( $name, $object_vars ) ) {
+					$props[ $name ]['source'] = 'object';
 				} else {
 					$props[ $name ]['source'] = 'meta';
 				}
@@ -123,7 +123,7 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 	 *
 	 * @return array
 	 */
-	public function to_array( array $props = array() ): array {
+	public function to_array( array $props = array(), $resolve_deep = true ): array {
 		if ( empty( $props ) ) {
 			$props = array_keys( $this->props );
 		}
