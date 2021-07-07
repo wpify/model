@@ -9,16 +9,11 @@ namespace WpifyModel;
  * @method BasicPost[] find( array $args = array() )
  */
 final class BasicPostRepository extends AbstractPostRepository {
-	/**
-	 * @param $object
-	 *
-	 * @return BasicPost
-	 */
-	protected function factory( $object ): BasicPost {
-		return new BasicPost( $object );
+	static function post_type(): string {
+		return 'post';
 	}
 
-	protected function post_type(): string {
-		return 'post';
+	static function model(): string {
+		return BasicPost::class;
 	}
 }

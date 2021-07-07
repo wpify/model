@@ -2,18 +2,24 @@
 
 namespace WpifyModel;
 
+use Doctrine\Common\Collections\ArrayCollection;
+
 /**
  * Class AbstractRepository
  *
  * @package WpifyModel
  */
-abstract class AbstractRepository extends Base implements RepositoryInterface {
+abstract class AbstractRepository implements RepositoryInterface {
+	/** @var array */
+	protected $relations;
+
 	/**
 	 * AbstractRepository constructor.
+	 *
+	 * @param array $relations
 	 */
-	public function __construct() {
-		$this->initialize();
-		$this->setup();
+	public function __construct( array $relations = array() ) {
+		$this->relations = $relations;
 	}
 
 	/**
@@ -24,11 +30,9 @@ abstract class AbstractRepository extends Base implements RepositoryInterface {
 	abstract public function find( array $args = array() );
 
 	/**
-	 * @param array $args
-	 *
-	 * @return mixed
+	 * @return ArrayCollection
 	 */
-	abstract public function all( array $args = array() );
+	abstract public function all(): ArrayCollection;
 
 	/**
 	 * @param mixed $object
@@ -49,11 +53,23 @@ abstract class AbstractRepository extends Base implements RepositoryInterface {
 	 *
 	 * @return mixed
 	 */
-	abstract public function save( ModelInterface $model );
+	public function save( ModelInterface $model ) {
+		return $model->save();
+	}
 
 	/**
 	 * @param $object
-	 * @throws NotFoundException
+	 *
+	 * @return mixed
 	 */
-	abstract protected function factory( $object );
+	protected function factory( $object ) {
+		$class = $this::model();
+
+		return new $class( $object, $this->relations );
+	}
+
+	/**
+	 * @return class-string
+	 */
+	abstract static function model(): string;
 }

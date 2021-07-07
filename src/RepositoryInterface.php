@@ -27,7 +27,7 @@ interface RepositoryInterface {
 	 *
 	 * @return mixed
 	 */
-	public function all( array $args = array() );
+	public function all();
 
 	/**
 	 * @param AbstractModel $model
@@ -35,4 +35,11 @@ interface RepositoryInterface {
 	 * @return mixed
 	 */
 	public function delete( ModelInterface $model );
+
+	/**
+	 * @param ModelInterface $model
+	 *
+	 * @return mixed
+	 */
+	public function save( ModelInterface $model );
 }

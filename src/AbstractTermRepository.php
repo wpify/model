@@ -3,17 +3,17 @@
 namespace WpifyModel;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use WP_Query;
 
-abstract class AbstractPostRepository extends AbstractRepository {
+abstract class AbstractTermRepository extends AbstractRepository {
 	/**
-	 * AbstractPostRepository constructor.
+	 * AbstractTermRepository constructor.
 	 *
 	 * @param array $relations
 	 */
 	public function __construct( array $relations = array() ) {
 		$default_relations = array(
-			'parent'   => array( array( $this, 'get' ), 'parent_post' ),
+			'parent'   => array( array( $this, 'get' ), 'parent_id' ),
+			'children' => array( array( $this, 'child_of' ), 'id' ),
 		);
 
 		parent::__construct( array_merge( $default_relations, $relations ) );
@@ -23,7 +23,7 @@ abstract class AbstractPostRepository extends AbstractRepository {
 	 * @return ArrayCollection
 	 */
 	public function all(): ArrayCollection {
-		$args = array( 'posts_per_page' => - 1 );
+		$args = array( 'hide_empty' => false );
 
 		return $this->find( $args );
 	}
@@ -34,39 +34,50 @@ abstract class AbstractPostRepository extends AbstractRepository {
 	 * @return ArrayCollection
 	 */
 	public function find( array $args = array() ): ArrayCollection {
-		$defaults   = array( 'post_type' => $this::post_type() );
+		$defaults   = array( 'taxonomy' => $this::model()::taxonomy() );
 		$args       = wp_parse_args( $args, $defaults );
-		$query      = new WP_Query( $args );
 		$collection = new ArrayCollection();
+		$terms      = get_terms( $args );
 
-		while ( $query->have_posts() ) {
-			$query->the_post();
-
-			global $post;
-
+		foreach ( $terms as $term ) {
 			try {
-				$collection->add( $this->factory( $post ) );
+				$collection->add( $this->factory( $term ) );
 			} catch ( NotFoundException $e ) {
 			}
 		}
-
-		wp_reset_postdata();
 
 		return $collection;
 	}
 
 	/**
-	 * @return string
+	 * @return ArrayCollection
 	 */
-	abstract static function post_type(): string;
+	public function not_empty(): ArrayCollection {
+		$args = array( 'hide_empty' => true );
+
+		return $this->find( $args );
+	}
 
 	/**
-	 * @param ?object $object
+	 * @param int $parent_id
+	 *
+	 * @return ArrayCollection
+	 */
+	public function child_of( int $parent_id ): ArrayCollection {
+		$args = array( 'child_of' => $parent_id );
+
+		return $this->find( $args );
+	}
+
+	/**
+	 * @param $object
+	 *
+	 * @return mixed
 	 */
 	public function get( $object = null ) {
 		try {
 			return $this->factory( $object );
-		} catch ( NotFoundException $exception ) {
+		} catch ( NotFoundException $e ) {
 			return null;
 		}
 	}
@@ -77,6 +88,6 @@ abstract class AbstractPostRepository extends AbstractRepository {
 	 * @return mixed
 	 */
 	public function delete( ModelInterface $model ) {
-		return wp_delete_post( $model->id, true );
+		return wp_delete_term( $model->id, $this->model()::taxonomy() );
 	}
 }

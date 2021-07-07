@@ -12,16 +12,15 @@ use ReflectionProperty;
  * Class AbstractModel
  * @package WpifyModel
  */
-abstract class AbstractModel extends Base implements ModelInterface, IteratorAggregate, ArrayAccess {
+abstract class AbstractModel implements ModelInterface, IteratorAggregate, ArrayAccess {
 	/** @var int */
 	public $id;
-
+	/** @var array */
+	protected $relations;
 	/** @var object */
 	private $object;
-
 	/** @var array */
 	private $props = array();
-
 	/** @var array */
 	private $data = array();
 
@@ -29,11 +28,12 @@ abstract class AbstractModel extends Base implements ModelInterface, IteratorAgg
 	 * AbstractPost constructor.
 	 *
 	 * @param $object
+	 * @param $relations
 	 */
-	public function __construct( $object = null ) {
+	public function __construct( $object, $relations ) {
 		$this->object    = $this->object( $object );
+		$this->relations = $relations;
 		$this->initialize();
-		$this->setup();
 	}
 
 	/**
@@ -44,14 +44,9 @@ abstract class AbstractModel extends Base implements ModelInterface, IteratorAgg
 	abstract protected function object( $object = null );
 
 	/**
-	 * @return mixed
-	 */
-	abstract protected function meta_type();
-
-	/**
 	 * Initialize the object
 	 */
-	protected function initialize() {
+	private function initialize() {
 		$reflection = new ReflectionClass( $this );
 		$properties = $reflection->getProperties( ReflectionProperty::IS_PUBLIC );
 		$props      = $this->props( $this->props );
@@ -81,6 +76,8 @@ abstract class AbstractModel extends Base implements ModelInterface, IteratorAgg
 					$props[ $name ]['getter'] = 'get_' . $name;
 				} elseif ( array_key_exists( $name, $object_vars ) ) {
 					$props[ $name ]['source'] = 'object';
+				} elseif ( ! empty( $this->relations[ $name ] ) ) {
+					$props[ $name ]['source'] = 'relation';
 				} else {
 					$props[ $name ]['source'] = 'meta';
 				}
@@ -215,8 +212,8 @@ abstract class AbstractModel extends Base implements ModelInterface, IteratorAgg
 	 * @param $data
 	 */
 	public function __unserialize( $data ) {
-		$this->object    = $this->object( $data['id'] ?? null );
-		$this->data      = $data;
+		$this->object = $this->object( $data['id'] ?? null );
+		$this->data   = $data;
 		$this->initialize();
 	}
 
@@ -245,6 +242,8 @@ abstract class AbstractModel extends Base implements ModelInterface, IteratorAgg
 				} elseif ( $prop['source'] === 'getter' ) {
 					$getter             = $prop['getter'];
 					$this->data[ $key ] = $this->$getter();
+				} elseif ( $prop['source'] === 'relation' ) {
+					$this->data[ $key ] = $this->get_relation( $key );
 				} elseif ( isset( $prop['default'] ) ) {
 					$this->data[ $key ] = $prop['default'];
 				} else {
@@ -283,7 +282,45 @@ abstract class AbstractModel extends Base implements ModelInterface, IteratorAgg
 	 * @return array|false|mixed
 	 */
 	public function get_meta( $key ) {
-		return get_metadata( $this->meta_type(), $this->id, $key, true );
+		return get_metadata( $this::meta_type(), $this->id, $key, true );
+	}
+
+	/**
+	 * @return mixed
+	 */
+	abstract static function meta_type();
+
+	/**
+	 * @param $key
+	 *
+	 * @return null
+	 */
+	protected function get_relation( $key ) {
+		if ( ! empty( $this->relations[ $key ] ) && is_array( $this->relations[ $key ] ) ) {
+			$relation = $this->relations[ $key ];
+			$args     = array();
+			$callback = null;
+
+			foreach ( $relation as $item ) {
+				if ( empty( $callback ) ) {
+					if ( ! is_callable( $item ) ) {
+						return null;
+					}
+
+					$callback = $item;
+				} else {
+					if ( ! isset( $this->$item ) ) {
+						return null;
+					}
+
+					$args[] = $this->$item;
+				}
+			}
+
+			return $callback( ...$args );
+		}
+
+		return null;
 	}
 
 	/**
@@ -293,7 +330,7 @@ abstract class AbstractModel extends Base implements ModelInterface, IteratorAgg
 	 * @return bool|int
 	 */
 	public function set_meta( $key, $value ) {
-		return update_metadata( $this->meta_type(), $this->id, $key, $value );
+		return update_metadata( $this::meta_type(), $this->id, $key, $value );
 	}
 
 	/**

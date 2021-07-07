@@ -10,7 +10,7 @@ final class BasicPage extends AbstractPostModel {
 	/**
 	 * @return string
 	 */
-	protected function post_type(): string {
+	static function post_type(): string {
 		return 'page';
 	}
 }

@@ -3,7 +3,7 @@
 namespace WpifyModel;
 
 final class BasicCategoryTerm extends AbstractTermModel {
-	protected function taxonomy(): string {
+	static function taxonomy(): string {
 		return 'category';
 	}
 }

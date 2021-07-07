@@ -3,7 +3,7 @@
 namespace WpifyModel;
 
 interface ModelInterface {
-	public function __construct( $object = null );
+	public function __construct( $object, $relations );
 
 	public function save();
 

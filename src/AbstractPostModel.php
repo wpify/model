@@ -157,6 +157,13 @@ abstract class AbstractPostModel extends AbstractModel {
 	public $parent_id = 0;
 
 	/**
+	 * Parent post
+	 *
+	 * @var self
+	 */
+	public $parent;
+
+	/**
 	 * The unique identifier for a post, not necessarily a URL, used as the feed GUID.
 	 *
 	 * @since 3.5.0
@@ -209,6 +216,13 @@ abstract class AbstractPostModel extends AbstractModel {
 	public $filter;
 
 	/**
+	 * @return string
+	 */
+	static function meta_type(): string {
+		return 'post';
+	}
+
+	/**
 	 * @return int|WP_Error
 	 */
 	public function save() {
@@ -242,18 +256,6 @@ abstract class AbstractPostModel extends AbstractModel {
 	}
 
 	/**
-	 * @return string
-	 */
-	protected function meta_type() {
-		return 'post';
-	}
-
-	/**
-	 * @return string
-	 */
-	abstract protected function post_type(): string;
-
-	/**
 	 * @param array $props
 	 *
 	 * @return array
@@ -284,7 +286,7 @@ abstract class AbstractPostModel extends AbstractModel {
 	 * @return ?WP_Post
 	 * @throws NotFoundException
 	 */
-	protected function object( $object = null ) {
+	protected function object( $object = null ): ?WP_Post {
 		if ( $object instanceof WP_Post ) {
 			$new_object = $object;
 		} elseif ( is_null( $object ) ) {
@@ -326,4 +328,9 @@ abstract class AbstractPostModel extends AbstractModel {
 
 		return $new_object;
 	}
+
+	/**
+	 * @return string
+	 */
+	abstract static function post_type(): string;
 }
