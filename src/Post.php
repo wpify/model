@@ -3,14 +3,14 @@
 namespace WpifyModel;
 
 /**
- * Class BasicPage
+ * Class BasicPost
  * @package WpifyModel
  */
-final class BasicPage extends AbstractPostModel {
+class Post extends AbstractPostModel {
 	/**
 	 * @return string
 	 */
 	static function post_type(): string {
-		return 'page';
+		return 'post';
 	}
 }

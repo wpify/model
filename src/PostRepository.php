@@ -5,15 +5,16 @@ namespace WpifyModel;
 /**
  * Class BasePostRepository
  * @package WpifyModel
- * @method BasicPost get( $object = null )
- * @method BasicPost[] find( array $args = array() )
+ *
+ * @method Post get( $object = null )
+ * @method Post[] find( array $args = array() )
  */
-final class BasicPostRepository extends AbstractPostRepository {
+class PostRepository extends AbstractPostRepository {
 	static function post_type(): string {
 		return 'post';
 	}
 
 	static function model(): string {
-		return BasicPost::class;
+		return Post::class;
 	}
 }
