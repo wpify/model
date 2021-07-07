@@ -2,8 +2,6 @@
 
 namespace WpifyModel;
 
-use Doctrine\Common\Collections\ArrayCollection;
-
 abstract class AbstractTermRepository extends AbstractRepository {
 	/**
 	 * AbstractTermRepository constructor.
@@ -20,9 +18,9 @@ abstract class AbstractTermRepository extends AbstractRepository {
 	}
 
 	/**
-	 * @return ArrayCollection
+	 * @return mixed
 	 */
-	public function all(): ArrayCollection {
+	public function all() {
 		$args = array( 'hide_empty' => false );
 
 		return $this->find( $args );
@@ -31,28 +29,28 @@ abstract class AbstractTermRepository extends AbstractRepository {
 	/**
 	 * @param array $args
 	 *
-	 * @return ArrayCollection
+	 * @return mixed
 	 */
-	public function find( array $args = array() ): ArrayCollection {
+	public function find( array $args = array() ) {
 		$defaults   = array( 'taxonomy' => $this::model()::taxonomy() );
 		$args       = wp_parse_args( $args, $defaults );
-		$collection = new ArrayCollection();
+		$collection = array();
 		$terms      = get_terms( $args );
 
 		foreach ( $terms as $term ) {
 			try {
-				$collection->add( $this->factory( $term ) );
+				$collection[] = $this->factory( $term );
 			} catch ( NotFoundException $e ) {
 			}
 		}
 
-		return $collection;
+		return $this->collection_factory( $collection );
 	}
 
 	/**
-	 * @return ArrayCollection
+	 * @return array
 	 */
-	public function not_empty(): ArrayCollection {
+	public function not_empty() {
 		$args = array( 'hide_empty' => true );
 
 		return $this->find( $args );
@@ -61,9 +59,9 @@ abstract class AbstractTermRepository extends AbstractRepository {
 	/**
 	 * @param int $parent_id
 	 *
-	 * @return ArrayCollection
+	 * @return array
 	 */
-	public function child_of( int $parent_id ): ArrayCollection {
+	public function child_of( int $parent_id ) {
 		$args = array( 'child_of' => $parent_id );
 
 		return $this->find( $args );

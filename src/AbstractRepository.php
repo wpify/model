@@ -30,9 +30,9 @@ abstract class AbstractRepository implements RepositoryInterface {
 	abstract public function find( array $args = array() );
 
 	/**
-	 * @return ArrayCollection
+	 * @return mixed
 	 */
-	abstract public function all(): ArrayCollection;
+	abstract public function all();
 
 	/**
 	 * @param mixed $object
@@ -66,6 +66,15 @@ abstract class AbstractRepository implements RepositoryInterface {
 		$class = $this::model();
 
 		return new $class( $object, $this->relations );
+	}
+
+	/**
+	 * @param array $data
+	 *
+	 * @return mixed
+	 */
+	protected function collection_factory( array $data ) {
+		return $data;
 	}
 
 	/**

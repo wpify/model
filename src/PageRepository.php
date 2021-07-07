@@ -11,7 +11,7 @@ namespace WpifyModel;
  * @method Page[] all();
  * @method Page[] find( array $args = array() )
  */
-final class PageRepository extends AbstractPostRepository {
+class PageRepository extends AbstractPostRepository {
 	static function post_type(): string {
 		return 'page';
 	}

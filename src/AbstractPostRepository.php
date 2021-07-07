@@ -31,13 +31,13 @@ abstract class AbstractPostRepository extends AbstractRepository {
 	/**
 	 * @param array $args
 	 *
-	 * @return ArrayCollection
+	 * @return mixed
 	 */
-	public function find( array $args = array() ): ArrayCollection {
+	public function find( array $args = array() ) {
 		$defaults   = array( 'post_type' => $this::post_type() );
 		$args       = wp_parse_args( $args, $defaults );
 		$query      = new WP_Query( $args );
-		$collection = new ArrayCollection();
+		$collection = array();
 
 		while ( $query->have_posts() ) {
 			$query->the_post();
@@ -45,14 +45,14 @@ abstract class AbstractPostRepository extends AbstractRepository {
 			global $post;
 
 			try {
-				$collection->add( $this->factory( $post ) );
+				$collection[] = $this->factory( $post );
 			} catch ( NotFoundException $e ) {
 			}
 		}
 
 		wp_reset_postdata();
 
-		return $collection;
+		return $this->collection_factory( $collection );
 	}
 
 	/**

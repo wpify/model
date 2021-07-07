@@ -123,7 +123,7 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 	 *
 	 * @return array
 	 */
-	public function to_array( array $props = array(), $resolve_deep = true ): array {
+	public function to_array( array $props = array() ): array {
 		if ( empty( $props ) ) {
 			$props = array_keys( $this->props );
 		}
