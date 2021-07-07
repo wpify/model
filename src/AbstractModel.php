@@ -298,8 +298,8 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 	protected function get_relation( $key ) {
 		if ( ! empty( $this->relations[ $key ] ) && is_array( $this->relations[ $key ] ) ) {
 			$relation = $this->relations[ $key ];
-			$args     = array();
 			$callback = null;
+			$args     = array();
 
 			foreach ( $relation as $item ) {
 				if ( empty( $callback ) ) {
