@@ -2,8 +2,6 @@
 
 namespace WpifyModel;
 
-use Doctrine\Common\Collections\ArrayCollection;
-
 /**
  * Class AbstractRepository
  *

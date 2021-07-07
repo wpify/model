@@ -2,7 +2,6 @@
 
 namespace WpifyModel;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use WP_Query;
 
 abstract class AbstractPostRepository extends AbstractRepository {
@@ -20,9 +19,9 @@ abstract class AbstractPostRepository extends AbstractRepository {
 	}
 
 	/**
-	 * @return ArrayCollection
+	 * @return mixed
 	 */
-	public function all(): ArrayCollection {
+	public function all() {
 		$args = array( 'posts_per_page' => - 1 );
 
 		return $this->find( $args );
