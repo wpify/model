@@ -26,6 +26,60 @@ abstract class AbstractTermRepository extends AbstractRepository {
 	}
 
 	/**
+	 * @return AbstractTermModel[]
+	 */
+	public function all() {
+		$args = array( 'hide_empty' => false );
+
+		return $this->find( $args );
+	}
+
+	/**
+	 * @param array $args
+	 *
+	 * @return mixed
+	 */
+	public function find( array $args = array() ) {
+		$defaults   = array( 'taxonomy' => $this::taxonomy() );
+		$args       = wp_parse_args( $args, $defaults );
+		$collection = array();
+		$terms      = get_terms( $args );
+
+		foreach ( $terms as $term ) {
+			$collection[] = $this->factory( $term );
+		}
+
+		return $this->collection_factory( $collection );
+	}
+
+	abstract static function taxonomy(): string;
+
+	/**
+	 * @return AbstractTermModel[]
+	 */
+	public function not_empty() {
+		$args = array( 'hide_empty' => true );
+
+		return $this->find( $args );
+	}
+
+	/**
+	 * @return AbstractTermModel
+	 */
+	public function create() {
+		return $this->factory( null );
+	}
+
+	/**
+	 * @param AbstractTermModel $model
+	 *
+	 * @return mixed
+	 */
+	public function delete( $model ) {
+		return wp_delete_term( $model->id, $this::taxonomy() );
+	}
+
+	/**
 	 * @param AbstractTermModel $model
 	 *
 	 * @return AbstractTermModel|null
@@ -66,26 +120,6 @@ abstract class AbstractTermRepository extends AbstractRepository {
 
 		return $this->collection_factory( array() );
 	}
-
-	/**
-	 * @param array $args
-	 *
-	 * @return mixed
-	 */
-	public function find( array $args = array() ) {
-		$defaults   = array( 'taxonomy' => $this::taxonomy() );
-		$args       = wp_parse_args( $args, $defaults );
-		$collection = array();
-		$terms      = get_terms( $args );
-
-		foreach ( $terms as $term ) {
-			$collection[] = $this->factory( $term );
-		}
-
-		return $this->collection_factory( $collection );
-	}
-
-	abstract static function taxonomy(): string;
 
 	/**
 	 * @param AbstractTermModel $model
@@ -173,38 +207,4 @@ abstract class AbstractTermRepository extends AbstractRepository {
 	}
 
 	abstract static function model(): string;
-
-	/**
-	 * @return AbstractTermModel[]
-	 */
-	public function all() {
-		$args = array( 'hide_empty' => false );
-
-		return $this->find( $args );
-	}
-
-	/**
-	 * @return array
-	 */
-	public function not_empty() {
-		$args = array( 'hide_empty' => true );
-
-		return $this->find( $args );
-	}
-
-	/**
-	 * @return AbstractTermModel
-	 */
-	public function create() {
-		return $this->factory( null );
-	}
-
-	/**
-	 * @param AbstractTermModel $model
-	 *
-	 * @return mixed
-	 */
-	public function delete( $model ) {
-		return wp_delete_term( $model->id, $this::taxonomy() );
-	}
 }
