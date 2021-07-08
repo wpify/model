@@ -14,10 +14,23 @@ abstract class AbstractPostRepository extends AbstractRepository {
 	 */
 	public function __construct( array $relations = array() ) {
 		$default_relations = array(
-			'parent' => array( array( $this, 'get' ), 'parent_id' ),
+			'parent' => array(
+				'fetch' => array( $this, 'fetch_parent' ),
+			),
 		);
 
 		parent::__construct( array_merge( $default_relations, $relations ) );
+	}
+
+	public function fetch_parent( AbstractPostModel $model ) {
+		return $this->get( $model->parent_id );
+	}
+
+	/**
+	 * @param ?object $object
+	 */
+	public function get( $object = null ) {
+		return ! empty( $object ) ? $this->factory( $object ) : null;
 	}
 
 	/**
@@ -57,13 +70,6 @@ abstract class AbstractPostRepository extends AbstractRepository {
 	 * @return string
 	 */
 	abstract static function post_type(): string;
-
-	/**
-	 * @param ?object $object
-	 */
-	public function get( $object = null ) {
-		return ! empty( $object ) ? $this->factory( $object ) : null;
-	}
 
 	/**
 	 * @return AbstractPostModel

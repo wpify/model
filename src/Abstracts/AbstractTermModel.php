@@ -128,4 +128,18 @@ abstract class AbstractTermModel extends AbstractModel {
 
 	abstract static function taxonomy(): string;
 
+	protected function set_parent( ?AbstractTermModel $parent = null ) {
+		if ( $parent ) {
+			$this->parent_id = $parent->id;
+			$this->parent    = $parent;
+		} else {
+			unset( $this->parent_id );
+			unset( $this->parent );
+		}
+	}
+
+	protected function set_parent_id( ?int $parent_id = null ) {
+		unset( $this->parent );
+		$this->parent_id = $parent_id;
+	}
 }

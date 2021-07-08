@@ -220,6 +220,11 @@ abstract class AbstractPostModel extends AbstractModel {
 	}
 
 	/**
+	 * @return string
+	 */
+	abstract static function post_type(): string;
+
+	/**
 	 * @param array $props
 	 *
 	 * @return array
@@ -244,8 +249,18 @@ abstract class AbstractPostModel extends AbstractModel {
 		) );
 	}
 
-	/**
-	 * @return string
-	 */
-	abstract static function post_type(): string;
+	protected function set_parent( ?AbstractPostModel $parent = null ) {
+		if ( $parent ) {
+			$this->parent_id = $parent->id;
+			$this->parent    = $parent;
+		} else {
+			unset( $this->parent_id );
+			unset( $this->parent );
+		}
+	}
+
+	protected function set_parent_id( ?int $parent_id = null ) {
+		unset( $this->parent );
+		$this->parent_id = $parent_id;
+	}
 }

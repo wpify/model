@@ -20,14 +20,14 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 	/** @var array */
 	protected $_relations;
 
+	/** @var array */
+	protected $_data = array();
+
 	/** @var object */
 	private $_object;
 
 	/** @var array */
 	private $_props = array();
-
-	/** @var array */
-	private $_data = array();
 
 	/**
 	 * AbstractPost constructor.
@@ -186,7 +186,7 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 	 * @param $prop
 	 */
 	public function __unset( $prop ) {
-		unset( $this->_props[ $prop ] );
+		unset( $this->_data[ $prop ] );
 	}
 
 	/**
@@ -234,9 +234,11 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 	 * @param mixed $value
 	 */
 	public function __set( string $key, $value ) {
-		$this->_data[ $key ] = $value;
+		dump($key, $value);
 
 		if ( isset( $this->_props[ $key ] ) ) {
+			$this->_data[ $key ] = $value;
+
 			$prop = $this->_props[ $key ];
 
 			if ( ! empty( $prop['setter'] ) ) {
