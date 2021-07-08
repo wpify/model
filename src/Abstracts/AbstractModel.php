@@ -18,16 +18,16 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 	public $id;
 
 	/** @var array */
-	protected $relations;
+	protected $_relations;
 
 	/** @var object */
-	private $object;
+	private $_object;
 
 	/** @var array */
-	private $props = array();
+	private $_props = array();
 
 	/** @var array */
-	private $data = array();
+	private $_data = array();
 
 	/**
 	 * AbstractPost constructor.
@@ -36,19 +36,20 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 	 * @param $relations
 	 */
 	public function __construct( $object, $relations ) {
-		$this->object    = $object;
-		$this->relations = $relations;
+		$this->_object    = $object;
+		$this->_relations = $relations;
 
 		$reflection = new ReflectionClass( $this );
 		$properties = $reflection->getProperties( ReflectionProperty::IS_PUBLIC );
-		$props      = $this->props( $this->props );
+		$props      = $this->props( $this->_props );
 
 		foreach ( $properties as $property ) {
 			$name = $property->name;
 
 			if ( ! isset( $props[ $name ] ) ) {
 				$props[ $name ] = array(
-					'name' => $name,
+					'name'    => $name,
+					'changed' => false,
 				);
 			}
 
@@ -58,16 +59,18 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 					: null;
 			}
 
-			$object_vars = is_object( $this->object )
-				? get_object_vars( $this->object )
+			$object_vars = is_object( $this->_object )
+				? get_object_vars( $this->_object )
 				: array();
 
 			if ( empty( $props[ $name ]['source'] ) ) {
 				if ( method_exists( $this, 'get_' . $name ) ) {
 					$props[ $name ]['source'] = 'getter';
 					$props[ $name ]['getter'] = 'get_' . $name;
-				} elseif ( ! empty( $this->relations[ $name ] ) ) {
+				} elseif ( ! empty( $this->_relations[ $name ] ) ) {
 					$props[ $name ]['source'] = 'relation';
+					$props[ $name ]['fetch']  = $this->_relations[ $name ]['fetch'] ?? null;
+					$props[ $name ]['assign'] = $this->_relations[ $name ]['assign'] ?? null;
 				} elseif ( array_key_exists( $name, $object_vars ) ) {
 					$props[ $name ]['source'] = 'object';
 				} else {
@@ -91,7 +94,7 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 			unset( $this->$name );
 		}
 
-		$this->props = $props;
+		$this->_props = $props;
 	}
 
 	/**
@@ -117,7 +120,7 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 	 */
 	public function to_array( array $props = array() ): array {
 		if ( empty( $props ) ) {
-			$props = array_keys( $this->props );
+			$props = array_keys( $this->_props );
 		}
 
 		$data = array();
@@ -134,7 +137,7 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 	 * @param mixed $value
 	 */
 	public function offsetSet( $offset, $value ) {
-		$this->data[ $offset ] = $value;
+		$this->_data[ $offset ] = $value;
 	}
 
 	/**
@@ -143,14 +146,14 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 	 * @return bool
 	 */
 	public function offsetExists( $offset ): bool {
-		return isset( $this->props[ $offset ] );
+		return isset( $this->_props[ $offset ] );
 	}
 
 	/**
 	 * @param mixed $offset
 	 */
 	public function offsetUnset( $offset ) {
-		unset( $this->data[ $offset ] );
+		unset( $this->_data[ $offset ] );
 	}
 
 	/**
@@ -159,15 +162,15 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 	 * @return array|false|mixed|null
 	 */
 	public function offsetGet( $offset ) {
-		return isset( $this->props[ $offset ] ) ? $this->$offset : null;
+		return isset( $this->_props[ $offset ] ) ? $this->$offset : null;
 	}
 
 	/**
 	 * Refreshes the data in the instance
 	 */
 	public function refresh( $object = null ) {
-		$this->object = $object;
-		$this->data   = array();
+		$this->_object = $object;
+		$this->_data   = array();
 	}
 
 	/**
@@ -176,14 +179,14 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 	 * @return bool
 	 */
 	public function __isset( $prop ) {
-		return isset( $this->props[ $prop ] );
+		return isset( $this->_props[ $prop ] );
 	}
 
 	/**
 	 * @param $prop
 	 */
 	public function __unset( $prop ) {
-		unset( $this->props[ $prop ] );
+		unset( $this->_props[ $prop ] );
 	}
 
 	/**
@@ -192,35 +195,35 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 	 * @return mixed
 	 */
 	public function __get( string $key ) {
-		if ( isset( $this->props[ $key ] ) ) {
-			$prop = $this->props[ $key ];
+		if ( isset( $this->_props[ $key ] ) ) {
+			$prop = $this->_props[ $key ];
 
-			if ( ! isset( $this->data[ $key ] ) ) {
+			if ( ! isset( $this->_data[ $key ] ) ) {
 				$source_name = $prop['source_name'];
 
 				if ( $prop['source'] === 'object' ) {
-					if ( isset( $this->object->$source_name ) ) {
-						$this->data[ $key ] = $this->object->$source_name;
+					if ( isset( $this->_object->$source_name ) ) {
+						$this->_data[ $key ] = $this->_object->$source_name;
 					} elseif ( isset( $prop['default'] ) ) {
-						$this->data[ $key ] = $prop['default'];
+						$this->_data[ $key ] = $prop['default'];
 					} else {
-						$this->data[ $key ] = null;
+						$this->_data[ $key ] = null;
 					}
 				} elseif ( $prop['source'] === 'meta' ) {
-					$this->data[ $key ] = $this->get_meta( $source_name );
+					$this->_data[ $key ] = $this->fetch_meta( $source_name );
 				} elseif ( $prop['source'] === 'getter' ) {
-					$getter             = $prop['getter'];
-					$this->data[ $key ] = $this->$getter();
-				} elseif ( $prop['source'] === 'relation' ) {
-					$this->data[ $key ] = $this->get_relation( $key );
+					$getter              = $prop['getter'];
+					$this->_data[ $key ] = $this->$getter();
+				} elseif ( $prop['source'] === 'relation' && is_callable( $prop['fetch'] ) ) {
+					$this->_data[ $key ] = $prop['fetch']( $this );
 				} elseif ( isset( $prop['default'] ) ) {
-					$this->data[ $key ] = $prop['default'];
+					$this->_data[ $key ] = $prop['default'];
 				} else {
-					$this->data[ $key ] = $this->$key;
+					$this->_data[ $key ] = $this->$key ?? null;
 				}
 			}
 
-			return $this->data[ $key ];
+			return $this->_data[ $key ];
 		}
 
 		return null;
@@ -231,17 +234,19 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 	 * @param mixed $value
 	 */
 	public function __set( string $key, $value ) {
-		$this->data[ $key ] = $value;
+		$this->_data[ $key ] = $value;
 
-		if ( isset( $this->props[ $key ] ) ) {
-			$prop = $this->props[ $key ];
+		if ( isset( $this->_props[ $key ] ) ) {
+			$prop = $this->_props[ $key ];
 
 			if ( ! empty( $prop['setter'] ) ) {
-				$setter             = $prop['setter'];
-				$this->data[ $key ] = $this->$setter( $value );
+				$setter              = $prop['setter'];
+				$this->_data[ $key ] = $this->$setter( $value );
 			} else {
-				$this->data[ $key ] = $value;
+				$this->_data[ $key ] = $value;
 			}
+
+			$this->_props[ $key ]['changed'] = true;
 		}
 	}
 
@@ -250,7 +255,7 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 	 *
 	 * @return array|false|mixed
 	 */
-	public function get_meta( $key ) {
+	public function fetch_meta( $key ) {
 		return get_metadata( $this::meta_type(), $this->id, $key, true );
 	}
 
@@ -261,65 +266,25 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 
 	/**
 	 * @param $key
-	 *
-	 * @return null
-	 */
-	protected function get_relation( $key ) {
-		if ( ! empty( $this->relations[ $key ] ) && is_array( $this->relations[ $key ] ) ) {
-			$relation = $this->relations[ $key ];
-			$callback = null;
-			$args     = array();
-
-			foreach ( $relation as $item ) {
-				if ( empty( $callback ) ) {
-					if ( ! is_callable( $item ) ) {
-						return null;
-					}
-
-					$callback = $item;
-				} else {
-					if ( ! isset( $this->$item ) ) {
-						return null;
-					}
-
-					$args[] = $this->$item;
-				}
-			}
-
-			return $callback( ...$args );
-		}
-
-		return null;
-	}
-
-	/**
-	 * @param $key
 	 * @param $value
 	 *
 	 * @return bool|int
 	 */
-	public function set_meta( $key, $value ) {
+	public function store_meta( $key, $value ) {
 		return update_metadata( $this::meta_type(), $this->id, $key, $value );
 	}
 
 	/**
 	 * @return array
 	 */
-	public function get_props(): array {
-		return $this->props;
+	public function own_props(): array {
+		return $this->_props;
 	}
 
 	/**
 	 * @return object
 	 */
-	public function get_object(): object {
-		return $this->object;
-	}
-
-	/**
-	 * @return array
-	 */
-	protected function get_data(): array {
-		return $this->data;
+	public function source_object(): object {
+		return $this->_object;
 	}
 }

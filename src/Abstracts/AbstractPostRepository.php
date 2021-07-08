@@ -14,7 +14,7 @@ abstract class AbstractPostRepository extends AbstractRepository {
 	 */
 	public function __construct( array $relations = array() ) {
 		$default_relations = array(
-			'parent' => array( array( $this, 'get' ), 'parent_post' ),
+			'parent' => array( array( $this, 'get' ), 'parent_id' ),
 		);
 
 		parent::__construct( array_merge( $default_relations, $relations ) );
@@ -62,18 +62,26 @@ abstract class AbstractPostRepository extends AbstractRepository {
 	 * @param ?object $object
 	 */
 	public function get( $object = null ) {
-		return $this->factory( $object );
+		return ! empty( $object ) ? $this->factory( $object ) : null;
+	}
+
+	/**
+	 * @return AbstractPostModel
+	 */
+	public function create() {
+		return $this->factory( null );
 	}
 
 	/**
 	 * @param AbstractPostModel $model
 	 *
 	 * @return mixed
+	 * @throws NotFoundException
 	 */
 	public function save( $model ) {
 		$object_data = array();
 
-		foreach ( $model->get_props() as $key => $prop ) {
+		foreach ( $model->own_props() as $key => $prop ) {
 			$source_name = $prop['source_name'];
 
 			if ( $prop['source'] === 'object' ) {
@@ -84,6 +92,8 @@ abstract class AbstractPostRepository extends AbstractRepository {
 				}
 
 				$object_data['meta_input'][ $source_name ] = $model->$key;
+			} elseif ( $prop['source'] === 'relation' && is_callable( $prop['assign'] ) && $prop['changed'] ) {
+				$prop['assign']( $model );
 			}
 		}
 
@@ -94,19 +104,10 @@ abstract class AbstractPostRepository extends AbstractRepository {
 		}
 
 		if ( ! is_wp_error( $result ) ) {
-			$model->refresh( $result );
+			$model->refresh( $this->resolve_object( $result ) );
 		}
 
 		return $result;
-	}
-
-	/**
-	 * @param AbstractPostModel $model
-	 *
-	 * @return mixed
-	 */
-	public function delete( $model ) {
-		return wp_delete_post( $model->id, true );
 	}
 
 	/**
@@ -117,7 +118,7 @@ abstract class AbstractPostRepository extends AbstractRepository {
 	 */
 	protected function resolve_object( $data ): WP_Post {
 		if ( is_object( $data ) && get_class( $data ) === $this::model() ) {
-			$object = $data->get_object();
+			$object = $data->source_object();
 		} elseif ( $data instanceof WP_Post ) {
 			$object = $data;
 		} elseif ( is_null( $data ) ) {
@@ -127,7 +128,6 @@ abstract class AbstractPostRepository extends AbstractRepository {
 				'post_date'     => current_time( 'mysql' ),
 				'post_date_gmt' => current_time( 'mysql', 1 ),
 				'post_type'     => $this::post_type(),
-				'filter'        => 'raw',
 			) );
 		} elseif ( isset( $data->id ) ) {
 			$object = get_post( $data->id );
@@ -140,5 +140,14 @@ abstract class AbstractPostRepository extends AbstractRepository {
 		}
 
 		return $object;
+	}
+
+	/**
+	 * @param AbstractPostModel $model
+	 *
+	 * @return mixed
+	 */
+	public function delete( $model ) {
+		return wp_delete_post( $model->id, true );
 	}
 }

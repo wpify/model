@@ -13,20 +13,58 @@ abstract class AbstractTermRepository extends AbstractRepository {
 	 */
 	public function __construct( array $relations = array() ) {
 		$default_relations = array(
-			'parent'   => array( array( $this, 'get' ), 'parent_id' ),
-			'children' => array( array( $this, 'child_of' ), 'id' ),
+			'parent'   => array(
+				'fetch' => array( $this, 'fetch_parent' ),
+			),
+			'children' => array(
+				'fetch'  => array( $this, 'fetch_children' ),
+				'assign' => array( $this, 'assign_children' ),
+			),
 		);
 
 		parent::__construct( array_merge( $default_relations, $relations ) );
 	}
 
 	/**
-	 * @return AbstractTermModel[]
+	 * @param AbstractTermModel $model
+	 *
+	 * @return AbstractTermModel|null
 	 */
-	public function all() {
-		$args = array( 'hide_empty' => false );
+	public function fetch_parent( $model ) {
+		return $this->get( $model->parent_id );
+	}
 
-		return $this->find( $args );
+	/**
+	 * @param $object
+	 *
+	 * @return ?AbstractTermModel
+	 */
+	public function get( $object = null ) {
+		return ! empty( $object ) ? $this->factory( $object ) : null;
+	}
+
+	/**
+	 * @param AbstractTermModel $model
+	 *
+	 * @return array
+	 */
+	public function fetch_children( $model ) {
+		return $this->child_of( $model->id );
+	}
+
+	/**
+	 * @param ?int $parent_id
+	 *
+	 * @return array
+	 */
+	public function child_of( ?int $parent_id ) {
+		if ( $parent_id > 0 ) {
+			$args = array( 'child_of' => $parent_id );
+
+			return $this->find( $args );
+		}
+
+		return $this->collection_factory( array() );
 	}
 
 	/**
@@ -50,45 +88,15 @@ abstract class AbstractTermRepository extends AbstractRepository {
 	abstract static function taxonomy(): string;
 
 	/**
-	 * @return array
-	 */
-	public function not_empty() {
-		$args = array( 'hide_empty' => true );
-
-		return $this->find( $args );
-	}
-
-	/**
-	 * @param ?int $parent_id
-	 *
-	 * @return array
-	 */
-	public function child_of( ?int $parent_id ) {
-		if ( $parent_id > 0 ) {
-			$args = array( 'child_of' => $parent_id );
-
-			return $this->find( $args );
-		}
-
-		return null;
-	}
-
-	/**
-	 * @param $object
-	 *
-	 * @return mixed
-	 */
-	public function get( $object = null ) {
-		return $this->factory( $object );
-	}
-
-	/**
 	 * @param AbstractTermModel $model
 	 *
-	 * @return mixed
+	 * @throws NotFoundException
 	 */
-	public function delete( $model ) {
-		return wp_delete_term( $model->id, $this::taxonomy() );
+	public function assign_children( $model ) {
+		foreach ( $model->children as $child ) {
+			$child->parent_id = $model->id;
+			$this->save( $child );
+		}
 	}
 
 	/**
@@ -114,9 +122,11 @@ abstract class AbstractTermRepository extends AbstractRepository {
 
 		if ( ! is_wp_error( $result ) ) {
 			// save the meta data
-			foreach ( $model->get_props() as $key => $prop ) {
-				if ( $prop['source'] === 'meta' ) {
-					$model->set_meta( $prop['source_name'], $this->$key );
+			foreach ( $model->own_props() as $key => $prop ) {
+				if ( $prop['source'] === 'meta' && $prop['changed'] ) {
+					$model->store_meta( $prop['source_name'], $model->$key );
+				} elseif ( $prop['source'] === 'relation' && is_callable( $prop['assign'] ) && $prop['changed'] ) {
+					$prop['assign']( $model );
 				}
 			}
 
@@ -138,10 +148,10 @@ abstract class AbstractTermRepository extends AbstractRepository {
 		$object = null;
 
 		if ( is_object( $data ) && get_class( $data ) === $this::model() ) {
-			$object = $data->get_object();
+			$object = $data->source_object();
 		} elseif ( $data instanceof WP_Term ) {
 			$object = $data;
-		} elseif ( is_null( $data ) ) {
+		} elseif ( empty( $data ) ) {
 			$object = new WP_Term( (object) array(
 				'taxonomy' => $this::taxonomy(),
 			) );
@@ -156,11 +166,45 @@ abstract class AbstractTermRepository extends AbstractRepository {
 		}
 
 		if ( ! is_object( $object ) ) {
-			throw new NotFoundException( 'The term was not found' );
+			throw new NotFoundException( 'The term was not found', $data );
 		}
 
 		return $object;
 	}
 
 	abstract static function model(): string;
+
+	/**
+	 * @return AbstractTermModel[]
+	 */
+	public function all() {
+		$args = array( 'hide_empty' => false );
+
+		return $this->find( $args );
+	}
+
+	/**
+	 * @return array
+	 */
+	public function not_empty() {
+		$args = array( 'hide_empty' => true );
+
+		return $this->find( $args );
+	}
+
+	/**
+	 * @return AbstractTermModel
+	 */
+	public function create() {
+		return $this->factory( null );
+	}
+
+	/**
+	 * @param AbstractTermModel $model
+	 *
+	 * @return mixed
+	 */
+	public function delete( $model ) {
+		return wp_delete_term( $model->id, $this::taxonomy() );
+	}
 }

@@ -35,14 +35,14 @@ interface RepositoryInterface {
 	public function delete( $model );
 
 	/**
-	 * @param ModelInterface $model
+	 * @return class-string
+	 */
+	static function model(): string;
+
+	/**
+	 * @param $model
 	 *
 	 * @return mixed
 	 */
 	public function save( $model );
-
-	/**
-	 * @return class-string
-	 */
-	static function model(): string;
 }
