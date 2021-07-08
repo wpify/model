@@ -1,9 +1,6 @@
 <?php
 
-namespace WpifyModel;
-
-use WP_Error;
-use WP_Post;
+namespace WpifyModel\Abstracts;
 
 /**
  * Class AbstractPostModel
@@ -223,39 +220,6 @@ abstract class AbstractPostModel extends AbstractModel {
 	}
 
 	/**
-	 * @return int|WP_Error
-	 */
-	public function save() {
-		$object_data = array();
-
-		foreach ( $this->get_props() as $key => $prop ) {
-			$source_name = $prop['source_name'];
-
-			if ( $prop['source'] === 'object' ) {
-				$object_data[ $source_name ] = $this->$key;
-			} elseif ( $prop['source'] === 'meta' ) {
-				if ( ! isset( $object_data['meta_input'] ) ) {
-					$object_data['meta_input'] = array();
-				}
-
-				$object_data['meta_input'][ $source_name ] = $this->$key;
-			}
-		}
-
-		if ( $this->id > 0 ) {
-			$result = wp_update_post( $object_data, true );
-		} else {
-			$result = wp_insert_post( $object_data, true );
-		}
-
-		if ( ! is_wp_error( $result ) ) {
-			$this->refresh( $result );
-		}
-
-		return $result;
-	}
-
-	/**
 	 * @param array $props
 	 *
 	 * @return array
@@ -278,55 +242,6 @@ abstract class AbstractPostModel extends AbstractModel {
 			'parent_id'        => array( 'source' => 'object', 'source_name' => 'post_parent' ),
 			'mime_type'        => array( 'source' => 'object', 'source_name' => 'post_mime_type' ),
 		) );
-	}
-
-	/**
-	 * @param $object
-	 *
-	 * @return ?WP_Post
-	 * @throws NotFoundException
-	 */
-	protected function object( $object = null ): ?WP_Post {
-		if ( $object instanceof WP_Post ) {
-			$new_object = $object;
-		} elseif ( is_null( $object ) ) {
-			$new_object = new WP_Post( (object) array(
-				'ID'                    => null,
-				'post_author'           => get_current_user_id(),
-				'post_date'             => current_time( 'mysql' ),
-				'post_date_gmt'         => current_time( 'mysql', 1 ),
-				'post_content'          => $this->content,
-				'post_title'            => $this->title,
-				'post_excerpt'          => $this->excerpt,
-				'post_status'           => $this->status,
-				'comment_status'        => $this->comment_status,
-				'ping_status'           => $this->ping_status,
-				'post_password'         => $this->password,
-				'post_name'             => $this->slug,
-				'to_ping'               => $this->to_ping,
-				'pinged'                => $this->pinged,
-				'post_modified'         => $this->modified_at,
-				'post_modified_gmt'     => $this->modified_at_gmt,
-				'post_content_filtered' => $this->content_filtered,
-				'post_parent'           => $this->parent_id,
-				'guid'                  => $this->guid,
-				'menu_order'            => $this->menu_order,
-				'post_type'             => $this->post_type(),
-				'post_mime_type'        => $this->mime_type,
-				'comment_count'         => $this->comment_count,
-				'filter'                => 'raw',
-			) );
-		} elseif ( isset( $object->id ) ) {
-			$new_object = get_post( $object->id );
-		} else {
-			$new_object = get_post( $object );
-		}
-
-		if ( ! is_object( $new_object ) ) {
-			throw new NotFoundException( 'The post was not found' );
-		}
-
-		return $new_object;
 	}
 
 	/**

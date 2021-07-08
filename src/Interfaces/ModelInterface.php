@@ -1,11 +1,9 @@
 <?php
 
-namespace WpifyModel;
+namespace WpifyModel\Interfaces;
 
 interface ModelInterface {
 	public function __construct( $object, $relations );
-
-	public function save();
 
 	public function refresh( $object = null );
 

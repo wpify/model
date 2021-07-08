@@ -2,6 +2,8 @@
 
 namespace WpifyModel;
 
+use WpifyModel\Abstracts\AbstractPostModel;
+
 /**
  * Class BasicPost
  * @package WpifyModel

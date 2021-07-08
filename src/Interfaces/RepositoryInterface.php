@@ -1,6 +1,6 @@
 <?php
 
-namespace WpifyModel;
+namespace WpifyModel\Interfaces;
 
 /**
  * Class AbstractRepository
@@ -23,23 +23,26 @@ interface RepositoryInterface {
 	public function get( $object = null );
 
 	/**
-	 * @param array $args
-	 *
 	 * @return mixed
 	 */
 	public function all();
-
-	/**
-	 * @param AbstractModel $model
-	 *
-	 * @return mixed
-	 */
-	public function delete( ModelInterface $model );
 
 	/**
 	 * @param ModelInterface $model
 	 *
 	 * @return mixed
 	 */
-	public function save( ModelInterface $model );
+	public function delete( $model );
+
+	/**
+	 * @param ModelInterface $model
+	 *
+	 * @return mixed
+	 */
+	public function save( $model );
+
+	/**
+	 * @return class-string
+	 */
+	static function model(): string;
 }

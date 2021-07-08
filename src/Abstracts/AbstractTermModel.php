@@ -1,10 +1,8 @@
 <?php
 
-namespace WpifyModel;
+namespace WpifyModel\Abstracts;
 
-use WP_Term;
-
-abstract class AbstractTermModel extends AbstractModel implements ModelInterface {
+abstract class AbstractTermModel extends AbstractModel {
 	/**
 	 * Term ID.
 	 *
@@ -108,35 +106,6 @@ abstract class AbstractTermModel extends AbstractModel implements ModelInterface
 		return 'term';
 	}
 
-	public function save() {
-		$args = array(
-			'name'        => $this->name,
-			'description' => $this->description,
-			'parent'      => $this->parent_id,
-			'slug'        => $this->slug,
-			'term_group'  => $this->group,
-		);
-
-		if ( $this->id > 0 ) {
-			$result = wp_update_term( $this->id, $this->taxonomy_name, $args );
-		} else {
-			$result = wp_insert_term( $this->name, $this->taxonomy_name, $args );
-		}
-
-		if ( ! is_wp_error( $result ) ) {
-			// save the meta data
-			foreach ( $this->get_props() as $key => $prop ) {
-				if ( $prop['source'] === 'meta' ) {
-					$this->set_meta( $prop['source_name'], $this->$key );
-				}
-			}
-
-			$this->refresh( $result );
-		}
-
-		return $result;
-	}
-
 	/**
 	 * @param array $props
 	 *
@@ -155,47 +124,6 @@ abstract class AbstractTermModel extends AbstractModel implements ModelInterface
 			'count'         => array( 'source' => 'object', 'source_name' => 'count' ),
 			'filter'        => array( 'source' => 'object', 'source_name' => 'filter' ),
 		) );
-	}
-
-	/**
-	 * @param $object
-	 *
-	 * @return ?WP_Term
-	 * @throws NotFoundException
-	 */
-	protected function object( $object = null ): ?WP_Term {
-		$new_object = null;
-
-		if ( $object instanceof WP_Term ) {
-			$new_object = $object;
-		} elseif ( is_null( $object ) ) {
-			$new_object = new WP_Term( (object) array(
-				'term_id'          => $this->id,
-				'name'             => $this->name,
-				'slug'             => $this->slug,
-				'term_group'       => $this->group,
-				'term_taxonomy_id' => $this->taxonomy_id,
-				'taxonomy'         => $this::taxonomy(),
-				'description'      => $this->description,
-				'parent'           => $this->parent_id,
-				'count'            => $this->count,
-				'filter'           => $this->filter,
-			) );
-		} elseif ( isset( $object->id ) ) {
-			$new_object = get_term_by( 'ID', $object->id, $this::taxonomy() );
-		} elseif ( is_string( $object ) ) {
-			$new_object = get_term_by( 'slug', $object, $this::taxonomy() );
-		} elseif ( is_int( $object ) ) {
-			$new_object = get_term_by( 'ID', $object, $this::taxonomy() );
-		} elseif ( is_array( $object ) && isset( $object['field'] ) && isset( $object['value'] ) ) {
-			$new_object = get_term_by( $object['field'], $object['value'], $this::taxonomy() );
-		}
-
-		if ( ! is_object( $new_object ) ) {
-			throw new NotFoundException( 'The term was not found' );
-		}
-
-		return $new_object;
 	}
 
 	abstract static function taxonomy(): string;

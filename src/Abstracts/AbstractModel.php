@@ -1,12 +1,13 @@
 <?php
 
-namespace WpifyModel;
+namespace WpifyModel\Abstracts;
 
 use ArrayAccess;
 use ArrayIterator;
 use IteratorAggregate;
 use ReflectionClass;
 use ReflectionProperty;
+use WpifyModel\Interfaces\ModelInterface;
 
 /**
  * Class AbstractModel
@@ -15,12 +16,16 @@ use ReflectionProperty;
 abstract class AbstractModel implements ModelInterface, IteratorAggregate, ArrayAccess {
 	/** @var int */
 	public $id;
+
 	/** @var array */
 	protected $relations;
+
 	/** @var object */
 	private $object;
+
 	/** @var array */
 	private $props = array();
+
 	/** @var array */
 	private $data = array();
 
@@ -31,22 +36,9 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 	 * @param $relations
 	 */
 	public function __construct( $object, $relations ) {
-		$this->object    = $this->object( $object );
+		$this->object    = $object;
 		$this->relations = $relations;
-		$this->initialize();
-	}
 
-	/**
-	 * @param null $object
-	 *
-	 * @return mixed
-	 */
-	abstract protected function object( $object = null );
-
-	/**
-	 * Initialize the object
-	 */
-	private function initialize() {
 		$reflection = new ReflectionClass( $this );
 		$properties = $reflection->getProperties( ReflectionProperty::IS_PUBLIC );
 		$props      = $this->props( $this->props );
@@ -171,17 +163,10 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 	}
 
 	/**
-	 * Saves data from instance
-	 *
-	 * @return mixed
-	 */
-	abstract public function save();
-
-	/**
 	 * Refreshes the data in the instance
 	 */
 	public function refresh( $object = null ) {
-		$this->object = $this->object( ! empty( $object ) ? $object : $this->object );
+		$this->object = $object;
 		$this->data   = array();
 	}
 
@@ -199,22 +184,6 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 	 */
 	public function __unset( $prop ) {
 		unset( $this->props[ $prop ] );
-	}
-
-	/**
-	 * @return array
-	 */
-	public function __serialize() {
-		return $this->to_array();
-	}
-
-	/**
-	 * @param $data
-	 */
-	public function __unserialize( $data ) {
-		$this->object = $this->object( $data['id'] ?? null );
-		$this->data   = $data;
-		$this->initialize();
 	}
 
 	/**
@@ -336,14 +305,14 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 	/**
 	 * @return array
 	 */
-	protected function get_props(): array {
+	public function get_props(): array {
 		return $this->props;
 	}
 
 	/**
 	 * @return object
 	 */
-	protected function get_object(): object {
+	public function get_object(): object {
 		return $this->object;
 	}
 
