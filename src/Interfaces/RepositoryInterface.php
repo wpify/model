@@ -9,6 +9,11 @@ namespace WpifyModel\Interfaces;
  */
 interface RepositoryInterface {
 	/**
+	 * @return class-string
+	 */
+	static function model(): string;
+
+	/**
 	 * @param array $args
 	 *
 	 * @return mixed
@@ -33,11 +38,6 @@ interface RepositoryInterface {
 	 * @return mixed
 	 */
 	public function delete( $model );
-
-	/**
-	 * @return class-string
-	 */
-	static function model(): string;
 
 	/**
 	 * @param $model

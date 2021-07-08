@@ -234,7 +234,7 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 	 * @param mixed $value
 	 */
 	public function __set( string $key, $value ) {
-		dump($key, $value);
+		dump( $key, $value );
 
 		if ( isset( $this->_props[ $key ] ) ) {
 			$this->_data[ $key ] = $value;

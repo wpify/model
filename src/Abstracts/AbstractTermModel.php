@@ -106,6 +106,8 @@ abstract class AbstractTermModel extends AbstractModel {
 		return 'term';
 	}
 
+	abstract static function taxonomy(): string;
+
 	/**
 	 * @param array $props
 	 *
@@ -125,8 +127,6 @@ abstract class AbstractTermModel extends AbstractModel {
 			'filter'        => array( 'source' => 'object', 'source_name' => 'filter' ),
 		) );
 	}
-
-	abstract static function taxonomy(): string;
 
 	protected function set_parent( ?AbstractTermModel $parent = null ) {
 		if ( $parent ) {
