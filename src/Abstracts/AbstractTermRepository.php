@@ -191,6 +191,8 @@ abstract class AbstractTermRepository extends AbstractRepository {
 			) );
 		} elseif ( isset( $data->id ) ) {
 			$object = get_term_by( 'ID', $data->id, $this::taxonomy() );
+		} elseif ( is_numeric( $data ) ) {
+			$object = get_term_by( 'ID', (int) $data, $this::taxonomy() );
 		} elseif ( is_string( $data ) ) {
 			$object = get_term_by( 'slug', $data, $this::taxonomy() );
 		} elseif ( is_int( $data ) ) {

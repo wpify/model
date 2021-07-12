@@ -7,6 +7,8 @@ use WP_Query;
 use WpifyModel\Exceptions\NotFoundException;
 
 abstract class AbstractPostRepository extends AbstractRepository {
+	public $query;
+
 	/**
 	 * AbstractPostRepository constructor.
 	 *
@@ -50,11 +52,11 @@ abstract class AbstractPostRepository extends AbstractRepository {
 	public function find( array $args = array() ) {
 		$defaults   = array( 'post_type' => $this::post_type() );
 		$args       = wp_parse_args( $args, $defaults );
-		$query      = new WP_Query( $args );
+		$this->query      = new WP_Query( $args );
 		$collection = array();
 
-		while ( $query->have_posts() ) {
-			$query->the_post();
+		while ( $this->query->have_posts() ) {
+			$this->query->the_post();
 
 			global $post;
 
@@ -155,5 +157,18 @@ abstract class AbstractPostRepository extends AbstractRepository {
 	 */
 	public function delete( $model ) {
 		return wp_delete_post( $model->id, true );
+	}
+
+	public function get_paginate_links($args = array())
+	{
+		$pagination = $this->get_pagination();
+		$default_args = array('total' => $pagination['total_pages'], 'current' => $pagination['current_page']);
+		$args = wp_parse_args($args, $default_args);
+		return paginate_links($args);
+	}
+
+	public function get_pagination(): array
+	{
+		return array('found_posts' => $this->query->found_posts, 'current_page' => $this->query->query_vars['paged'] ?: 1, 'total_pages' => $this->query->max_num_pages, 'per_page' => $this->query->query_vars['posts_per_page']);
 	}
 }
