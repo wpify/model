@@ -152,9 +152,16 @@ abstract class AbstractTermRepository extends AbstractRepository {
 			$result = wp_update_term( $model->id, $model->taxonomy_name, $args );
 		} else {
 			$result = wp_insert_term( $model->name, $model->taxonomy_name, $args );
+
+			// Term exists
+			if (is_wp_error($result) && is_int($result->get_error_data())) {
+				$model->id = $result->get_error_data();
+			} else {
+				$model->id = $result['term_id'];
+			}
 		}
 
-		if ( ! is_wp_error( $result ) ) {
+		if ( $model->id ) {
 			// save the meta data
 			foreach ( $model->own_props() as $key => $prop ) {
 				if ( $prop['source'] === 'meta' && $prop['changed'] ) {
