@@ -171,7 +171,7 @@ abstract class AbstractTermRepository extends AbstractRepository {
 				}
 			}
 
-			$object = $this->resolve_object( $result['term_id'] );
+			$object = $this->resolve_object( $model->id );
 
 			$model->refresh( $object );
 		}
