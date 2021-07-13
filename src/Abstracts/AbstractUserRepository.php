@@ -64,7 +64,7 @@ abstract class AbstractUserRepository extends AbstractRepository {
 	}
 
 	/**
-	 * @param AbstractPostModel $model
+	 * @param AbstractUserModel $model
 	 *
 	 * @return mixed
 	 * @throws NotFoundException
@@ -89,6 +89,9 @@ abstract class AbstractUserRepository extends AbstractRepository {
 			}
 		}
 
+		if ( is_wp_error( $result ) ) {
+			throw new NotFoundException( $result->get_error_message() );
+		}
 		if ( $model->id ) {
 			foreach ( $model->own_props() as $key => $prop ) {
 				if ( $prop['source'] === 'meta' && $prop['changed'] ) {
@@ -103,7 +106,7 @@ abstract class AbstractUserRepository extends AbstractRepository {
 			$model->refresh( $this->resolve_object( $result ) );
 		}
 
-		return $result;
+		return $model;
 	}
 
 	/**
