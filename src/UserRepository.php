@@ -2,7 +2,6 @@
 
 namespace WpifyModel;
 
-use PmsDeps\Wpify\Core\Models\UserModel;
 use WpifyModel\Abstracts\AbstractPostRepository;
 use WpifyModel\Abstracts\AbstractUserRepository;
 
@@ -19,6 +18,6 @@ use WpifyModel\Abstracts\AbstractUserRepository;
  */
 class UserRepository extends AbstractUserRepository {
 	static function model(): string {
-		return UserModel::class;
+		return User::class;
 	}
 }
