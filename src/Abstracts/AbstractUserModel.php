@@ -88,6 +88,22 @@ abstract class AbstractUserModel extends AbstractModel {
 	public $display_name = '';
 
 	/**
+	 * User first name
+	 *
+	 * @since 3.5.0
+	 * @var string
+	 */
+	public $first_name = '';
+
+	/**
+	 * User last name
+	 *
+	 * @since 3.5.0
+	 * @var string
+	 */
+	public $last_name = '';
+
+	/**
 	 * ID of a post's parent post.
 	 *
 	 * @since 3.5.0
@@ -126,6 +142,8 @@ abstract class AbstractUserModel extends AbstractModel {
 			'activation_key' => array( 'source' => 'object', 'source_name' => 'user_activation_key' ),
 			'status'         => array( 'source' => 'object', 'source_name' => 'user_status' ),
 			'display_name'   => array( 'source' => 'object', 'source_name' => 'display_name' ),
+			'first_name'     => array( 'source' => 'meta', 'source_name' => 'first_name' ),
+			'last_name'      => array( 'source' => 'meta', 'source_name' => 'first_name' ),
 		) );
 	}
 
