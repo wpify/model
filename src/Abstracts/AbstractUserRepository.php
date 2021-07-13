@@ -132,6 +132,8 @@ abstract class AbstractUserRepository extends AbstractRepository {
 			) );
 		} elseif ( isset( $data->id ) ) {
 			$object = get_user_by( 'ID', $data->id );
+		} elseif ( is_numeric( $data ) ) {
+			$object = get_user_by( 'ID', $data );
 		} elseif ( is_email( $data ) ) {
 			$object = get_user_by( 'email', $data );
 		}
