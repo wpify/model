@@ -131,7 +131,7 @@ abstract class AbstractUserRepository extends AbstractRepository {
 				'user_registered'     => '',
 				'user_activation_key' => '',
 				'user_status'         => 1,
-				'displau_name'        => '',
+				'display_name'        => '',
 			) );
 		} elseif ( isset( $data->id ) ) {
 			$object = get_user_by( 'ID', $data->id );
