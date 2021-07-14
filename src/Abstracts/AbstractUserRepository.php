@@ -155,4 +155,12 @@ abstract class AbstractUserRepository extends AbstractRepository {
 	public function delete( $model ) {
 		return wp_delete_user( $model->id, true );
 	}
+
+	public function get_current_user() {
+		if ( ! is_user_logged_in() ) {
+			return null;
+		}
+
+		return $this->get( get_current_user_id() );
+	}
 }
