@@ -2,6 +2,7 @@
 
 namespace WpifyModel\Abstracts;
 
+use stdClass;
 use WP_Term;
 use WpifyModel\Exceptions\NotFoundException;
 
@@ -154,7 +155,7 @@ abstract class AbstractTermRepository extends AbstractRepository {
 			$result = wp_insert_term( $model->name, $model->taxonomy_name, $args );
 
 			// Term exists
-			if (is_wp_error($result) && is_int($result->get_error_data())) {
+			if ( is_wp_error( $result ) && is_int( $result->get_error_data() ) ) {
 				$model->id = $result->get_error_data();
 			} else {
 				$model->id = $result['term_id'];
@@ -193,9 +194,8 @@ abstract class AbstractTermRepository extends AbstractRepository {
 		} elseif ( $data instanceof WP_Term ) {
 			$object = $data;
 		} elseif ( empty( $data ) ) {
-			$object = new WP_Term( (object) array(
-				'taxonomy' => $this::taxonomy(),
-			) );
+			$object           = new WP_Term( new stdClass() );
+			$object->taxonomy = $this::taxonomy();
 		} elseif ( isset( $data->id ) ) {
 			$object = get_term_by( 'ID', $data->id, $this::taxonomy() );
 		} elseif ( is_numeric( $data ) ) {

@@ -14,7 +14,17 @@
 	  "WpifyModel\\": "src/"
 	}
   },
+  "scripts": {
+	"generate-unit-test": "codecept generate:test unit",
+	"test": "codecept run unit --debug"
+  },
   "require": {
 	"php": ">=7.3.0||^8.0.0"
+  },
+  "require-dev": {
+	"codeception/codeception": "^4.1",
+	"codeception/module-phpbrowser": "^1.0.0",
+	"codeception/module-asserts": "^1.0.0",
+    "brain/monkey": "^2.6"
   }
 }
