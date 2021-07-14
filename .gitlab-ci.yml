@@ -11,5 +11,5 @@ php_unit:
     - PATH=$(composer global config bin-dir --absolute --quiet):$PATH
     - composer config -g cache-dir "$(pwd)/.composer-cache"
   script:
-    - composer install
+    - composer install --quiet
     - ./vendor/bin/codecept run unit
