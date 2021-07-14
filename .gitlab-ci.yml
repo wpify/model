@@ -1,7 +1,7 @@
 stages:
   - tests
 
-composer:
+php_unit:
   stage: tests
   image: composer:2
   cache:
