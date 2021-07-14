@@ -22,12 +22,10 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 
 	/** @var array */
 	protected $_data = array();
-
+	/** @var array */
+	protected $_props = array();
 	/** @var object */
 	private $_object;
-
-	/** @var array */
-	private $_props = array();
 
 	/**
 	 * AbstractPost constructor.
@@ -41,20 +39,19 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 
 		$reflection = new ReflectionClass( $this );
 		$properties = $reflection->getProperties( ReflectionProperty::IS_PUBLIC );
-		$props      = $this->props( $this->_props );
 
 		foreach ( $properties as $property ) {
 			$name = $property->name;
 
-			if ( ! isset( $props[ $name ] ) ) {
-				$props[ $name ] = array(
+			if ( ! isset( $this->_props[ $name ] ) ) {
+				$this->_props[ $name ] = array(
 					'name'    => $name,
 					'changed' => false,
 				);
 			}
 
-			if ( empty( $props[ $name ]['type'] ) ) {
-				$props[ $name ]['type'] = method_exists( $property, 'getType' )
+			if ( empty( $this->_props[ $name ]['type'] ) ) {
+				$this->_props[ $name ]['type'] = method_exists( $property, 'getType' )
 					? $property->getType()
 					: null;
 			}
@@ -63,47 +60,36 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 				? get_object_vars( $this->_object )
 				: array();
 
-			if ( empty( $props[ $name ]['source'] ) ) {
+			if ( empty( $this->_props[ $name ]['source'] ) ) {
 				if ( method_exists( $this, 'get_' . $name ) ) {
-					$props[ $name ]['source'] = 'getter';
-					$props[ $name ]['getter'] = 'get_' . $name;
+					$this->_props[ $name ]['source'] = 'getter';
+					$this->_props[ $name ]['getter'] = 'get_' . $name;
 				} elseif ( ! empty( $this->_relations[ $name ] ) ) {
-					$props[ $name ]['source'] = 'relation';
-					$props[ $name ]['fetch']  = $this->_relations[ $name ]['fetch'] ?? null;
-					$props[ $name ]['assign'] = $this->_relations[ $name ]['assign'] ?? null;
+					$this->_props[ $name ]['source'] = 'relation';
+					$this->_props[ $name ]['fetch']  = $this->_relations[ $name ]['fetch'] ?? null;
+					$this->_props[ $name ]['assign'] = $this->_relations[ $name ]['assign'] ?? null;
 				} elseif ( array_key_exists( $name, $object_vars ) ) {
-					$props[ $name ]['source'] = 'object';
+					$this->_props[ $name ]['source'] = 'object';
 				} else {
-					$props[ $name ]['source'] = 'meta';
+					$this->_props[ $name ]['source'] = 'meta';
 				}
 			}
 
 			if ( isset( $this->$name ) ) {
-				$props[ $name ]['default'] = $this->$name;
+				$this->_props[ $name ]['default'] = $this->$name;
 			}
 
-			if ( empty( $props[ $name ]['source_name'] ) ) {
-				$props[ $name ]['source_name'] = $name;
+			if ( empty( $this->_props[ $name ]['source_name'] ) ) {
+				$this->_props[ $name ]['source_name'] = $name;
 			}
 
-			if ( empty( $props[ $name ]['setter'] ) && method_exists( $this, 'set_' . $name ) ) {
-				$props[ $name ]['setter'] = 'set_' . $name;
+			if ( empty( $this->_props[ $name ]['setter'] ) && method_exists( $this, 'set_' . $name ) ) {
+				$this->_props[ $name ]['setter'] = 'set_' . $name;
 			}
 
 			// unset property, so it's handled by magic methods __get and __set
 			unset( $this->$name );
 		}
-
-		$this->_props = $props;
-	}
-
-	/**
-	 * @param array $props
-	 *
-	 * @return array
-	 */
-	protected function props( array $props = array() ): array {
-		return $props;
 	}
 
 	/**

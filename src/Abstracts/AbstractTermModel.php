@@ -99,6 +99,19 @@ abstract class AbstractTermModel extends AbstractModel {
 	 */
 	public $filter = 'raw';
 
+	protected $_props = array(
+		'id'            => array( 'source' => 'object', 'source_name' => 'term_id' ),
+		'name'          => array( 'source' => 'object', 'source_name' => 'name' ),
+		'slug'          => array( 'source' => 'object', 'source_name' => 'slug' ),
+		'group'         => array( 'source' => 'object', 'source_name' => 'term_group' ),
+		'taxonomy_id'   => array( 'source' => 'object', 'source_name' => 'term_taxonomy_id' ),
+		'taxonomy_name' => array( 'source' => 'object', 'source_name' => 'taxonomy' ),
+		'description'   => array( 'source' => 'object', 'source_name' => 'description' ),
+		'parent_id'     => array( 'source' => 'object', 'source_name' => 'parent' ),
+		'count'         => array( 'source' => 'object', 'source_name' => 'count' ),
+		'filter'        => array( 'source' => 'object', 'source_name' => 'filter' ),
+	);
+
 	/**
 	 * @return string
 	 */
@@ -107,26 +120,6 @@ abstract class AbstractTermModel extends AbstractModel {
 	}
 
 	abstract static function taxonomy(): string;
-
-	/**
-	 * @param array $props
-	 *
-	 * @return array
-	 */
-	protected function props( array $props = array() ): array {
-		return array_merge( $props, array(
-			'id'            => array( 'source' => 'object', 'source_name' => 'term_id' ),
-			'name'          => array( 'source' => 'object', 'source_name' => 'name' ),
-			'slug'          => array( 'source' => 'object', 'source_name' => 'slug' ),
-			'group'         => array( 'source' => 'object', 'source_name' => 'term_group' ),
-			'taxonomy_id'   => array( 'source' => 'object', 'source_name' => 'term_taxonomy_id' ),
-			'taxonomy_name' => array( 'source' => 'object', 'source_name' => 'taxonomy' ),
-			'description'   => array( 'source' => 'object', 'source_name' => 'description' ),
-			'parent_id'     => array( 'source' => 'object', 'source_name' => 'parent' ),
-			'count'         => array( 'source' => 'object', 'source_name' => 'count' ),
-			'filter'        => array( 'source' => 'object', 'source_name' => 'filter' ),
-		) );
-	}
 
 	protected function set_parent( ?AbstractTermModel $parent = null ) {
 		if ( $parent ) {

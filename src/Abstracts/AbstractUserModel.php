@@ -103,32 +103,25 @@ abstract class AbstractUserModel extends AbstractModel {
 	 */
 	public $last_name = '';
 
+	protected $_props = array(
+		'id'             => array( 'source' => 'object', 'source_name' => 'ID' ),
+		'login'          => array( 'source' => 'object', 'source_name' => 'user_login' ),
+		'pass'           => array( 'source' => 'object', 'source_name' => 'user_pass' ),
+		'nicename'       => array( 'source' => 'object', 'source_name' => 'user_nicename' ),
+		'email'          => array( 'source' => 'object', 'source_name' => 'user_email' ),
+		'url'            => array( 'source' => 'object', 'source_name' => 'user_url' ),
+		'registered'     => array( 'source' => 'object', 'source_name' => 'user_registered' ),
+		'activation_key' => array( 'source' => 'object', 'source_name' => 'user_activation_key' ),
+		'status'         => array( 'source' => 'object', 'source_name' => 'user_status' ),
+		'display_name'   => array( 'source' => 'object', 'source_name' => 'display_name' ),
+		'first_name'     => array( 'source' => 'meta', 'source_name' => 'first_name' ),
+		'last_name'      => array( 'source' => 'meta', 'source_name' => 'last_name' ),
+	);
+
 	/**
 	 * @return string
 	 */
 	static function meta_type(): string {
 		return 'user';
-	}
-
-	/**
-	 * @param array $props
-	 *
-	 * @return array
-	 */
-	protected function props( array $props = array() ): array {
-		return array_merge( $props, array(
-			'id'             => array( 'source' => 'object', 'source_name' => 'ID' ),
-			'login'          => array( 'source' => 'object', 'source_name' => 'user_login' ),
-			'pass'           => array( 'source' => 'object', 'source_name' => 'user_pass' ),
-			'nicename'       => array( 'source' => 'object', 'source_name' => 'user_nicename' ),
-			'email'          => array( 'source' => 'object', 'source_name' => 'user_email' ),
-			'url'            => array( 'source' => 'object', 'source_name' => 'user_url' ),
-			'registered'     => array( 'source' => 'object', 'source_name' => 'user_registered' ),
-			'activation_key' => array( 'source' => 'object', 'source_name' => 'user_activation_key' ),
-			'status'         => array( 'source' => 'object', 'source_name' => 'user_status' ),
-			'display_name'   => array( 'source' => 'object', 'source_name' => 'display_name' ),
-			'first_name'     => array( 'source' => 'meta', 'source_name' => 'first_name' ),
-			'last_name'      => array( 'source' => 'meta', 'source_name' => 'last_name' ),
-		) );
 	}
 }
