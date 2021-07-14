@@ -5,6 +5,7 @@ namespace WpifyModel\Abstracts;
 use WP_User;
 use WP_User_Query;
 use WpifyModel\Exceptions\NotFoundException;
+use WpifyModel\Exceptions\NotPersistedException;
 
 abstract class AbstractUserRepository extends AbstractRepository {
 	private $query;
@@ -65,6 +66,7 @@ abstract class AbstractUserRepository extends AbstractRepository {
 	 * @param AbstractUserModel $model
 	 *
 	 * @return mixed
+	 * @throws NotPersistedException
 	 * @throws NotFoundException
 	 */
 	public function save( $model ) {
@@ -82,13 +84,14 @@ abstract class AbstractUserRepository extends AbstractRepository {
 			$result = wp_update_user( $object_data );
 		} else {
 			$result = wp_insert_user( $object_data );
+
 			if ( ! is_wp_error( $result ) ) {
 				$model->id = $result;
 			}
 		}
 
 		if ( is_wp_error( $result ) ) {
-			throw new NotFoundException( $result->get_error_message() );
+			throw new NotPersistedException( $result->get_error_message() );
 		}
 
 		if ( $model->id ) {

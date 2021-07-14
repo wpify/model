@@ -39,10 +39,11 @@ class CategoryTest extends Unit {
 		$repository  = new CategoryRepository();
 		$model       = $repository->create();
 		$model->name = $term_name;
-		$repository->save( $model );
+		$new_model   = $repository->save( $model );
 
 		$this->assertEquals( $term_id, $model->id );
 		$this->assertEquals( $term_name, $model->name );
+		$this->assertEquals( $new_model, $model );
 	}
 
 	public function testUpdateCategory() {
@@ -76,13 +77,14 @@ class CategoryTest extends Unit {
 			->with( 'ID', $term_id, CategoryRepository::taxonomy() )
 			->andReturn( $result_term );
 
-		$repository  = new CategoryRepository();
-		$model       = $repository->get( $term_id );
-		$model->name = $term_name;
-		$repository->save( $model );
+		$repository    = new CategoryRepository();
+		$model         = $repository->get( $term_id );
+		$model->name   = $term_name;
+		$updated_model = $repository->save( $model );
 
 		$this->assertEquals( $term_id, $model->id );
 		$this->assertEquals( $term_name, $model->name );
+		$this->assertEquals( $updated_model, $model );
 	}
 
 	protected function _before() {

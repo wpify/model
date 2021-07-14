@@ -5,6 +5,7 @@ namespace WpifyModel\Abstracts;
 use stdClass;
 use WP_Term;
 use WpifyModel\Exceptions\NotFoundException;
+use WpifyModel\Exceptions\NotPersistedException;
 
 abstract class AbstractTermRepository extends AbstractRepository {
 	/**
@@ -139,6 +140,7 @@ abstract class AbstractTermRepository extends AbstractRepository {
 	 *
 	 * @return mixed
 	 * @throws NotFoundException
+	 * @throws NotPersistedException
 	 */
 	public function save( $model ) {
 		$args = array(
@@ -151,12 +153,18 @@ abstract class AbstractTermRepository extends AbstractRepository {
 
 		if ( $model->id > 0 ) {
 			$result = wp_update_term( $model->id, $model->taxonomy_name, $args );
+
+			if ( is_wp_error( $result ) ) {
+				throw new NotPersistedException();
+			}
 		} else {
 			$result = wp_insert_term( $model->name, $model->taxonomy_name, $args );
 
 			// Term exists
 			if ( is_wp_error( $result ) && is_int( $result->get_error_data() ) ) {
 				$model->id = $result->get_error_data();
+			} elseif ( is_wp_error( $result ) ) {
+				throw new NotPersistedException();
 			} else {
 				$model->id = $result['term_id'];
 			}
@@ -177,7 +185,7 @@ abstract class AbstractTermRepository extends AbstractRepository {
 			$model->refresh( $object );
 		}
 
-		return $result;
+		return $model;
 	}
 
 	/**

@@ -5,6 +5,7 @@ namespace WpifyModel\Abstracts;
 use WP_Post;
 use WP_Query;
 use WpifyModel\Exceptions\NotFoundException;
+use WpifyModel\Exceptions\NotPersistedException;
 
 abstract class AbstractPostRepository extends AbstractRepository {
 	public $query;
@@ -85,6 +86,7 @@ abstract class AbstractPostRepository extends AbstractRepository {
 	 *
 	 * @return mixed
 	 * @throws NotFoundException
+	 * @throws NotPersistedException
 	 */
 	public function save( $model ) {
 		$object_data = array();
@@ -113,9 +115,11 @@ abstract class AbstractPostRepository extends AbstractRepository {
 
 		if ( ! is_wp_error( $result ) ) {
 			$model->refresh( $this->resolve_object( $result ) );
+		} else {
+			throw new NotPersistedException();
 		}
 
-		return $result;
+		return $model;
 	}
 
 	/**

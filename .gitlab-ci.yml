@@ -1,0 +1,16 @@
+stages:
+  - tests
+
+composer:
+  stage: tests
+  image: composer:2
+  cache:
+    paths:
+      - .composer-cache/
+  before_script:
+    - PATH=$(composer global config bin-dir --absolute --quiet):$PATH
+    - composer config -g cache-dir "$(pwd)/.composer-cache"
+    - composer global require wpify/wordpress-scoper
+  script:
+    - composer install
+    - ./vendor/bin/codecept run unit
