@@ -25,7 +25,7 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 
 	/** @var array */
 	protected $_props = array();
-	
+
 	/** @var object */
 	private $_object;
 
@@ -35,7 +35,7 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 	 * @param $object
 	 * @param $relations
 	 */
-	public function __construct( $object, $relations ) {
+	public function __construct( $object, $relations = [] ) {
 		$this->_object    = $object;
 		$this->_relations = $relations;
 
