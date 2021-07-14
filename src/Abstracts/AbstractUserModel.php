@@ -104,21 +104,6 @@ abstract class AbstractUserModel extends AbstractModel {
 	public $last_name = '';
 
 	/**
-	 * ID of a post's parent post.
-	 *
-	 * @since 3.5.0
-	 * @var int
-	 */
-	public $parent_id = 0;
-
-	/**
-	 * Parent post
-	 *
-	 * @var self
-	 */
-	public $parent;
-
-	/**
 	 * @return string
 	 */
 	static function meta_type(): string {
@@ -143,22 +128,7 @@ abstract class AbstractUserModel extends AbstractModel {
 			'status'         => array( 'source' => 'object', 'source_name' => 'user_status' ),
 			'display_name'   => array( 'source' => 'object', 'source_name' => 'display_name' ),
 			'first_name'     => array( 'source' => 'meta', 'source_name' => 'first_name' ),
-			'last_name'      => array( 'source' => 'meta', 'source_name' => 'first_name' ),
+			'last_name'      => array( 'source' => 'meta', 'source_name' => 'last_name' ),
 		) );
-	}
-
-	protected function set_parent( ?AbstractPostModel $parent = null ) {
-		if ( $parent ) {
-			$this->parent_id = $parent->id;
-			$this->parent    = $parent;
-		} else {
-			unset( $this->parent_id );
-			unset( $this->parent );
-		}
-	}
-
-	protected function set_parent_id( ?int $parent_id = null ) {
-		unset( $this->parent );
-		$this->parent_id = $parent_id;
 	}
 }

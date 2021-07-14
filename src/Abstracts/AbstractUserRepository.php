@@ -2,8 +2,6 @@
 
 namespace WpifyModel\Abstracts;
 
-use WP_Post;
-use WP_Query;
 use WP_User;
 use WP_User_Query;
 use WpifyModel\Exceptions\NotFoundException;
@@ -92,6 +90,7 @@ abstract class AbstractUserRepository extends AbstractRepository {
 		if ( is_wp_error( $result ) ) {
 			throw new NotFoundException( $result->get_error_message() );
 		}
+
 		if ( $model->id ) {
 			foreach ( $model->own_props() as $key => $prop ) {
 				if ( $prop['source'] === 'meta' && $prop['changed'] ) {
