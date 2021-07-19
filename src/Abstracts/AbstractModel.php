@@ -198,7 +198,7 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 			if ( ! isset( $this->_data[ $key ] ) ) {
 				$source_name = $prop['source_name'];
 
-				if ( is_callable( $prop['getter'] ) ) {
+				if ( isset( $prop['getter'] ) && is_callable( $prop['getter'] ) ) {
 					$getter              = $prop['getter'];
 					$this->_data[ $key ] = $getter();
 				} elseif ( $prop['source'] === 'relation' ) {
@@ -238,7 +238,7 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 
 			$prop = $this->_props[ $key ];
 
-			if ( is_callable( $this, $prop['setter'] ) ) {
+			if ( isset( $prop['setter'] ) && is_callable( $this, $prop['setter'] ) ) {
 				$setter              = $prop['setter'];
 				$this->_data[ $key ] = $setter( $value );
 			} else {
@@ -248,7 +248,7 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 			$this->_props[ $key ]['changed'] = true;
 
 			$after_set_hook = sprintf( 'after_%s_set', $key );
-			
+
 			if ( method_exists( $this, $after_set_hook ) ) {
 				$this->$after_set_hook();
 			}
