@@ -8,6 +8,7 @@ use IteratorAggregate;
 use ReflectionClass;
 use ReflectionProperty;
 use WpifyModel\Interfaces\ModelInterface;
+use WpifyModel\Interfaces\RepositoryInterface;
 
 /**
  * Class AbstractModel
@@ -17,8 +18,8 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 	/** @var int */
 	public $id;
 
-	/** @var array */
-	protected $_relations;
+	/** @var RepositoryInterface */
+	protected $_repository;
 
 	/** @var array */
 	protected $_data = array();
@@ -27,17 +28,20 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 	protected $_props = array();
 
 	/** @var object */
-	private $_object;
+	protected $_object;
+
+	/** @var array */
+	protected $_observers;
 
 	/**
 	 * AbstractPost constructor.
 	 *
 	 * @param $object
-	 * @param $relations
+	 * @param RepositoryInterface $repository
 	 */
-	public function __construct( $object, $relations = [] ) {
-		$this->_object    = $object;
-		$this->_relations = $relations;
+	public function __construct( $object, RepositoryInterface $repository ) {
+		$this->_object     = $object;
+		$this->_repository = $repository;
 
 		$reflection = new ReflectionClass( $this );
 		$properties = $reflection->getProperties( ReflectionProperty::IS_PUBLIC );
@@ -64,12 +68,17 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 
 			if ( empty( $this->_props[ $name ]['source'] ) ) {
 				if ( method_exists( $this, 'get_' . $name ) ) {
-					$this->_props[ $name ]['source'] = 'getter';
-					$this->_props[ $name ]['getter'] = 'get_' . $name;
-				} elseif ( ! empty( $this->_relations[ $name ] ) ) {
-					$this->_props[ $name ]['source'] = 'relation';
-					$this->_props[ $name ]['fetch']  = $this->_relations[ $name ]['fetch'] ?? null;
-					$this->_props[ $name ]['assign'] = $this->_relations[ $name ]['assign'] ?? null;
+					$this->_props[ $name ]['getter'] = array( $this, 'get_' . $name );
+				}
+
+				if ( method_exists( $this, 'set_' . $name ) ) {
+					$this->_props[ $name ]['setter'] = array( $this, 'set_' . $name );
+				}
+
+				if ( method_exists( $this, $name . '_relation' ) ) {
+					$this->_props[ $name ]['source']   = 'relation';
+					$method                            = $name . '_relation';
+					$this->_props[ $name ]['relation'] = $this->$method();
 				} elseif ( array_key_exists( $name, $object_vars ) ) {
 					$this->_props[ $name ]['source'] = 'object';
 				} else {
@@ -189,7 +198,14 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 			if ( ! isset( $this->_data[ $key ] ) ) {
 				$source_name = $prop['source_name'];
 
-				if ( $prop['source'] === 'object' ) {
+				if ( is_callable( $prop['getter'] ) ) {
+					$getter              = $prop['getter'];
+					$this->_data[ $key ] = $getter();
+				} elseif ( $prop['source'] === 'relation' ) {
+					$relation = $prop['relation'];
+
+					$this->_data[ $key ] = $relation->fetch();
+				} elseif ( $prop['source'] === 'object' ) {
 					if ( isset( $this->_object->$source_name ) ) {
 						$this->_data[ $key ] = $this->_object->$source_name;
 					} elseif ( isset( $prop['default'] ) ) {
@@ -199,11 +215,6 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 					}
 				} elseif ( $prop['source'] === 'meta' ) {
 					$this->_data[ $key ] = $this->fetch_meta( $source_name );
-				} elseif ( $prop['source'] === 'getter' ) {
-					$getter              = $prop['getter'];
-					$this->_data[ $key ] = $this->$getter();
-				} elseif ( $prop['source'] === 'relation' && is_callable( $prop['fetch'] ) ) {
-					$this->_data[ $key ] = $prop['fetch']( $this );
 				} elseif ( isset( $prop['default'] ) ) {
 					$this->_data[ $key ] = $prop['default'];
 				} else {
@@ -227,14 +238,20 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 
 			$prop = $this->_props[ $key ];
 
-			if ( ! empty( $prop['setter'] ) ) {
+			if ( is_callable( $this, $prop['setter'] ) ) {
 				$setter              = $prop['setter'];
-				$this->_data[ $key ] = $this->$setter( $value );
+				$this->_data[ $key ] = $setter( $value );
 			} else {
 				$this->_data[ $key ] = $value;
 			}
 
 			$this->_props[ $key ]['changed'] = true;
+
+			$after_set_hook = sprintf( 'after_%s_set', $key );
+			
+			if ( method_exists( $this, $after_set_hook ) ) {
+				$this->$after_set_hook();
+			}
 		}
 	}
 

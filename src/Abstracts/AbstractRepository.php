@@ -10,18 +10,6 @@ use WpifyModel\Interfaces\RepositoryInterface;
  * @package WpifyModel
  */
 abstract class AbstractRepository implements RepositoryInterface {
-	/** @var array */
-	protected $relations;
-
-	/**
-	 * AbstractRepository constructor.
-	 *
-	 * @param array $relations
-	 */
-	public function __construct( array $relations = array() ) {
-		$this->relations = $relations;
-	}
-
 	/**
 	 * @param $object
 	 *
@@ -30,7 +18,7 @@ abstract class AbstractRepository implements RepositoryInterface {
 	protected function factory( $object ) {
 		$class = $this::model();
 
-		return new $class( $this->resolve_object( $object ), $this->relations );
+		return new $class( $this->resolve_object( $object ), $this );
 	}
 
 	/**

@@ -2,11 +2,16 @@
 
 namespace WpifyModel\Abstracts;
 
+use WpifyModel\Interfaces\UserModelInterface;
+use WpifyModel\Interfaces\UserRepositoryInterface;
+
 /**
  * Class AbstractPostModel
  * @package WpifyModel
+ *
+ * @property UserRepositoryInterface $_repository
  */
-abstract class AbstractUserModel extends AbstractModel {
+abstract class AbstractUserModel extends AbstractModel implements UserModelInterface {
 	/**
 	 * User ID.
 	 *
@@ -117,6 +122,10 @@ abstract class AbstractUserModel extends AbstractModel {
 		'first_name'     => array( 'source' => 'meta', 'source_name' => 'first_name' ),
 		'last_name'      => array( 'source' => 'meta', 'source_name' => 'last_name' ),
 	);
+
+	public function __construct( $object, UserRepositoryInterface $repository ) {
+		parent::__construct( $object, $repository );
+	}
 
 	/**
 	 * @return string

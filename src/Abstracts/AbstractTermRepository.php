@@ -6,27 +6,9 @@ use stdClass;
 use WP_Term;
 use WpifyModel\Exceptions\NotFoundException;
 use WpifyModel\Exceptions\NotPersistedException;
+use WpifyModel\Interfaces\TermRepositoryInterface;
 
-abstract class AbstractTermRepository extends AbstractRepository {
-	/**
-	 * AbstractTermRepository constructor.
-	 *
-	 * @param array $relations
-	 */
-	public function __construct( array $relations = array() ) {
-		$default_relations = array(
-			'parent'   => array(
-				'fetch' => array( $this, 'fetch_parent' ),
-			),
-			'children' => array(
-				'fetch'  => array( $this, 'fetch_children' ),
-				'assign' => array( $this, 'assign_children' ),
-			),
-		);
-
-		parent::__construct( array_merge( $default_relations, $relations ) );
-	}
-
+abstract class AbstractTermRepository extends AbstractRepository implements TermRepositoryInterface {
 	/**
 	 * @return AbstractTermModel[]
 	 */
@@ -100,15 +82,6 @@ abstract class AbstractTermRepository extends AbstractRepository {
 	}
 
 	/**
-	 * @param AbstractTermModel $model
-	 *
-	 * @return array
-	 */
-	public function fetch_children( $model ) {
-		return $this->child_of( $model->id );
-	}
-
-	/**
 	 * @param ?int $parent_id
 	 *
 	 * @return array
@@ -124,15 +97,22 @@ abstract class AbstractTermRepository extends AbstractRepository {
 	}
 
 	/**
-	 * @param AbstractTermModel $model
+	 * Retrieves the terms of the taxonomy that are attached to the post.
 	 *
-	 * @throws NotFoundException
+	 * @param int $post_id
+	 *
+	 * @return array|mixed
 	 */
-	public function assign_children( $model ) {
-		foreach ( $model->children as $child ) {
-			$child->parent_id = $model->id;
-			$this->save( $child );
+	public function terms_of_post( int $post_id ) {
+		$collection = array();
+		$terms      = get_the_terms( $post_id, $this::taxonomy() );
+
+		foreach ( $terms as $term ) {
+			$collection[] = $this->factory( $term );
 		}
+
+		return $this->collection_factory( $collection );
+
 	}
 
 	/**
@@ -217,7 +197,7 @@ abstract class AbstractTermRepository extends AbstractRepository {
 		}
 
 		if ( ! is_object( $object ) ) {
-			throw new NotFoundException( 'The term was not found', $data );
+			throw new NotFoundException( "The term (" . $this::taxonomy() . ") was not found\n\n" . print_r( $data, true ) );
 		}
 
 		return $object;

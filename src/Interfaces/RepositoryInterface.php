@@ -33,11 +33,11 @@ interface RepositoryInterface {
 	public function all();
 
 	/**
-	 * @param ModelInterface $model
+	 * @param PostModelInterface $model
 	 *
 	 * @return mixed
 	 */
-	public function delete( $model );
+	public function delete( PostModelInterface $model );
 
 	/**
 	 * @param $model

@@ -4,25 +4,39 @@ namespace WpifyModel\Abstracts;
 
 use WP_Post;
 use WP_Query;
+use WpifyModel\CategoryRepository;
 use WpifyModel\Exceptions\NotFoundException;
 use WpifyModel\Exceptions\NotPersistedException;
+use WpifyModel\Interfaces\PostModelInterface;
+use WpifyModel\Interfaces\PostRepositoryInterface;
+use WpifyModel\Interfaces\TermModelInterface;
+use WpifyModel\Interfaces\TermRepositoryInterface;
+use WpifyModel\Interfaces\UserRepositoryInterface;
+use WpifyModel\UserRepository;
 
-abstract class AbstractPostRepository extends AbstractRepository {
+abstract class AbstractPostRepository extends AbstractRepository implements PostRepositoryInterface {
 	public $query;
 
-	/**
-	 * AbstractPostRepository constructor.
-	 *
-	 * @param array $relations
-	 */
-	public function __construct( array $relations = array() ) {
-		$default_relations = array(
-			'parent' => array(
-				'fetch' => array( $this, 'fetch_parent' ),
-			),
-		);
+	/** @var ?UserRepositoryInterface */
+	private $user_repository;
 
-		parent::__construct( array_merge( $default_relations, $relations ) );
+	/** @var ?TermRepositoryInterface */
+	private $category_repository;
+
+	public function get_user_repository(): UserRepositoryInterface {
+		if ( empty( $this->user_repository ) ) {
+			$this->user_repository = new UserRepository();
+		}
+
+		return $this->user_repository;
+	}
+
+	public function get_category_repository(): TermRepositoryInterface {
+		if ( empty( $this->category_repository ) ) {
+			$this->category_repository = new CategoryRepository();
+		}
+
+		return $this->category_repository;
 	}
 
 	public function fetch_parent( AbstractPostModel $model ) {
@@ -51,10 +65,10 @@ abstract class AbstractPostRepository extends AbstractRepository {
 	 * @return mixed
 	 */
 	public function find( array $args = array() ) {
-		$defaults   = array( 'post_type' => $this::post_type() );
-		$args       = wp_parse_args( $args, $defaults );
-		$this->query      = new WP_Query( $args );
-		$collection = array();
+		$defaults    = array( 'post_type' => $this::post_type() );
+		$args        = wp_parse_args( $args, $defaults );
+		$this->query = new WP_Query( $args );
+		$collection  = array();
 
 		while ( $this->query->have_posts() ) {
 			$this->query->the_post();
@@ -155,24 +169,52 @@ abstract class AbstractPostRepository extends AbstractRepository {
 	}
 
 	/**
-	 * @param AbstractPostModel $model
+	 * @param PostModelInterface $model
 	 *
 	 * @return mixed
 	 */
-	public function delete( $model ) {
+	public function delete( PostModelInterface $model ) {
 		return wp_delete_post( $model->id, true );
 	}
 
-	public function get_paginate_links($args = array())
-	{
-		$pagination = $this->get_pagination();
-		$default_args = array('total' => $pagination['total_pages'], 'current' => $pagination['current_page']);
-		$args = wp_parse_args($args, $default_args);
-		return paginate_links($args);
+	/**
+	 * Assign the post to the terms
+	 *
+	 * @param PostModelInterface $model
+	 * @param TermModelInterface[] $terms
+	 */
+	public function assign_post_to_term( PostModelInterface $model, array $terms ) {
+		$to_assign = [];
+
+		foreach ( $terms as $term ) {
+			if ( isset( $to_assign[ $term->taxonomy_name ] ) && is_array( $to_assign[ $term->taxonomy_name ] ) ) {
+				$to_assign[ $term->taxonomy_name ][] = $term;
+			} else {
+				$to_assign[ $term->taxonomy_name ] = array( $term );
+			}
+		}
+
+		foreach ( $to_assign as $taxonomy => $assigns ) {
+			wp_set_post_terms( $model->id, array_values( array_map( function ( $term ) {
+				return $term->id;
+			}, $assigns ) ), $taxonomy );
+		}
 	}
 
-	public function get_pagination(): array
-	{
-		return array('found_posts' => $this->query->found_posts, 'current_page' => $this->query->query_vars['paged'] ?: 1, 'total_pages' => $this->query->max_num_pages, 'per_page' => $this->query->query_vars['posts_per_page']);
+	public function get_paginate_links( $args = array() ) {
+		$pagination   = $this->get_pagination();
+		$default_args = array( 'total' => $pagination['total_pages'], 'current' => $pagination['current_page'] );
+		$args         = wp_parse_args( $args, $default_args );
+
+		return paginate_links( $args );
+	}
+
+	public function get_pagination(): array {
+		return array(
+			'found_posts'  => $this->query->found_posts,
+			'current_page' => $this->query->query_vars['paged'] ?: 1,
+			'total_pages'  => $this->query->max_num_pages,
+			'per_page'     => $this->query->query_vars['posts_per_page']
+		);
 	}
 }

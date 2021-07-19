@@ -2,7 +2,18 @@
 
 namespace WpifyModel\Abstracts;
 
-abstract class AbstractTermModel extends AbstractModel {
+use WpifyModel\Interfaces\TermModelInterface;
+use WpifyModel\Interfaces\TermRepositoryInterface;
+use WpifyModel\Relations\TermChildTermsRelation;
+use WpifyModel\Relations\TermParentTermRelation;
+
+/**
+ * Class AbstractTermModel
+ * @package WpifyModel\Abstracts
+ *
+ * @property TermRepositoryInterface $_repository
+ */
+abstract class AbstractTermModel extends AbstractModel implements TermModelInterface {
 	/**
 	 * Term ID.
 	 *
@@ -112,6 +123,10 @@ abstract class AbstractTermModel extends AbstractModel {
 		'filter'        => array( 'source' => 'object', 'source_name' => 'filter' ),
 	);
 
+	public function __construct( $object, TermRepositoryInterface $repository ) {
+		parent::__construct( $object, $repository );
+	}
+
 	/**
 	 * @return string
 	 */
@@ -120,6 +135,20 @@ abstract class AbstractTermModel extends AbstractModel {
 	}
 
 	abstract static function taxonomy(): string;
+
+	/**
+	 * @return TermParentTermRelation
+	 */
+	public function parent_relation(): TermParentTermRelation {
+		return new TermParentTermRelation( $this, $this->_repository );
+	}
+
+	/**
+	 * @return TermChildTermsRelation
+	 */
+	public function children_relation(): TermChildTermsRelation {
+		return new TermChildTermsRelation( $this, $this->_repository );
+	}
 
 	protected function set_parent( ?AbstractTermModel $parent = null ) {
 		if ( $parent ) {

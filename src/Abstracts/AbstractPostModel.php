@@ -2,11 +2,21 @@
 
 namespace WpifyModel\Abstracts;
 
+use WpifyModel\Interfaces\PostModelInterface;
+use WpifyModel\Interfaces\PostRepositoryInterface;
+use WpifyModel\Interfaces\TermModelInterface;
+use WpifyModel\Relations\PostAuthorRelation;
+use WpifyModel\Relations\PostParentPostRelation;
+use WpifyModel\Relations\PostTermsRelation;
+use WpifyModel\User;
+
 /**
  * Class AbstractPostModel
  * @package WpifyModel
+ *
+ * @property PostRepositoryInterface $_repository
  */
-abstract class AbstractPostModel extends AbstractModel {
+abstract class AbstractPostModel extends AbstractModel implements PostModelInterface {
 	/**
 	 * Post ID.
 	 *
@@ -24,6 +34,13 @@ abstract class AbstractPostModel extends AbstractModel {
 	 * @var string
 	 */
 	public $author_id = 0;
+
+	/**
+	 * Post author.
+	 *
+	 * @var User
+	 */
+	public $author;
 
 	/**
 	 * The post's local publication time.
@@ -212,6 +229,13 @@ abstract class AbstractPostModel extends AbstractModel {
 	 */
 	public $filter;
 
+	/**
+	 * Post categories
+	 *
+	 * @var TermModelInterface[]
+	 */
+	public $categories;
+
 	protected $_props = array(
 		'id'               => array( 'source' => 'object', 'source_name' => 'ID' ),
 		'author_id'        => array( 'source' => 'object', 'source_name' => 'post_author' ),
@@ -230,6 +254,10 @@ abstract class AbstractPostModel extends AbstractModel {
 		'mime_type'        => array( 'source' => 'object', 'source_name' => 'post_mime_type' ),
 	);
 
+	public function __construct( $object, PostRepositoryInterface $repository ) {
+		parent::__construct( $object, $repository );
+	}
+
 	/**
 	 * @return string
 	 */
@@ -242,19 +270,36 @@ abstract class AbstractPostModel extends AbstractModel {
 	 */
 	abstract static function post_type(): string;
 
-
-	protected function set_parent( ?AbstractPostModel $parent = null ) {
-		if ( $parent ) {
-			$this->parent_id = $parent->id;
-			$this->parent    = $parent;
-		} else {
-			unset( $this->parent_id );
-			unset( $this->parent );
-		}
+	protected function parent_relation(): PostParentPostRelation {
+		return new PostParentPostRelation( $this, $this->_repository );
 	}
 
-	protected function set_parent_id( ?int $parent_id = null ) {
+	protected function after_parent_set() {
+		$this->parent_id = $this->parent->id ?? null;
+	}
+
+	protected function after_parent_id_set() {
 		unset( $this->parent );
-		$this->parent_id = $parent_id;
+	}
+
+	protected function author_relation(): PostAuthorRelation {
+		return new PostAuthorRelation( $this, $this->_repository->get_user_repository() );
+	}
+
+	protected function after_author_set() {
+		$this->author_id = $this->author->id ?? null;
+	}
+
+	protected function after_author_id_set() {
+		unset( $this->author );
+	}
+
+	protected function categories_relation(): PostTermsRelation {
+		return new PostTermsRelation(
+			$this,
+			'categories',
+			$this->_repository->get_category_repository(),
+			$this->_repository
+		);
 	}
 }

@@ -6,20 +6,10 @@ use WP_User;
 use WP_User_Query;
 use WpifyModel\Exceptions\NotFoundException;
 use WpifyModel\Exceptions\NotPersistedException;
+use WpifyModel\Interfaces\UserRepositoryInterface;
 
-abstract class AbstractUserRepository extends AbstractRepository {
+abstract class AbstractUserRepository extends AbstractRepository implements UserRepositoryInterface {
 	private $query;
-
-	/**
-	 * AbstractPostRepository constructor.
-	 *
-	 * @param array $relations
-	 */
-	public function __construct( array $relations = array() ) {
-		$default_relations = array();
-
-		parent::__construct( array_merge( $default_relations, $relations ) );
-	}
 
 	/**
 	 * @param ?object $object
