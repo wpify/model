@@ -10,6 +10,10 @@ use WpifyModel\Interfaces\PostRepositoryInterface;
  * @package WpifyModel
  */
 class Product extends AbstractModel {
+	public function __construct( $object, ProductRepository $repository ) {
+		parent::__construct( $object, $repository );
+	}
+
 	/**
 	 * @return string
 	 */
@@ -44,10 +48,6 @@ class Product extends AbstractModel {
 		'id'               => array( 'source' => 'object', 'source_name' => 'id' ),
 		'parent_id'        => array( 'source' => 'object', 'source_name' => 'parent_id' ),
 	);
-
-	public function __construct( $object, PostRepositoryInterface $repository ) {
-		parent::__construct( $object, $repository );
-	}
 
 	/**
 	 * @return string
