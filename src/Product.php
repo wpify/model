@@ -10,17 +10,6 @@ use WpifyModel\Interfaces\PostRepositoryInterface;
  * @package WpifyModel
  */
 class Product extends AbstractModel {
-	public function __construct( $object, ProductRepository $repository ) {
-		parent::__construct( $object, $repository );
-	}
-
-	/**
-	 * @return string
-	 */
-	static function post_type(): string {
-		return 'product';
-	}
-
 	/**
 	 * Post ID.
 	 *
@@ -54,5 +43,9 @@ class Product extends AbstractModel {
 	 */
 	static function meta_type(): string {
 		return 'product';
+	}
+
+	public function __construct( $object, ProductRepository $repository ) {
+		parent::__construct( $object, $repository );
 	}
 }

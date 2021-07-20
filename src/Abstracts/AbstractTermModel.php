@@ -134,8 +134,6 @@ abstract class AbstractTermModel extends AbstractModel implements TermModelInter
 		return 'term';
 	}
 
-	abstract static function taxonomy(): string;
-
 	/**
 	 * @return TermParentTermRelation
 	 */

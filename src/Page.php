@@ -9,10 +9,4 @@ use WpifyModel\Abstracts\AbstractPostModel;
  * @package WpifyModel
  */
 class Page extends AbstractPostModel {
-	/**
-	 * @return string
-	 */
-	static function post_type(): string {
-		return 'page';
-	}
 }

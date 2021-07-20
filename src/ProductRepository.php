@@ -21,10 +21,6 @@ class ProductRepository extends AbstractRepository implements RepositoryInterfac
 		return 'product';
 	}
 
-	static function model(): string {
-		return Product::class;
-	}
-
 	public function fetch_parent( AbstractPostModel $model ) {
 		return $this->get( $model->parent_id );
 	}
@@ -51,14 +47,14 @@ class ProductRepository extends AbstractRepository implements RepositoryInterfac
 	 * @return mixed
 	 */
 	public function find( array $args = array() ) {
-		$defaults    = [];
-		$args        = wp_parse_args( $args, $defaults );
-		$products = wc_get_products($args);
+		$defaults = [];
+		$args     = wp_parse_args( $args, $defaults );
+		$products = wc_get_products( $args );
 
-		$collection  = array();
+		$collection = array();
 
-		foreach ($products as $product) {
-			$collection[] = $this->factory( $product);
+		foreach ( $products as $product ) {
+			$collection[] = $this->factory( $product );
 		}
 
 		return $this->collection_factory( $collection );
@@ -136,6 +132,10 @@ class ProductRepository extends AbstractRepository implements RepositoryInterfac
 		}
 
 		return $object;
+	}
+
+	static function model(): string {
+		return Product::class;
 	}
 
 	/**

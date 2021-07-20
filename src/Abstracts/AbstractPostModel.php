@@ -265,11 +265,6 @@ abstract class AbstractPostModel extends AbstractModel implements PostModelInter
 		return 'post';
 	}
 
-	/**
-	 * @return string
-	 */
-	abstract static function post_type(): string;
-
 	protected function parent_relation(): PostParentPostRelation {
 		return new PostParentPostRelation( $this, $this->_repository );
 	}
