@@ -141,25 +141,18 @@ abstract class AbstractTermModel extends AbstractModel implements TermModelInter
 		return new TermParentTermRelation( $this, $this->_repository );
 	}
 
+	protected function after_parent_set() {
+		$this->parent_id = $this->parent->id ?? null;
+	}
+
+	protected function after_parent_id_set() {
+		unset( $this->parent );
+	}
+
 	/**
 	 * @return TermChildTermsRelation
 	 */
 	public function children_relation(): TermChildTermsRelation {
 		return new TermChildTermsRelation( $this, $this->_repository );
-	}
-
-	protected function set_parent( ?AbstractTermModel $parent = null ) {
-		if ( $parent ) {
-			$this->parent_id = $parent->id;
-			$this->parent    = $parent;
-		} else {
-			unset( $this->parent_id );
-			unset( $this->parent );
-		}
-	}
-
-	protected function set_parent_id( ?int $parent_id = null ) {
-		unset( $this->parent );
-		$this->parent_id = $parent_id;
 	}
 }
