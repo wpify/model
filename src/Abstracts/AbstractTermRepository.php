@@ -151,12 +151,11 @@ abstract class AbstractTermRepository extends AbstractRepository implements Term
 		}
 
 		if ( $model->id ) {
-			// save the meta data
 			foreach ( $model->own_props() as $key => $prop ) {
 				if ( $prop['source'] === 'meta' && $prop['changed'] ) {
 					$model->store_meta( $prop['source_name'], $model->$key );
-				} elseif ( $prop['source'] === 'relation' && is_callable( $prop['assign'] ) && $prop['changed'] ) {
-					$prop['assign']( $model );
+				} elseif ( $prop['source'] === 'relation' && isset( $prop['relation'] ) && method_exists( $prop['relation'], 'assign' ) && $prop['changed'] ) {
+					$prop['relation']->assign();
 				}
 			}
 
