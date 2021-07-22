@@ -6,6 +6,7 @@ use WpifyModel\Interfaces\PostModelInterface;
 use WpifyModel\Interfaces\PostRepositoryInterface;
 use WpifyModel\Interfaces\TermModelInterface;
 use WpifyModel\Relations\PostAuthorRelation;
+use WpifyModel\Relations\PostChildrenPostsRelation;
 use WpifyModel\Relations\PostParentPostRelation;
 use WpifyModel\Relations\PostTermsRelation;
 use WpifyModel\User;
@@ -320,5 +321,10 @@ abstract class AbstractPostModel extends AbstractModel implements PostModelInter
 			$this->_repository->get_post_tag_repository(),
 			$this->_repository
 		);
+	}
+
+	public function children_relation()
+	{
+		return new PostChildrenPostsRelation($this, $this->_repository);
 	}
 }
