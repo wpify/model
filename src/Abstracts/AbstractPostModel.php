@@ -236,6 +236,13 @@ abstract class AbstractPostModel extends AbstractModel implements PostModelInter
 	 */
 	public $categories;
 
+	/**
+	 * Post tags
+	 *
+	 * @var TermModelInterface[]
+	 */
+	public $tags;
+
 	protected $_props = array(
 		'id'               => array( 'source' => 'object', 'source_name' => 'ID' ),
 		'author_id'        => array( 'source' => 'object', 'source_name' => 'post_author' ),
@@ -294,6 +301,15 @@ abstract class AbstractPostModel extends AbstractModel implements PostModelInter
 			$this,
 			'categories',
 			$this->_repository->get_category_repository(),
+			$this->_repository
+		);
+	}
+
+	protected function tags_relation(): PostTermsRelation {
+		return new PostTermsRelation(
+			$this,
+			'tags',
+			$this->_repository->get_post_tag_repository(),
 			$this->_repository
 		);
 	}

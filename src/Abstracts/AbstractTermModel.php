@@ -2,6 +2,7 @@
 
 namespace WpifyModel\Abstracts;
 
+use WpifyModel\Interfaces\PostModelInterface;
 use WpifyModel\Interfaces\TermModelInterface;
 use WpifyModel\Interfaces\TermRepositoryInterface;
 use WpifyModel\Relations\TermChildTermsRelation;
@@ -110,6 +111,11 @@ abstract class AbstractTermModel extends AbstractModel implements TermModelInter
 	 */
 	public $filter = 'raw';
 
+	/**
+	 * @var PostModelInterface[]
+	 */
+	public $posts;
+
 	protected $_props = array(
 		'id'            => array( 'source' => 'object', 'source_name' => 'term_id' ),
 		'name'          => array( 'source' => 'object', 'source_name' => 'name' ),
@@ -154,5 +160,9 @@ abstract class AbstractTermModel extends AbstractModel implements TermModelInter
 	 */
 	public function children_relation(): TermChildTermsRelation {
 		return new TermChildTermsRelation( $this, $this->_repository );
+	}
+
+	public function posts_relation() {
+
 	}
 }

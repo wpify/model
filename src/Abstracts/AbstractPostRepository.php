@@ -12,6 +12,7 @@ use WpifyModel\Interfaces\PostRepositoryInterface;
 use WpifyModel\Interfaces\TermModelInterface;
 use WpifyModel\Interfaces\TermRepositoryInterface;
 use WpifyModel\Interfaces\UserRepositoryInterface;
+use WpifyModel\PostTagRepository;
 use WpifyModel\UserRepository;
 
 abstract class AbstractPostRepository extends AbstractRepository implements PostRepositoryInterface {
@@ -22,6 +23,9 @@ abstract class AbstractPostRepository extends AbstractRepository implements Post
 
 	/** @var ?TermRepositoryInterface */
 	private $category_repository;
+
+	/** @var ?TermRepositoryInterface */
+	private $post_tag_repository;
 
 	public function get_user_repository(): UserRepositoryInterface {
 		if ( empty( $this->user_repository ) ) {
@@ -39,6 +43,14 @@ abstract class AbstractPostRepository extends AbstractRepository implements Post
 		return $this->category_repository;
 	}
 
+	public function get_post_tag_repository(): TermRepositoryInterface {
+		if ( empty( $this->post_tag_repository ) ) {
+			$this->post_tag_repository = new PostTagRepository();
+		}
+
+		return $this->post_tag_repository;
+	}
+
 	public function fetch_parent( AbstractPostModel $model ) {
 		return $this->get( $model->parent_id );
 	}
@@ -54,7 +66,10 @@ abstract class AbstractPostRepository extends AbstractRepository implements Post
 	 * @return AbstractPostModel[]
 	 */
 	public function all() {
-		$args = array( 'posts_per_page' => - 1 );
+		$args = array(
+			'posts_per_page' => - 1,
+			'post_status'    => 'any'
+		);
 
 		return $this->find( $args );
 	}
@@ -65,7 +80,11 @@ abstract class AbstractPostRepository extends AbstractRepository implements Post
 	 * @return mixed
 	 */
 	public function find( array $args = array() ) {
-		$defaults    = array( 'post_type' => $this::post_type() );
+		$defaults    = array(
+			'post_type'      => $this::post_type(),
+			'post_status'    => 'any',
+			'posts_per_page' => - 1,
+		);
 		$args        = wp_parse_args( $args, $defaults );
 		$this->query = new WP_Query( $args );
 		$collection  = array();
@@ -87,6 +106,30 @@ abstract class AbstractPostRepository extends AbstractRepository implements Post
 	 * @return string
 	 */
 	abstract static function post_type(): string;
+
+	public function published() {
+		$args = array(
+			'posts_per_page' => - 1,
+			'post_status'    => 'publish'
+		);
+
+		return $this->find( $args );
+	}
+
+	public function all_by_term( TermModelInterface $term ) {
+		$args = array(
+			'tax_query' => array(
+				array(
+					'taxonomy' => $term->repository()->taxonomy,
+					'field'    => 'term_id',
+					'terms'    => array( $term->id ),
+					'operator' => '=',
+				)
+			),
+		);
+
+		return $this->find( $args );
+	}
 
 	/**
 	 * @return AbstractPostModel
@@ -184,7 +227,7 @@ abstract class AbstractPostRepository extends AbstractRepository implements Post
 	 * @param TermModelInterface[] $terms
 	 */
 	public function assign_post_to_term( PostModelInterface $model, array $terms ) {
-		$to_assign = [];
+		$to_assign = array();
 
 		foreach ( $terms as $term ) {
 			if ( isset( $to_assign[ $term->taxonomy_name ] ) && is_array( $to_assign[ $term->taxonomy_name ] ) ) {
