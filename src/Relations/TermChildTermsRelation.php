@@ -33,7 +33,7 @@ class TermChildTermsRelation implements RelationInterface {
 	 * @return TermModelInterface[]
 	 */
 	public function fetch() {
-		return $this->repository->child_of( $this->model->id, $this->args );
+		return $this->repository->children_of( $this->model->id, $this->args );
 	}
 
 	public function assign() {

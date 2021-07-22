@@ -10,7 +10,7 @@ use WpifyModel\Abstracts\AbstractTermRepository;
  * @package Test
  *
  * @method Category[] all( array $args = array() )
- * @method Category[] child_of( ?int $parent_id )
+ * @method Category[] children_of( ?int $parent_id )
  * @method Category[] not_empty()
  * @method Category[] find( array $args = array() )
  * @method Category create()

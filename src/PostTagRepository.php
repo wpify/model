@@ -10,7 +10,7 @@ use WpifyModel\Abstracts\AbstractTermRepository;
  * @package Test
  *
  * @method PostTag[] all( array $args = array() )
- * @method PostTag[] child_of( ?int $parent_id )
+ * @method PostTag[] children_of( ?int $parent_id )
  * @method PostTag[] not_empty()
  * @method PostTag[] find( array $args = array() )
  * @method PostTag create()

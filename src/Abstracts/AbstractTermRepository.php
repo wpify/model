@@ -91,7 +91,7 @@ abstract class AbstractTermRepository extends AbstractRepository implements Term
 	 *
 	 * @return array
 	 */
-	public function child_of( int $parent_id = 0, array $args = array() ) {
+	public function children_of( int $parent_id = 0, array $args = array() ) {
 		if ( $parent_id > 0 ) {
 			$args = array_merge( array( 'child_of' => $parent_id ), $args );
 
