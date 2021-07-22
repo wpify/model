@@ -12,13 +12,6 @@ abstract class AbstractUserRepository extends AbstractRepository implements User
 	private $query;
 
 	/**
-	 * @param ?object $object
-	 */
-	public function get( $object = null ) {
-		return ! empty( $object ) ? $this->factory( $object ) : null;
-	}
-
-	/**
 	 * @return AbstractPostModel[]
 	 */
 	public function all() {
@@ -155,5 +148,12 @@ abstract class AbstractUserRepository extends AbstractRepository implements User
 		}
 
 		return $this->get( get_current_user_id() );
+	}
+
+	/**
+	 * @param ?object $object
+	 */
+	public function get( $object = null ) {
+		return ! empty( $object ) ? $this->factory( $object ) : null;
 	}
 }

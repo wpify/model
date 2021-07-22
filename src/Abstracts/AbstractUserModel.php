@@ -108,6 +108,9 @@ abstract class AbstractUserModel extends AbstractModel implements UserModelInter
 	 */
 	public $last_name = '';
 
+	/**
+	 * @var string[][]
+	 */
 	protected $_props = array(
 		'id'             => array( 'source' => 'object', 'source_name' => 'ID' ),
 		'login'          => array( 'source' => 'object', 'source_name' => 'user_login' ),
@@ -123,6 +126,12 @@ abstract class AbstractUserModel extends AbstractModel implements UserModelInter
 		'last_name'      => array( 'source' => 'meta', 'source_name' => 'last_name' ),
 	);
 
+	/**
+	 * AbstractUserModel constructor.
+	 *
+	 * @param $object
+	 * @param UserRepositoryInterface $repository
+	 */
 	public function __construct( $object, UserRepositoryInterface $repository ) {
 		parent::__construct( $object, $repository );
 	}
@@ -132,5 +141,12 @@ abstract class AbstractUserModel extends AbstractModel implements UserModelInter
 	 */
 	static function meta_type(): string {
 		return 'user';
+	}
+
+	/**
+	 * @return UserRepositoryInterface
+	 */
+	public function model_repository(): UserRepositoryInterface {
+		return $this->_repository;
 	}
 }
