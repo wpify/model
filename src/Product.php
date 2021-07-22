@@ -7,6 +7,7 @@ use WpifyModel\Abstracts\AbstractModel;
 /**
  * Class BasicPost
  * @package WpifyModel
+ * @property ProductRepository $_repository
  * @method \WC_Product source_object()
  */
 class Product extends AbstractModel {
@@ -40,11 +41,18 @@ class Product extends AbstractModel {
 	 */
 	public $type;
 
+	/**
+	 * @var string[][]
+	 */
 	protected $_props = array(
-		'id'               => array( 'source' => 'object', 'source_name' => 'id' ),
-		'parent_id'        => array( 'source' => 'object', 'source_name' => 'parent_id' ),
-		'type'        => array( 'source' => 'object', 'source_name' => 'type' ),
+		'id'        => array( 'source' => 'object', 'source_name' => 'id' ),
+		'parent_id' => array( 'source' => 'object', 'source_name' => 'parent_id' ),
+		'type'      => array( 'source' => 'object', 'source_name' => 'type' ),
 	);
+
+	public function __construct( $object, ProductRepository $repository ) {
+		parent::__construct( $object, $repository );
+	}
 
 	/**
 	 * @return string
@@ -53,21 +61,19 @@ class Product extends AbstractModel {
 		return 'product';
 	}
 
-	public function __construct( $object, ProductRepository $repository ) {
-		parent::__construct( $object, $repository );
-	}
-
 	/**
 	 * @param $key
 	 *
 	 * @return array|false|mixed
 	 */
 	public function fetch_meta( $key ) {
-		return $this->source_object()->get_meta($key, true);
+		return $this->source_object()->get_meta( $key, true );
 	}
 
-	public function model_repository()
-	{
+	/**
+	 * @return ProductRepository
+	 */
+	public function model_repository(): ProductRepository {
 		return $this->_repository;
 	}
 }

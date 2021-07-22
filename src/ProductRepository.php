@@ -7,6 +7,7 @@ use WpifyModel\Abstracts\AbstractPostModel;
 use WpifyModel\Abstracts\AbstractRepository;
 use WpifyModel\Exceptions\NotFoundException;
 use WpifyModel\Exceptions\NotPersistedException;
+use WpifyModel\Interfaces\ModelInterface;
 use WpifyModel\Interfaces\PostModelInterface;
 use WpifyModel\Interfaces\RepositoryInterface;
 use WpifyModel\Interfaces\TermModelInterface;
@@ -68,9 +69,9 @@ class ProductRepository extends AbstractRepository implements RepositoryInterfac
 	}
 
 	/**
-	 * @param AbstractPostModel $model
+	 * @param ModelInterface $model
 	 *
-	 * @return mixed
+	 * @return ModelInterface
 	 * @throws NotFoundException
 	 * @throws NotPersistedException
 	 */

@@ -6,7 +6,6 @@ use stdClass;
 use WP_Term;
 use WpifyModel\Exceptions\NotFoundException;
 use WpifyModel\Exceptions\NotPersistedException;
-use WpifyModel\Interfaces\PostRepositoryInterface;
 use WpifyModel\Interfaces\TermModelInterface;
 use WpifyModel\Interfaces\TermRepositoryInterface;
 
@@ -112,8 +111,10 @@ abstract class AbstractTermRepository extends AbstractRepository implements Term
 		$collection = array();
 		$terms      = get_the_terms( $post_id, $this::taxonomy() );
 
-		foreach ( $terms as $term ) {
-			$collection[] = $this->factory( $term );
+		if ( ! empty( $terms ) ) {
+			foreach ( $terms as $term ) {
+				$collection[] = $this->factory( $term );
+			}
 		}
 
 		return $this->collection_factory( $collection );
