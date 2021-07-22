@@ -116,8 +116,8 @@ abstract class AbstractPostRepository extends AbstractRepository implements Post
 				}
 
 				$object_data['meta_input'][ $source_name ] = $model->$key;
-			} elseif ( $prop['source'] === 'relation' && is_callable( $prop['assign'] ) && $prop['changed'] ) {
-				$prop['assign']( $model );
+			} elseif ( $prop['source'] === 'relation' && isset( $prop['relation'] ) && method_exists( $prop['relation'], 'assign' ) && $prop['changed'] ) {
+				$prop['relation']->assign();
 			}
 		}
 

@@ -30,9 +30,6 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 	/** @var object */
 	protected $_object;
 
-	/** @var array */
-	protected $_observers;
-
 	/**
 	 * AbstractPost constructor.
 	 *
