@@ -244,6 +244,14 @@ abstract class AbstractPostModel extends AbstractModel implements PostModelInter
 	 */
 	public $tags;
 
+	/**
+	 * Children of the post
+	 *
+	 * @var self[]
+	 */
+	public $children;
+
+
 	protected $_props = array(
 		'id'               => array( 'source' => 'object', 'source_name' => 'ID' ),
 		'author_id'        => array( 'source' => 'object', 'source_name' => 'post_author' ),
