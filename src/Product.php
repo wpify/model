@@ -66,4 +66,8 @@ class Product extends AbstractModel {
 		return $this->source_object()->get_meta($key, true);
 	}
 
+	public function model_repository()
+	{
+		return $this->_repository;
+	}
 }
