@@ -107,6 +107,38 @@ abstract class AbstractPostRepository extends AbstractRepository implements Post
 	 */
 	abstract static function post_type(): string;
 
+	/**
+	 * @param $data
+	 *
+	 * @return WP_Post
+	 * @throws NotFoundException
+	 */
+	protected function resolve_object( $data ): WP_Post {
+		if ( is_object( $data ) && get_class( $data ) === $this::model() ) {
+			$object = $data->source_object();
+		} elseif ( $data instanceof WP_Post ) {
+			$object = $data;
+		} elseif ( is_null( $data ) ) {
+			$object = new WP_Post( (object) array(
+				'ID'            => null,
+				'post_author'   => get_current_user_id(),
+				'post_date'     => current_time( 'mysql' ),
+				'post_date_gmt' => current_time( 'mysql', 1 ),
+				'post_type'     => $this::post_type(),
+			) );
+		} elseif ( isset( $data->id ) ) {
+			$object = get_post( $data->id );
+		} else {
+			$object = get_post( $data );
+		}
+
+		if ( ! ( $object instanceof WP_Post ) ) {
+			throw new NotFoundException( 'The post was not found' );
+		}
+
+		return $object;
+	}
+
 	public function published() {
 		$args = array(
 			'posts_per_page' => - 1,
@@ -120,10 +152,9 @@ abstract class AbstractPostRepository extends AbstractRepository implements Post
 		$args = array(
 			'tax_query' => array(
 				array(
-					'taxonomy' => $term->repository()->taxonomy,
+					'taxonomy' => $term->model_repository()::taxonomy(),
 					'field'    => 'term_id',
 					'terms'    => array( $term->id ),
-					'operator' => '=',
 				)
 			),
 		);
@@ -180,38 +211,6 @@ abstract class AbstractPostRepository extends AbstractRepository implements Post
 	}
 
 	/**
-	 * @param $data
-	 *
-	 * @return WP_Post
-	 * @throws NotFoundException
-	 */
-	protected function resolve_object( $data ): WP_Post {
-		if ( is_object( $data ) && get_class( $data ) === $this::model() ) {
-			$object = $data->source_object();
-		} elseif ( $data instanceof WP_Post ) {
-			$object = $data;
-		} elseif ( is_null( $data ) ) {
-			$object = new WP_Post( (object) array(
-				'ID'            => null,
-				'post_author'   => get_current_user_id(),
-				'post_date'     => current_time( 'mysql' ),
-				'post_date_gmt' => current_time( 'mysql', 1 ),
-				'post_type'     => $this::post_type(),
-			) );
-		} elseif ( isset( $data->id ) ) {
-			$object = get_post( $data->id );
-		} else {
-			$object = get_post( $data );
-		}
-
-		if ( ! ( $object instanceof WP_Post ) ) {
-			throw new NotFoundException( 'The post was not found' );
-		}
-
-		return $object;
-	}
-
-	/**
 	 * @param PostModelInterface $model
 	 *
 	 * @return mixed
@@ -226,7 +225,7 @@ abstract class AbstractPostRepository extends AbstractRepository implements Post
 	 * @param PostModelInterface $model
 	 * @param TermModelInterface[] $terms
 	 */
-	public function assign_post_to_term( PostModelInterface $model, array $terms ) {
+	public function assign_post_to_term( PostModelInterface $model, array $terms, bool $append = false ) {
 		$to_assign = array();
 
 		foreach ( $terms as $term ) {
@@ -240,7 +239,7 @@ abstract class AbstractPostRepository extends AbstractRepository implements Post
 		foreach ( $to_assign as $taxonomy => $assigns ) {
 			wp_set_post_terms( $model->id, array_values( array_map( function ( $term ) {
 				return $term->id;
-			}, $assigns ) ), $taxonomy );
+			}, $assigns ) ), $taxonomy, $append );
 		}
 	}
 

@@ -19,11 +19,26 @@ use WpifyModel\Abstracts\AbstractTermRepository;
  * @method mixed delete( $model )
  */
 class PostTagRepository extends AbstractTermRepository {
+
+	/** @var PostRepository */
+	protected $post_repository;
+
 	static function model(): string {
 		return PostTag::class;
 	}
 
 	static function taxonomy(): string {
 		return 'post_tag';
+	}
+
+	/**
+	 * @return PostRepository
+	 */
+	public function get_post_repository(): PostRepository {
+		if ( empty( $this->post_repository ) ) {
+			$this->post_repository = new PostRepository();
+		}
+
+		return $this->post_repository;
 	}
 }

@@ -13,22 +13,27 @@ class TermChildTermsRelation implements RelationInterface {
 	/** @var TermRepositoryInterface */
 	private $repository;
 
+	/** @var array */
+	private $args;
+
 	/**
 	 * TermRelation constructor.
 	 *
 	 * @param TermModelInterface $model
 	 * @param TermRepositoryInterface $repository
+	 * @param array $args
 	 */
-	public function __construct( TermModelInterface $model, TermRepositoryInterface $repository ) {
+	public function __construct( TermModelInterface $model, TermRepositoryInterface $repository, array $args = array() ) {
 		$this->model      = $model;
 		$this->repository = $repository;
+		$this->args       = $args;
 	}
 
 	/**
 	 * @return TermModelInterface[]
 	 */
 	public function fetch() {
-		return $this->repository->child_of( $this->model->id );
+		return $this->repository->child_of( $this->model->id, $this->args );
 	}
 
 	public function assign() {

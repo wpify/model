@@ -3,10 +3,12 @@
 namespace WpifyModel\Abstracts;
 
 use WpifyModel\Interfaces\PostModelInterface;
+use WpifyModel\Interfaces\RepositoryInterface;
 use WpifyModel\Interfaces\TermModelInterface;
 use WpifyModel\Interfaces\TermRepositoryInterface;
 use WpifyModel\Relations\TermChildTermsRelation;
 use WpifyModel\Relations\TermParentTermRelation;
+use WpifyModel\Relations\TermPostsRelation;
 
 /**
  * Class AbstractTermModel
@@ -111,11 +113,6 @@ abstract class AbstractTermModel extends AbstractModel implements TermModelInter
 	 */
 	public $filter = 'raw';
 
-	/**
-	 * @var PostModelInterface[]
-	 */
-	public $posts;
-
 	protected $_props = array(
 		'id'            => array( 'source' => 'object', 'source_name' => 'term_id' ),
 		'name'          => array( 'source' => 'object', 'source_name' => 'name' ),
@@ -141,10 +138,17 @@ abstract class AbstractTermModel extends AbstractModel implements TermModelInter
 	}
 
 	/**
+	 * @return TermRepositoryInterface
+	 */
+	public function model_repository(): TermRepositoryInterface {
+		return $this->_repository;
+	}
+
+	/**
 	 * @return TermParentTermRelation
 	 */
 	public function parent_relation(): TermParentTermRelation {
-		return new TermParentTermRelation( $this, $this->_repository );
+		return new TermParentTermRelation( $this, $this->model_repository() );
 	}
 
 	protected function after_parent_set() {
@@ -159,10 +163,6 @@ abstract class AbstractTermModel extends AbstractModel implements TermModelInter
 	 * @return TermChildTermsRelation
 	 */
 	public function children_relation(): TermChildTermsRelation {
-		return new TermChildTermsRelation( $this, $this->_repository );
-	}
-
-	public function posts_relation() {
-
+		return new TermChildTermsRelation( $this, $this->model_repository() );
 	}
 }

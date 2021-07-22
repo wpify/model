@@ -203,7 +203,7 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 
 					$this->_data[ $key ] = $relation->fetch();
 				} elseif ( $prop['source'] === 'object' ) {
-					$getter = 'get_'.$source_name;
+					$getter = 'get_' . $source_name;
 					if ( method_exists( $this->_object, $getter ) ) {
 						$this->_data[ $key ] = $this->_object->$getter();
 					} elseif ( isset( $this->_object->$source_name ) ) {

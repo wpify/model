@@ -6,14 +6,18 @@ use stdClass;
 use WP_Term;
 use WpifyModel\Exceptions\NotFoundException;
 use WpifyModel\Exceptions\NotPersistedException;
+use WpifyModel\Interfaces\PostRepositoryInterface;
+use WpifyModel\Interfaces\TermModelInterface;
 use WpifyModel\Interfaces\TermRepositoryInterface;
 
 abstract class AbstractTermRepository extends AbstractRepository implements TermRepositoryInterface {
 	/**
+	 * @param array $args
+	 *
 	 * @return AbstractTermModel[]
 	 */
-	public function all() {
-		$args = array( 'hide_empty' => false );
+	public function all( array $args = array() ) {
+		$args = array_merge( array( 'hide_empty' => false ), $args );
 
 		return $this->find( $args );
 	}
@@ -82,13 +86,14 @@ abstract class AbstractTermRepository extends AbstractRepository implements Term
 	}
 
 	/**
-	 * @param ?int $parent_id
+	 * @param int $parent_id
+	 * @param array $args
 	 *
 	 * @return array
 	 */
-	public function child_of( ?int $parent_id ) {
+	public function child_of( int $parent_id = 0, array $args = array() ) {
 		if ( $parent_id > 0 ) {
-			$args = array( 'child_of' => $parent_id );
+			$args = array_merge( array( 'child_of' => $parent_id ), $args );
 
 			return $this->find( $args );
 		}
@@ -112,7 +117,12 @@ abstract class AbstractTermRepository extends AbstractRepository implements Term
 		}
 
 		return $this->collection_factory( $collection );
+	}
 
+	public function posts_in_term( TermModelInterface $term ) {
+		$collection = array();
+
+		return $this->collection_factory( $collection );
 	}
 
 	/**

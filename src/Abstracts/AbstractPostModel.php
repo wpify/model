@@ -272,6 +272,14 @@ abstract class AbstractPostModel extends AbstractModel implements PostModelInter
 		return 'post';
 	}
 
+	/**
+	 * @return PostRepositoryInterface
+	 */
+	public function model_repository(): PostRepositoryInterface {
+		return $this->_repository;
+	}
+
+
 	protected function parent_relation(): PostParentPostRelation {
 		return new PostParentPostRelation( $this, $this->_repository );
 	}

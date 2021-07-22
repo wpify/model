@@ -5,7 +5,6 @@ namespace WpifyModel\Relations;
 use WpifyModel\Interfaces\PostRepositoryInterface;
 use WpifyModel\Interfaces\RelationInterface;
 use WpifyModel\Interfaces\TermModelInterface;
-use WpifyModel\Interfaces\TermRepositoryInterface;
 
 class TermPostsRelation implements RelationInterface {
 	/** @var TermModelInterface */
@@ -13,9 +12,6 @@ class TermPostsRelation implements RelationInterface {
 
 	/** @var string */
 	private $key;
-
-	/** @var TermRepositoryInterface */
-	private $term_repository;
 
 	/** @var PostRepositoryInterface */
 	private $post_repository;
@@ -25,26 +21,23 @@ class TermPostsRelation implements RelationInterface {
 	 *
 	 * @param TermModelInterface $model
 	 * @param string $key
-	 * @param TermRepositoryInterface $term_repository
 	 * @param PostRepositoryInterface $post_repository
 	 */
 	public function __construct(
 		TermModelInterface $model,
 		string $key,
-		TermRepositoryInterface $term_repository,
 		PostRepositoryInterface $post_repository
 	) {
 		$this->model           = $model;
 		$this->key             = $key;
-		$this->term_repository = $term_repository;
 		$this->post_repository = $post_repository;
 	}
 
 	public function fetch() {
-		// TODO: Implement fetch() method.
+		return $this->post_repository->all_by_term( $this->model );
 	}
 
 	public function assign() {
-		// TODO: Implement assign() method.
+		$this->post_repository->assign_post_to_term( $this->model->{$this->key}, [ $this->model ], true );
 	}
 }
