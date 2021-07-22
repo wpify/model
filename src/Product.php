@@ -3,11 +3,11 @@
 namespace WpifyModel;
 
 use WpifyModel\Abstracts\AbstractModel;
-use WpifyModel\Interfaces\PostRepositoryInterface;
 
 /**
  * Class BasicPost
  * @package WpifyModel
+ * @method \WC_Product source_object()
  */
 class Product extends AbstractModel {
 	/**
@@ -33,9 +33,17 @@ class Product extends AbstractModel {
 	 */
 	public $parent;
 
+	/**
+	 * Product type
+	 *
+	 * @var string
+	 */
+	public $type;
+
 	protected $_props = array(
 		'id'               => array( 'source' => 'object', 'source_name' => 'id' ),
 		'parent_id'        => array( 'source' => 'object', 'source_name' => 'parent_id' ),
+		'type'        => array( 'source' => 'object', 'source_name' => 'type' ),
 	);
 
 	/**
@@ -48,4 +56,14 @@ class Product extends AbstractModel {
 	public function __construct( $object, ProductRepository $repository ) {
 		parent::__construct( $object, $repository );
 	}
+
+	/**
+	 * @param $key
+	 *
+	 * @return array|false|mixed
+	 */
+	public function fetch_meta( $key ) {
+		return $this->source_object()->get_meta($key, true);
+	}
+
 }
