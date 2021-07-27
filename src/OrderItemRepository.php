@@ -16,9 +16,17 @@ use WpifyModel\Interfaces\TermModelInterface;
 /**
  * Class BasePostRepository
  * @package WpifyModel
- *
  */
 class OrderItemRepository extends AbstractRepository implements RepositoryInterface {
+	/**
+	 * @var string
+	 */
+	private $model;
+
+	public function __construct( string $model = OrderItemLine::class ) {
+		$this->model = $model;
+	}
+
 	/**
 	 * @param ?object $object
 	 */
@@ -43,7 +51,7 @@ class OrderItemRepository extends AbstractRepository implements RepositoryInterf
 	public function find( array $args = array() ) {
 		$defaults = [];
 		$args     = wp_parse_args( $args, $defaults );
-		$items = wc_get_orders( $args );
+		$items    = wc_get_orders( $args );
 
 		$collection = array();
 
@@ -63,7 +71,6 @@ class OrderItemRepository extends AbstractRepository implements RepositoryInterf
 
 	/**
 	 * @param ModelInterface $model
-	 *
 	 * // TODO: Implement this
 	 */
 	public function save( $model ) {
@@ -84,7 +91,7 @@ class OrderItemRepository extends AbstractRepository implements RepositoryInterf
 		} elseif ( is_null( $data ) ) {
 			$object = new WC_Order_Item();
 		} elseif ( isset( $data->id ) ) {
-			$object = new WC_Order_Item($data->id);
+			$object = new WC_Order_Item( $data->id );
 		} else {
 			$object = null;
 		}
@@ -97,7 +104,7 @@ class OrderItemRepository extends AbstractRepository implements RepositoryInterf
 	}
 
 	public function model(): string {
-		return OrderItem::class;
+		return $this->model;
 	}
 
 	/**
@@ -107,6 +114,6 @@ class OrderItemRepository extends AbstractRepository implements RepositoryInterf
 	 * @throws \Exception
 	 */
 	public function delete( PostModelInterface $model ) {
-		return wc_delete_order_item( $model->id);
+		return wc_delete_order_item( $model->id );
 	}
 }

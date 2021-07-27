@@ -89,29 +89,32 @@ class Order extends AbstractModel {
 
 	/**
 	 * Get order Line items
-	 * @return array
+	 * @return OrderItemsRelation
 	 */
 	public function line_items_relation() {
-		return new OrderItemsRelation( $this, $this->model_repository()->get_item_repository(), 'line_item' );
+		return new OrderItemsRelation( $this, $this->model_repository()->get_item_repository(OrderItemLine::class), 'line_item' );
 	}
 
 	/**
 	 * Get order Shipping items
-	 * @return array
+	 * @return OrderItemsRelation
 	 */
 	public function shipping_items_relation() {
-		return new OrderItemsRelation( $this, $this->model_repository()->get_item_repository(), 'shipping' );
+		return new OrderItemsRelation( $this, $this->model_repository()->get_item_repository(OrderItemShipping::class), 'shipping' );
 	}
 
 
 	/**
 	 * Get order Shipping items
-	 * @return array
+	 * @return OrderItemsRelation
 	 */
 	public function fee_items_relation() {
-		return new OrderItemsRelation( $this, $this->model_repository()->get_item_repository(), 'fee' );
+		return new OrderItemsRelation( $this, $this->model_repository()->get_item_repository(OrderItemFee::class), 'fee' );
 	}
 
+	/**
+	 * @return array|OrderItem[]
+	 */
 	public function get_items() {
 		return array_merge( $this->line_items, $this->shipping_items, $this->fee_items );
 	}

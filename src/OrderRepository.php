@@ -173,11 +173,8 @@ class OrderRepository extends AbstractRepository implements RepositoryInterface 
 		}
 	}
 
-	public function get_item_repository() {
-		if ( empty( $this->item_repository ) ) {
-			$this->item_repository = new OrderItemRepository();
-		}
-
-		return $this->item_repository;
+	public function get_item_repository( $model = OrderItemLine::class ) {
+		// TODO: Cache this
+		return new OrderItemRepository( $model );
 	}
 }
