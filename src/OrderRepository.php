@@ -117,7 +117,7 @@ class OrderRepository extends AbstractRepository implements RepositoryInterface 
 	 * @throws NotFoundException
 	 */
 	protected function resolve_object( $data ): WC_Order {
-		if ( is_object( $data ) && get_class( $data ) === $this::model() ) {
+		if ( is_object( $data ) && get_class( $data ) === $this->model() ) {
 			$object = $data->source_object();
 		} elseif ( $data instanceof WC_Order ) {
 			$object = $data;
