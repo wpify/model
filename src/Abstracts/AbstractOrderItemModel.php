@@ -47,9 +47,9 @@ abstract class AbstractOrderItemModel extends AbstractModel {
 	}
 
 	/**
-	 * @return ProductRepository
+	 * @return OrderItemRepository
 	 */
-	public function model_repository(): ProductRepository {
+	public function model_repository(): OrderItemRepository {
 		return $this->_repository;
 	}
 }

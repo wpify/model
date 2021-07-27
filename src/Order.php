@@ -8,7 +8,7 @@ use WpifyModel\Relations\OrderItemsRelation;
 /**
  * Class Order
  * @package WpifyModel
- * @property ProductRepository $_repository
+ * @property OrderRepository $_repository
  * @method \WC_Order source_object()
  */
 class Order extends AbstractModel {
@@ -81,7 +81,7 @@ class Order extends AbstractModel {
 	}
 
 	/**
-	 * @return ProductRepository
+	 * @return OrderRepository
 	 */
 	public function model_repository(): OrderRepository {
 		return $this->_repository;
@@ -113,9 +113,6 @@ class Order extends AbstractModel {
 	}
 
 	public function get_items() {
-		var_dump($this->line_items);
-		var_dump($this->shiping_items);
-		var_dump($this->fee_items);
 		return array_merge( $this->line_items, $this->shipping_items, $this->fee_items );
 	}
 
