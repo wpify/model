@@ -34,23 +34,25 @@ class Order extends AbstractModel {
 
 	/**
 	 * Line items
-	 * @var OrderItem[]
+	 * @var OrderItemLine[]
 	 */
 	public $line_items;
 
 	/**
 	 * Shipping items
-	 * @var OrderItem[]
+	 * @var OrderItemShipping[]
 	 */
 	public $shipping_items;
 
 	/**
 	 * Fee items
-	 * @var OrderItem[]
+	 * @var OrderItemFee[]
 	 */
 	public $fee_items;
 
 	public $items;
+
+	public $weight;
 
 	/**
 	 * @var string[][]
@@ -117,6 +119,54 @@ class Order extends AbstractModel {
 	 */
 	public function get_items() {
 		return array_merge( $this->line_items, $this->shipping_items, $this->fee_items );
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function get_weight(string $unit = 'kg')
+	{
+		if ($this->weight) {
+			return $this->weight;
+		}
+		$wc_weight_unit = get_option('woocommerce_weight_unit');
+		$this->weight = 0;
+		foreach ($this->line_items as $item) {
+			$prod = $item->product;
+			if (\method_exists($prod, 'get_weight')) {
+				if ($prod->get_weight()) {
+					$this->weight += $prod->get_weight();
+				}
+			}
+		}
+		if ($wc_weight_unit === 'g' && $unit === 'kg') {
+			$this->weight = $this->weight / 1000;
+		}
+		if ($wc_weight_unit === 'kg' && $unit === 'g') {
+			$this->weight = $this->weight * 1000;
+		}
+		return $this->weight;
+	}
+	/**
+	 * @param string|[] $shipping_method_id Expects ID in method_id:instance_id format
+	 */
+	public function has_shipping_method($shipping_method_ids)
+	{
+		$methods = [];
+		foreach ($this->shipping_items as $item) {
+			$methods[] = \sprintf('%s:%s', $item->get_method_id(), $item->get_instance_id());
+		}
+		if (\is_array($shipping_method_ids)) {
+			$found = \false;
+			foreach ($methods as $method) {
+				if (\in_array($method, $shipping_method_ids)) {
+					$found = \true;
+					break;
+				}
+			}
+			return $found;
+		}
+		return \in_array($shipping_method_ids, $methods);
 	}
 
 }
