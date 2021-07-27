@@ -135,7 +135,7 @@ class ProductRepository extends AbstractRepository implements RepositoryInterfac
 		return $object;
 	}
 
-	static function model(): string {
+	public function model(): string {
 		return Product::class;
 	}
 

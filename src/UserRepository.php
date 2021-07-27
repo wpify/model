@@ -17,7 +17,7 @@ use WpifyModel\Abstracts\AbstractUserRepository;
  * @method mixed delete( $model )
  */
 class UserRepository extends AbstractUserRepository {
-	static function model(): string {
+	public function model(): string {
 		return User::class;
 	}
 }

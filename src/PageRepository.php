@@ -21,7 +21,7 @@ class PageRepository extends AbstractPostRepository {
 		return 'page';
 	}
 
-	static function model(): string {
+	public function model(): string {
 		return Page::class;
 	}
 }

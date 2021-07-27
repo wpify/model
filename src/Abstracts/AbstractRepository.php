@@ -16,7 +16,7 @@ abstract class AbstractRepository implements RepositoryInterface {
 	 * @return mixed
 	 */
 	protected function factory( $object ) {
-		$class = $this::model();
+		$class = $this->model();
 
 		return new $class( $this->resolve_object( $object ), $this );
 	}

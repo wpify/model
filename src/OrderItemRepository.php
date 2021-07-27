@@ -96,7 +96,7 @@ class OrderItemRepository extends AbstractRepository implements RepositoryInterf
 		return $object;
 	}
 
-	static function model(): string {
+	public function model(): string {
 		return OrderItem::class;
 	}
 

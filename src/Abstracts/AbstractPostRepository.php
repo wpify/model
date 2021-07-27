@@ -114,7 +114,7 @@ abstract class AbstractPostRepository extends AbstractRepository implements Post
 	 * @throws NotFoundException
 	 */
 	protected function resolve_object( $data ): WP_Post {
-		if ( is_object( $data ) && get_class( $data ) === $this::model() ) {
+		if ( is_object( $data ) && get_class( $data ) === $this->model() ) {
 			$object = $data->source_object();
 		} elseif ( $data instanceof WP_Post ) {
 			$object = $data;

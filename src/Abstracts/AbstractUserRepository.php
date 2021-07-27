@@ -101,7 +101,7 @@ abstract class AbstractUserRepository extends AbstractRepository implements User
 	 * @throws NotFoundException
 	 */
 	protected function resolve_object( $data ): WP_User {
-		if ( is_object( $data ) && get_class( $data ) === $this::model() ) {
+		if ( is_object( $data ) && get_class( $data ) === $this->model() ) {
 			$object = $data->source_object();
 		} elseif ( $data instanceof WP_User ) {
 			$object = $data;

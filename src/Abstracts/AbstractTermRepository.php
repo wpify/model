@@ -187,7 +187,7 @@ abstract class AbstractTermRepository extends AbstractRepository implements Term
 	protected function resolve_object( $data = null ): ?WP_Term {
 		$object = null;
 
-		if ( is_object( $data ) && get_class( $data ) === $this::model() ) {
+		if ( is_object( $data ) && get_class( $data ) === $this->model() ) {
 			$object = $data->source_object();
 		} elseif ( $data instanceof WP_Term ) {
 			$object = $data;
@@ -213,5 +213,5 @@ abstract class AbstractTermRepository extends AbstractRepository implements Term
 		return $object;
 	}
 
-	abstract static function model(): string;
+	abstract public function model(): string;
 }

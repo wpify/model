@@ -20,7 +20,7 @@ class PostRepository extends AbstractPostRepository {
 		return 'post';
 	}
 
-	static function model(): string {
+	public function model(): string {
 		return Post::class;
 	}
 }
