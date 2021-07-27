@@ -15,9 +15,10 @@ use WpifyModel\Interfaces\TermModelInterface;
 /**
  * Class BasePostRepository
  * @package WpifyModel
- *
  */
 class OrderRepository extends AbstractRepository implements RepositoryInterface {
+	private $item_repository;
+
 	static function post_type(): string {
 		return 'shop_order';
 	}
@@ -50,7 +51,7 @@ class OrderRepository extends AbstractRepository implements RepositoryInterface 
 	public function find( array $args = array() ) {
 		$defaults = [];
 		$args     = wp_parse_args( $args, $defaults );
-		$items = wc_get_orders( $args );
+		$items    = wc_get_orders( $args );
 
 		$collection = array();
 
@@ -151,7 +152,7 @@ class OrderRepository extends AbstractRepository implements RepositoryInterface 
 	/**
 	 * Assign the post to the terms
 	 *
-	 * @param PostModelInterface $model
+	 * @param PostModelInterface   $model
 	 * @param TermModelInterface[] $terms
 	 */
 	public function assign_post_to_term( PostModelInterface $model, array $terms ) {
@@ -170,5 +171,13 @@ class OrderRepository extends AbstractRepository implements RepositoryInterface 
 				return $term->id;
 			}, $assigns ) ), $taxonomy );
 		}
+	}
+
+	public function get_item_repository() {
+		if ( empty( $this->item_repository ) ) {
+			$this->item_repository = new OrderItemRepository();
+		}
+
+		return $this->item_repository;
 	}
 }
