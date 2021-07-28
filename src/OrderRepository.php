@@ -78,30 +78,23 @@ class OrderRepository extends AbstractRepository implements RepositoryInterface 
 	 */
 	public function save( $model ) {
 		$object_data = array();
-
+		$order       = $model->source_object();
 		foreach ( $model->own_props() as $key => $prop ) {
-			$source_name = $prop['source_name'];
-
-			if ( $prop['source'] === 'object' ) {
-				$object_data[ $source_name ] = $model->$key;
-			} elseif ( $prop['source'] === 'meta' ) {
-				if ( ! isset( $object_data['meta_input'] ) ) {
-					$object_data['meta_input'] = array();
-				}
-
-				$object_data['meta_input'][ $source_name ] = $model->$key;
-			} elseif ( $prop['source'] === 'relation' && is_callable( $prop['assign'] ) && $prop['changed'] ) {
+			// TODO: uncomment this if needed to set object data back
+//			$source_name = $prop['source_name'];
+//            if ($prop['source'] === 'object') {
+//                $object_data[$source_name] = $model->{$key};
+//            }
+//
+			if ( $prop['source'] === 'meta' ) {
+				$order->update_meta_data( $key, $model->{$key} );
+			} elseif ( $prop['source'] === 'relation' && \is_callable( $prop['assign'] ) && $prop['changed'] ) {
 				$prop['assign']( $model );
 			}
 		}
 
-		if ( $model->id > 0 ) {
-			$result = wp_update_post( $object_data, true );
-		} else {
-			$result = wp_insert_post( $object_data, true );
-		}
-
-		if ( ! is_wp_error( $result ) ) {
+		$result = $order->save();
+		if ( $result && ! is_wp_error( $result ) ) {
 			$model->refresh( $this->resolve_object( $result ) );
 		} else {
 			throw new NotPersistedException();
@@ -179,4 +172,18 @@ class OrderRepository extends AbstractRepository implements RepositoryInterface 
 		// TODO: Cache this
 		return new OrderItemRepository( $model );
 	}
+
+	public function count( $args = [] ) {
+		$args  = wp_parse_args(
+			$args,
+			[
+				'limit'  => - 1,
+				'return' => 'ids',
+			]
+		);
+		$items = wc_get_orders( $args );
+
+		return count( $items );
+	}
+
 }
