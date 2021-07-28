@@ -80,7 +80,7 @@ class OrderRepository extends AbstractRepository implements RepositoryInterface 
 		$object_data = array();
 		$order       = $model->source_object();
 		foreach ( $model->own_props() as $key => $prop ) {
-			if (!empty($prop['readonly']) && $prop['readonly']) {
+			if ( ! empty( $prop['readonly'] ) ) {
 				continue;
 			}
 			// TODO: uncomment this if needed to set object data back

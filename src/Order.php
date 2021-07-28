@@ -58,10 +58,8 @@ class Order extends AbstractModel {
 	 * @var string[][]
 	 */
 	protected $_props = array(
-		'id'        => array( 'source' => 'object', 'source_name' => 'id' ),
-		'parent_id' => array( 'source' => 'object', 'source_name' => 'parent_id' ),
-		'items'     => array( 'source' => 'getter', 'readonly' => true ),
-		'weight'    => array( 'source' => 'getter', 'readonly' => true ),
+		'items'     => array( 'source' => 'getter', 'getter' => 'get_items', 'readonly' => true ),
+		'weight'    => array( 'source' => 'getter', 'getter' => 'get_weight', 'readonly' => true ),
 	);
 
 	public function __construct( $object, OrderRepository $repository ) {
