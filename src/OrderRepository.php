@@ -91,7 +91,7 @@ class OrderRepository extends AbstractRepository implements RepositoryInterface 
 //
 			if ( $prop['source'] === 'meta' ) {
 				$order->update_meta_data( $key, $model->{$key} );
-			} elseif ( $prop['source'] === 'relation' && \is_callable( $prop['assign'] ) && $prop['changed'] ) {
+			} elseif ( $prop['source'] === 'relation' && !empty($prop['assign']) && \is_callable( $prop['assign'] ) && $prop['changed'] ) {
 				$prop['assign']( $model );
 			}
 		}
