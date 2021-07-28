@@ -60,6 +60,8 @@ class Order extends AbstractModel {
 	protected $_props = array(
 		'id'        => array( 'source' => 'object', 'source_name' => 'id' ),
 		'parent_id' => array( 'source' => 'object', 'source_name' => 'parent_id' ),
+		'items'     => array( 'source' => 'getter', 'readonly' => true ),
+		'weight'    => array( 'source' => 'getter', 'readonly' => true ),
 	);
 
 	public function __construct( $object, OrderRepository $repository ) {
@@ -94,7 +96,7 @@ class Order extends AbstractModel {
 	 * @return OrderItemsRelation
 	 */
 	public function line_items_relation() {
-		return new OrderItemsRelation( $this, $this->model_repository()->get_item_repository(OrderItemLine::class), 'line_item' );
+		return new OrderItemsRelation( $this, $this->model_repository()->get_item_repository( OrderItemLine::class ), 'line_item' );
 	}
 
 	/**
@@ -102,7 +104,7 @@ class Order extends AbstractModel {
 	 * @return OrderItemsRelation
 	 */
 	public function shipping_items_relation() {
-		return new OrderItemsRelation( $this, $this->model_repository()->get_item_repository(OrderItemShipping::class), 'shipping' );
+		return new OrderItemsRelation( $this, $this->model_repository()->get_item_repository( OrderItemShipping::class ), 'shipping' );
 	}
 
 
@@ -111,7 +113,7 @@ class Order extends AbstractModel {
 	 * @return OrderItemsRelation
 	 */
 	public function fee_items_relation() {
-		return new OrderItemsRelation( $this, $this->model_repository()->get_item_repository(OrderItemFee::class), 'fee' );
+		return new OrderItemsRelation( $this, $this->model_repository()->get_item_repository( OrderItemFee::class ), 'fee' );
 	}
 
 	/**
@@ -124,47 +126,49 @@ class Order extends AbstractModel {
 	/**
 	 * @return mixed
 	 */
-	public function get_weight(string $unit = 'kg')
-	{
+	public function get_weight( string $unit = 'kg' ) {
 		// TODO: Cache this
-		$wc_weight_unit = get_option('woocommerce_weight_unit');
-		$weight = 0;
-		foreach ($this->line_items as $item) {
+		$wc_weight_unit = get_option( 'woocommerce_weight_unit' );
+		$weight         = 0;
+		foreach ( $this->line_items as $item ) {
 			$prod = $item->product;
-			if (\method_exists($prod, 'get_weight')) {
-				if ($prod->get_weight()) {
+			if ( \method_exists( $prod, 'get_weight' ) ) {
+				if ( $prod->get_weight() ) {
 					$weight += $prod->get_weight();
 				}
 			}
 		}
-		if ($wc_weight_unit === 'g' && $unit === 'kg') {
+		if ( $wc_weight_unit === 'g' && $unit === 'kg' ) {
 			$weight = $weight / 1000;
 		}
-		if ($wc_weight_unit === 'kg' && $unit === 'g') {
+		if ( $wc_weight_unit === 'kg' && $unit === 'g' ) {
 			$weight = $weight * 1000;
 		}
+
 		return $weight;
 	}
+
 	/**
 	 * @param string|[] $shipping_method_id Expects ID in method_id:instance_id format
 	 */
-	public function has_shipping_method($shipping_method_ids)
-	{
+	public function has_shipping_method( $shipping_method_ids ) {
 		$methods = [];
-		foreach ($this->shipping_items as $item) {
-			$methods[] = \sprintf('%s:%s', $item->method_id, $item->instance_id);
+		foreach ( $this->shipping_items as $item ) {
+			$methods[] = \sprintf( '%s:%s', $item->method_id, $item->instance_id );
 		}
-		if (\is_array($shipping_method_ids)) {
+		if ( \is_array( $shipping_method_ids ) ) {
 			$found = \false;
-			foreach ($methods as $method) {
-				if (in_array($method, $shipping_method_ids)) {
+			foreach ( $methods as $method ) {
+				if ( in_array( $method, $shipping_method_ids ) ) {
 					$found = true;
 					break;
 				}
 			}
+
 			return $found;
 		}
-		return in_array($shipping_method_ids, $methods);
+
+		return in_array( $shipping_method_ids, $methods );
 	}
 
 }
