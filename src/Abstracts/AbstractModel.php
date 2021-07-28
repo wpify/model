@@ -99,7 +99,7 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 			}
 
 			if ( $property->getDocComment() ) {
-				$parsed = $parser->parse( $property->getDocComment() );
+				$parsed = $parser->parse( get_class($this), 'properties', $property->getDocComment(), $name );
 				foreach ( $parsed->children as $child ) {
 					if ( isset( $child->name ) && $child->name === '@readonly' ) {
 						$this->_props[ $name ]['readonly'] = true;

@@ -10,6 +10,7 @@ use PHPStan\PhpDocParser\Parser\TypeParser;
 class PHPDocParser {
 	public $lexer;
 	public $parser;
+	static $parsed;
 
 	public function __construct() {
 		$this->lexer     = new Lexer();
@@ -17,9 +18,23 @@ class PHPDocParser {
 		$this->parser    = new \PHPStan\PhpDocParser\Parser\PhpDocParser( new TypeParser( $constExprParser ), $constExprParser );
 	}
 
-	public function parse( $input ) {
+	public function parse( $class, $type, $input, $name = '' ) {
+		if ( 'properties' === $type && isset( self::$parsed[ $class ][$type][ $name ] ) ) {
+			return self::$parsed[ $class ]['properties'][ $name ];
+		} elseif ( isset( self::$parsed[ $class ][ $type ] ) ) {
+			return self::$parsed[ $class ][ $type ];
+		}
+
 		$tokens = new TokenIterator( $this->lexer->tokenize( $input ) );
 
-		return $this->parser->parse( $tokens );
+		$parsed = $this->parser->parse( $tokens );
+		if ( $type === 'properties' ) {
+			self::$parsed[ $class ][ $type ][ $name ] = $parsed;
+		} else {
+			self::$parsed[ $class ][ $type ] = $parsed;
+		}
+
+		return $parsed;
 	}
+
 }
