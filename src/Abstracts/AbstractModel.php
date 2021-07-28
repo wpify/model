@@ -9,6 +9,7 @@ use ReflectionClass;
 use ReflectionProperty;
 use WpifyModel\Interfaces\ModelInterface;
 use WpifyModel\Interfaces\RepositoryInterface;
+use WpifyModel\PHPDocParser;
 
 /**
  * Class AbstractModel
@@ -42,7 +43,8 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 
 		$reflection = new ReflectionClass( $this );
 		$properties = $reflection->getProperties( ReflectionProperty::IS_PUBLIC );
-
+		$parser = new PHPDocParser();
+		die(var_dump($parser));
 		foreach ( $properties as $property ) {
 			$name = $property->name;
 
