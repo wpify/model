@@ -34,7 +34,7 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 	/**
 	 * AbstractPost constructor.
 	 *
-	 * @param $object
+	 * @param                     $object
 	 * @param RepositoryInterface $repository
 	 */
 	public function __construct( $object, RepositoryInterface $repository ) {
@@ -43,8 +43,9 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 
 		$reflection = new ReflectionClass( $this );
 		$properties = $reflection->getProperties( ReflectionProperty::IS_PUBLIC );
-		$parser = new PHPDocParser();
-		die(var_dump($parser));
+		// TODO: Cache parsing the doc comment
+		$parser     = new PHPDocParser();
+
 		foreach ( $properties as $property ) {
 			$name = $property->name;
 
@@ -97,6 +98,15 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 				$this->_props[ $name ]['setter'] = 'set_' . $name;
 			}
 
+			if ( $property->getDocComment() ) {
+				$parsed = $parser->parse( $property->getDocComment() );
+				foreach ( $parsed->children as $child ) {
+					if ( isset( $child->name ) && $child->name === '@readonly' ) {
+						$this->_props[ $name ]['readonly'] = true;
+						break;
+					}
+				}
+			}
 			// unset property, so it's handled by magic methods __get and __set
 			unset( $this->$name );
 		}
@@ -232,7 +242,7 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 
 	/**
 	 * @param string $key
-	 * @param mixed $value
+	 * @param mixed  $value
 	 */
 	public function __set( string $key, $value ) {
 		if ( isset( $this->_props[ $key ] ) ) {

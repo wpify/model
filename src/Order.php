@@ -50,8 +50,14 @@ class Order extends AbstractModel {
 	 */
 	public $fee_items;
 
+	/**
+	 * @readonly
+	 */
 	public $items;
 
+	/**
+	 * @readonly
+	 */
 	public $weight;
 
 	/**
