@@ -126,26 +126,24 @@ class Order extends AbstractModel {
 	 */
 	public function get_weight(string $unit = 'kg')
 	{
-		if ($this->weight) {
-			return $this->weight;
-		}
+		// TODO: Cache this
 		$wc_weight_unit = get_option('woocommerce_weight_unit');
-		$this->weight = 0;
+		$weight = 0;
 		foreach ($this->line_items as $item) {
 			$prod = $item->product;
 			if (\method_exists($prod, 'get_weight')) {
 				if ($prod->get_weight()) {
-					$this->weight += $prod->get_weight();
+					$weight += $prod->get_weight();
 				}
 			}
 		}
 		if ($wc_weight_unit === 'g' && $unit === 'kg') {
-			$this->weight = $this->weight / 1000;
+			$weight = $weight / 1000;
 		}
 		if ($wc_weight_unit === 'kg' && $unit === 'g') {
-			$this->weight = $this->weight * 1000;
+			$weight = $weight * 1000;
 		}
-		return $this->weight;
+		return $weight;
 	}
 	/**
 	 * @param string|[] $shipping_method_id Expects ID in method_id:instance_id format
@@ -154,19 +152,19 @@ class Order extends AbstractModel {
 	{
 		$methods = [];
 		foreach ($this->shipping_items as $item) {
-			$methods[] = \sprintf('%s:%s', $item->get_method_id(), $item->get_instance_id());
+			$methods[] = \sprintf('%s:%s', $item->method_id, $item->instance_id);
 		}
 		if (\is_array($shipping_method_ids)) {
 			$found = \false;
 			foreach ($methods as $method) {
-				if (\in_array($method, $shipping_method_ids)) {
-					$found = \true;
+				if (in_array($method, $shipping_method_ids)) {
+					$found = true;
 					break;
 				}
 			}
 			return $found;
 		}
-		return \in_array($shipping_method_ids, $methods);
+		return in_array($shipping_method_ids, $methods);
 	}
 
 }
