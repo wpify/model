@@ -123,6 +123,8 @@ class OrderRepository extends AbstractRepository implements RepositoryInterface 
 			$object = $data;
 		} elseif ( is_null( $data ) ) {
 			$object = new WC_Order();
+		} elseif ( is_numeric( $data ) ) {
+			$object = wc_get_order( $data );
 		} elseif ( isset( $data->id ) ) {
 			$object = wc_get_order( $data->id );
 		} else {

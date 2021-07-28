@@ -9,7 +9,7 @@ use WpifyModel\Abstracts\AbstractOrderItemModel;
  * Class Order
  * @package WpifyModel
  * @property ProductRepository $_repository
- * @method WC_Product source_object()
+ * @method \WC_Order_Item_Shipping source_object()
  */
 class OrderItemShipping extends AbstractOrderItemModel {
 	public $method_id;

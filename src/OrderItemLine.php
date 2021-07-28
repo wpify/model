@@ -2,6 +2,7 @@
 
 namespace WpifyModel;
 
+use WC_Order_Item_Product;
 use WC_Product;
 use WpifyModel\Abstracts\AbstractOrderItemModel;
 
@@ -9,7 +10,7 @@ use WpifyModel\Abstracts\AbstractOrderItemModel;
  * Class Order
  * @package WpifyModel
  * @property ProductRepository $_repository
- * @method WC_Product source_object()
+ * @method WC_Order_Item_Product source_object()
  */
 class OrderItemLine extends AbstractOrderItemModel {
 	public $product;
