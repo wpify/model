@@ -20,9 +20,7 @@ class PHPDocParser {
 
 	public function parse( $class, $type, $input, $name = '' ) {
 		if ( 'properties' === $type && isset( self::$parsed[ $class ][$type][ $name ] ) ) {
-			return self::$parsed[ $class ]['properties'][ $name ];
-		} elseif ( isset( self::$parsed[ $class ][ $type ] ) ) {
-			return self::$parsed[ $class ][ $type ];
+			return self::$parsed[ $class ][$type][ $name ];
 		}
 
 		$tokens = new TokenIterator( $this->lexer->tokenize( $input ) );
@@ -30,8 +28,6 @@ class PHPDocParser {
 		$parsed = $this->parser->parse( $tokens );
 		if ( $type === 'properties' ) {
 			self::$parsed[ $class ][ $type ][ $name ] = $parsed;
-		} else {
-			self::$parsed[ $class ][ $type ] = $parsed;
 		}
 
 		return $parsed;
