@@ -9,6 +9,7 @@ use WpifyModel\Interfaces\TermRepositoryInterface;
 use WpifyModel\Relations\TermChildTermsRelation;
 use WpifyModel\Relations\TermParentTermRelation;
 use WpifyModel\Relations\TermPostsRelation;
+use WpifyModel\Relations\TermTopLevelParentTermRelation;
 
 /**
  * Class AbstractTermModel
@@ -89,6 +90,13 @@ abstract class AbstractTermModel extends AbstractModel implements TermModelInter
 	public $parent;
 
 	/**
+	 * Top level parent term
+	 *
+	 * @var self
+	 */
+	public $top_level_parent;
+
+	/**
 	 * Children of the term
 	 *
 	 * @var self[]
@@ -164,5 +172,13 @@ abstract class AbstractTermModel extends AbstractModel implements TermModelInter
 	 */
 	public function children_relation(): TermChildTermsRelation {
 		return new TermChildTermsRelation( $this, $this->model_repository() );
+	}
+
+	/**
+	 * @return TermTopLevelParentTermRelation
+	 */
+	public function top_level_parent_relation(): TermTopLevelParentTermRelation
+	{
+		return new TermTopLevelParentTermRelation( $this, $this->model_repository() );
 	}
 }

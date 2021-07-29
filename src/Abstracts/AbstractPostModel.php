@@ -9,6 +9,7 @@ use WpifyModel\Relations\PostAuthorRelation;
 use WpifyModel\Relations\PostChildrenPostsRelation;
 use WpifyModel\Relations\PostParentPostRelation;
 use WpifyModel\Relations\PostTermsRelation;
+use WpifyModel\Relations\PostTopLevelParentPostRelation;
 use WpifyModel\User;
 
 /**
@@ -251,6 +252,14 @@ abstract class AbstractPostModel extends AbstractModel implements PostModelInter
 	 */
 	public $children;
 
+	/**
+	 * Top level parent
+	 *
+	 * @var self[]
+	 */
+	public $top_level_parent;
+
+
 
 	protected $_props = array(
 		'id'               => array( 'source' => 'object', 'source_name' => 'ID' ),
@@ -334,5 +343,10 @@ abstract class AbstractPostModel extends AbstractModel implements PostModelInter
 	public function children_relation()
 	{
 		return new PostChildrenPostsRelation($this, $this->_repository);
+	}
+
+	public function top_level_parent_relation()
+	{
+		return new PostTopLevelParentPostRelation($this, $this->_repository);
 	}
 }
