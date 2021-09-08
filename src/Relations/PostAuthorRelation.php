@@ -1,10 +1,10 @@
 <?php
 
-namespace WpifyModel\Relations;
+namespace Wpify\Model\Relations;
 
-use WpifyModel\Interfaces\PostModelInterface;
-use WpifyModel\Interfaces\RelationInterface;
-use WpifyModel\Interfaces\UserRepositoryInterface;
+use Wpify\Model\Interfaces\PostModelInterface;
+use Wpify\Model\Interfaces\RelationInterface;
+use Wpify\Model\Interfaces\UserRepositoryInterface;
 
 class PostAuthorRelation implements RelationInterface {
 	/** @var PostModelInterface */

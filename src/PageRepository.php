@@ -1,13 +1,13 @@
 <?php
 
-namespace WpifyModel;
+namespace Wpify\Model;
 
-use WpifyModel\Abstracts\AbstractPostRepository;
+use Wpify\Model\Abstracts\AbstractPostRepository;
 
 /**
  * Class BasePageRepository
  *
- * @package WpifyModel
+ * @package Wpify\Model
  *
  * @method Page[] all()
  * @method Page[] find( array $args = array() )

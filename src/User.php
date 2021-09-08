@@ -1,13 +1,13 @@
 <?php
 
-namespace WpifyModel;
+namespace Wpify\Model;
 
 
-use WpifyModel\Abstracts\AbstractUserModel;
+use Wpify\Model\Abstracts\AbstractUserModel;
 
 /**
  * Class BasicPost
- * @package WpifyModel
+ * @package Wpify\Model
  */
 class User extends AbstractUserModel {
 }

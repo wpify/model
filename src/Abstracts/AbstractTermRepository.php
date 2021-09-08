@@ -1,13 +1,13 @@
 <?php
 
-namespace WpifyModel\Abstracts;
+namespace Wpify\Model\Abstracts;
 
 use stdClass;
 use WP_Term;
-use WpifyModel\Exceptions\NotFoundException;
-use WpifyModel\Exceptions\NotPersistedException;
-use WpifyModel\Interfaces\TermModelInterface;
-use WpifyModel\Interfaces\TermRepositoryInterface;
+use Wpify\Model\Exceptions\NotFoundException;
+use Wpify\Model\Exceptions\NotPersistedException;
+use Wpify\Model\Interfaces\TermModelInterface;
+use Wpify\Model\Interfaces\TermRepositoryInterface;
 
 abstract class AbstractTermRepository extends AbstractRepository implements TermRepositoryInterface {
 	/**

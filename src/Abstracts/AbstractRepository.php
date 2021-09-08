@@ -1,13 +1,13 @@
 <?php
 
-namespace WpifyModel\Abstracts;
+namespace Wpify\Model\Abstracts;
 
-use WpifyModel\Interfaces\RepositoryInterface;
+use Wpify\Model\Interfaces\RepositoryInterface;
 
 /**
  * Class AbstractRepository
  *
- * @package WpifyModel
+ * @package Wpify\Model
  */
 abstract class AbstractRepository implements RepositoryInterface {
 	/**

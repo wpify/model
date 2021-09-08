@@ -1,13 +1,13 @@
 <?php
 
-namespace WpifyModel;
+namespace Wpify\Model;
 
 use WC_Product;
-use WpifyModel\Abstracts\AbstractOrderItemModel;
+use Wpify\Model\Abstracts\AbstractOrderItemModel;
 
 /**
  * Class Order
- * @package WpifyModel
+ * @package Wpify\Model
  * @property ProductRepository $_repository
  * @method \WC_Order_Item_Shipping source_object()
  */

@@ -1,6 +1,6 @@
 <?php
 
-namespace WpifyModel;
+namespace Wpify\Model;
 
 use PHPStan\PhpDocParser\Lexer\Lexer;
 use PHPStan\PhpDocParser\Parser\ConstExprParser;

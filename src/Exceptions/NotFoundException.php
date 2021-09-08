@@ -1,6 +1,6 @@
 <?php
 
-namespace WpifyModel\Exceptions;
+namespace Wpify\Model\Exceptions;
 
 use Exception;
 

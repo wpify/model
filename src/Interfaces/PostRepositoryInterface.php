@@ -1,8 +1,8 @@
 <?php
 
-namespace WpifyModel\Interfaces;
+namespace Wpify\Model\Interfaces;
 
-use WpifyModel\Abstracts\AbstractPostModel;
+use Wpify\Model\Abstracts\AbstractPostModel;
 
 interface PostRepositoryInterface extends RepositoryInterface {
 	public function fetch_parent( AbstractPostModel $model );

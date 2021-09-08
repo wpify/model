@@ -1,12 +1,12 @@
 <?php
 
-namespace WpifyModel;
+namespace Wpify\Model;
 
 /**
  * Class Order
- * @package WpifyModel
+ * @package Wpify\Model
  * @property ProductRepository $_repository
  * @method \WC_Order_Item_Fee source_object()
  */
-class OrderItemFee extends \WpifyModel\Abstracts\AbstractOrderItemModel {
+class OrderItemFee extends \Wpify\Model\Abstracts\AbstractOrderItemModel {
 }

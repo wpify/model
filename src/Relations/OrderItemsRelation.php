@@ -1,14 +1,14 @@
 <?php
 
-namespace WpifyModel\Relations;
+namespace Wpify\Model\Relations;
 
-use WpifyModel\Interfaces\ModelInterface;
-use WpifyModel\Interfaces\PostModelInterface;
-use WpifyModel\Interfaces\PostRepositoryInterface;
-use WpifyModel\Interfaces\RelationInterface;
-use WpifyModel\Interfaces\RepositoryInterface;
-use WpifyModel\Order;
-use WpifyModel\OrderItemRepository;
+use Wpify\Model\Interfaces\ModelInterface;
+use Wpify\Model\Interfaces\PostModelInterface;
+use Wpify\Model\Interfaces\PostRepositoryInterface;
+use Wpify\Model\Interfaces\RelationInterface;
+use Wpify\Model\Interfaces\RepositoryInterface;
+use Wpify\Model\Order;
+use Wpify\Model\OrderItemRepository;
 
 class OrderItemsRelation implements RelationInterface {
 	/** @var Order */
@@ -16,7 +16,7 @@ class OrderItemsRelation implements RelationInterface {
 
 	/** @var OrderItemRepository */
 	private $repository;
-	private string $type;
+	private $type;
 
 	/**
 	 * TermRelation constructor.

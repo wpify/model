@@ -1,12 +1,12 @@
 <?php
 
-namespace WpifyModel\Abstracts;
+namespace Wpify\Model\Abstracts;
 
 use WP_User;
 use WP_User_Query;
-use WpifyModel\Exceptions\NotFoundException;
-use WpifyModel\Exceptions\NotPersistedException;
-use WpifyModel\Interfaces\UserRepositoryInterface;
+use Wpify\Model\Exceptions\NotFoundException;
+use Wpify\Model\Exceptions\NotPersistedException;
+use Wpify\Model\Interfaces\UserRepositoryInterface;
 
 abstract class AbstractUserRepository extends AbstractRepository implements UserRepositoryInterface {
 	private $query;

@@ -1,8 +1,8 @@
 <?php
 
-namespace WpifyModel;
+namespace Wpify\Model;
 
-use WpifyModel\Abstracts\AbstractTermRepository;
+use Wpify\Model\Abstracts\AbstractTermRepository;
 
 /**
  * Class Categories

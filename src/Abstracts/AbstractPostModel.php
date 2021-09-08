@@ -1,20 +1,20 @@
 <?php
 
-namespace WpifyModel\Abstracts;
+namespace Wpify\Model\Abstracts;
 
-use WpifyModel\Interfaces\PostModelInterface;
-use WpifyModel\Interfaces\PostRepositoryInterface;
-use WpifyModel\Interfaces\TermModelInterface;
-use WpifyModel\Relations\PostAuthorRelation;
-use WpifyModel\Relations\PostChildrenPostsRelation;
-use WpifyModel\Relations\PostParentPostRelation;
-use WpifyModel\Relations\PostTermsRelation;
-use WpifyModel\Relations\PostTopLevelParentPostRelation;
-use WpifyModel\User;
+use Wpify\Model\Interfaces\PostModelInterface;
+use Wpify\Model\Interfaces\PostRepositoryInterface;
+use Wpify\Model\Interfaces\TermModelInterface;
+use Wpify\Model\Relations\PostAuthorRelation;
+use Wpify\Model\Relations\PostChildrenPostsRelation;
+use Wpify\Model\Relations\PostParentPostRelation;
+use Wpify\Model\Relations\PostTermsRelation;
+use Wpify\Model\Relations\PostTopLevelParentPostRelation;
+use Wpify\Model\User;
 
 /**
  * Class AbstractPostModel
- * @package WpifyModel
+ * @package Wpify\Model
  *
  * @property PostRepositoryInterface $_repository
  */

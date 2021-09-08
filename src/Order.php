@@ -1,15 +1,16 @@
 <?php
 
-namespace WpifyModel;
+namespace Wpify\Model;
 
-use WpifyModel\Abstracts\AbstractModel;
-use WpifyModel\Relations\OrderItemsRelation;
+use WC_Order;
+use Wpify\Model\Abstracts\AbstractModel;
+use Wpify\Model\Relations\OrderItemsRelation;
 
 /**
  * Class Order
- * @package WpifyModel
+ * @package Wpify\Model
  * @property OrderRepository $_repository
- * @method \WC_Order source_object()
+ * @method WC_Order source_object()
  */
 class Order extends AbstractModel {
 	/**

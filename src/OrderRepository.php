@@ -1,20 +1,20 @@
 <?php
 
-namespace WpifyModel;
+namespace Wpify\Model;
 
 use WC_Order;
-use WpifyModel\Abstracts\AbstractPostModel;
-use WpifyModel\Abstracts\AbstractRepository;
-use WpifyModel\Exceptions\NotFoundException;
-use WpifyModel\Exceptions\NotPersistedException;
-use WpifyModel\Interfaces\ModelInterface;
-use WpifyModel\Interfaces\PostModelInterface;
-use WpifyModel\Interfaces\RepositoryInterface;
-use WpifyModel\Interfaces\TermModelInterface;
+use Wpify\Model\Abstracts\AbstractPostModel;
+use Wpify\Model\Abstracts\AbstractRepository;
+use Wpify\Model\Exceptions\NotFoundException;
+use Wpify\Model\Exceptions\NotPersistedException;
+use Wpify\Model\Interfaces\ModelInterface;
+use Wpify\Model\Interfaces\PostModelInterface;
+use Wpify\Model\Interfaces\RepositoryInterface;
+use Wpify\Model\Interfaces\TermModelInterface;
 
 /**
  * Class BasePostRepository
- * @package WpifyModel
+ * @package Wpify\Model
  */
 class OrderRepository extends AbstractRepository implements RepositoryInterface {
 	private $item_repository;

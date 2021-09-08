@@ -1,2 +1,5 @@
-/.idea
-/vendor
+/.idea/
+/vendor/
+/composer.lock
+.DS_Store
+._*

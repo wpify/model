@@ -1,12 +1,12 @@
 <?php
 
-namespace WpifyModel\Abstracts;
+namespace Wpify\Model\Abstracts;
 
-use WpifyModel\OrderItemRepository;
+use Wpify\Model\OrderItemRepository;
 
 /**
  * Class Order
- * @package WpifyModel
+ * @package Wpify\Model
  * @property OrderItemRepository $_repository
  * @method \WC_Order_Item source_object()
  */

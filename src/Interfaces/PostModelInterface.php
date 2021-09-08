@@ -1,6 +1,6 @@
 <?php
 
-namespace WpifyModel\Interfaces;
+namespace Wpify\Model\Interfaces;
 
 interface PostModelInterface extends ModelInterface {
 }

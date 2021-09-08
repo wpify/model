@@ -1,14 +1,14 @@
 <?php
 
-namespace WpifyModel;
+namespace Wpify\Model;
 
-use WpifyModel\Abstracts\AbstractTermModel;
-use WpifyModel\Interfaces\PostModelInterface;
-use WpifyModel\Relations\TermPostsRelation;
+use Wpify\Model\Abstracts\AbstractTermModel;
+use Wpify\Model\Interfaces\PostModelInterface;
+use Wpify\Model\Relations\TermPostsRelation;
 
 /**
  * Class Category
- * @package WpifyModel
+ * @package Wpify\Model
  *
  * @method CategoryRepository model_repository()
  */

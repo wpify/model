@@ -1,10 +1,10 @@
 <?php
 
-namespace WpifyModel;
+namespace Wpify\Model;
 
-use WpifyModel\Abstracts\AbstractTermModel;
-use WpifyModel\Interfaces\PostModelInterface;
-use WpifyModel\Relations\TermPostsRelation;
+use Wpify\Model\Abstracts\AbstractTermModel;
+use Wpify\Model\Interfaces\PostModelInterface;
+use Wpify\Model\Relations\TermPostsRelation;
 
 class PostTag extends AbstractTermModel {
 	/** @var PostModelInterface */

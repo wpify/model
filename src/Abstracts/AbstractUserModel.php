@@ -1,13 +1,13 @@
 <?php
 
-namespace WpifyModel\Abstracts;
+namespace Wpify\Model\Abstracts;
 
-use WpifyModel\Interfaces\UserModelInterface;
-use WpifyModel\Interfaces\UserRepositoryInterface;
+use Wpify\Model\Interfaces\UserModelInterface;
+use Wpify\Model\Interfaces\UserRepositoryInterface;
 
 /**
  * Class AbstractPostModel
- * @package WpifyModel
+ * @package Wpify\Model
  *
  * @property UserRepositoryInterface $_repository
  */

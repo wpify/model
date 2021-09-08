@@ -1,12 +1,12 @@
 <?php
 
-namespace WpifyModel;
+namespace Wpify\Model;
 
-use WpifyModel\Abstracts\AbstractModel;
+use Wpify\Model\Abstracts\AbstractModel;
 
 /**
  * Class BasicPost
- * @package WpifyModel
+ * @package Wpify\Model
  * @property ProductRepository $_repository
  * @method \WC_Product source_object()
  */

@@ -1,6 +1,6 @@
 <?php
 
-namespace WpifyModel\Interfaces;
+namespace Wpify\Model\Interfaces;
 
 interface ModelInterface {
 	public function refresh( $object = null );

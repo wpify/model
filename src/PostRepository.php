@@ -1,12 +1,12 @@
 <?php
 
-namespace WpifyModel;
+namespace Wpify\Model;
 
-use WpifyModel\Abstracts\AbstractPostRepository;
+use Wpify\Model\Abstracts\AbstractPostRepository;
 
 /**
  * Class BasePostRepository
- * @package WpifyModel
+ * @package Wpify\Model
  *
  * @method Post[] all()
  * @method Post[] find( array $args = array() )

@@ -1,19 +1,19 @@
 <?php
 
-namespace WpifyModel\Abstracts;
+namespace Wpify\Model\Abstracts;
 
-use WpifyModel\Interfaces\PostModelInterface;
-use WpifyModel\Interfaces\RepositoryInterface;
-use WpifyModel\Interfaces\TermModelInterface;
-use WpifyModel\Interfaces\TermRepositoryInterface;
-use WpifyModel\Relations\TermChildTermsRelation;
-use WpifyModel\Relations\TermParentTermRelation;
-use WpifyModel\Relations\TermPostsRelation;
-use WpifyModel\Relations\TermTopLevelParentTermRelation;
+use Wpify\Model\Interfaces\PostModelInterface;
+use Wpify\Model\Interfaces\RepositoryInterface;
+use Wpify\Model\Interfaces\TermModelInterface;
+use Wpify\Model\Interfaces\TermRepositoryInterface;
+use Wpify\Model\Relations\TermChildTermsRelation;
+use Wpify\Model\Relations\TermParentTermRelation;
+use Wpify\Model\Relations\TermPostsRelation;
+use Wpify\Model\Relations\TermTopLevelParentTermRelation;
 
 /**
  * Class AbstractTermModel
- * @package WpifyModel\Abstracts
+ * @package Wpify\Model\Abstracts
  *
  * @property TermRepositoryInterface $_repository
  */

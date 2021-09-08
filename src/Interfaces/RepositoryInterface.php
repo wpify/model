@@ -1,11 +1,11 @@
 <?php
 
-namespace WpifyModel\Interfaces;
+namespace Wpify\Model\Interfaces;
 
 /**
  * Class AbstractRepository
  *
- * @package WpifyModel
+ * @package Wpify\Model
  */
 interface RepositoryInterface {
 	/**

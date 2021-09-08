@@ -1,10 +1,10 @@
 <?php
 
-namespace WpifyModel\Relations;
+namespace Wpify\Model\Relations;
 
-use WpifyModel\Interfaces\PostRepositoryInterface;
-use WpifyModel\Interfaces\RelationInterface;
-use WpifyModel\Interfaces\TermModelInterface;
+use Wpify\Model\Interfaces\PostRepositoryInterface;
+use Wpify\Model\Interfaces\RelationInterface;
+use Wpify\Model\Interfaces\TermModelInterface;
 
 class TermPostsRelation implements RelationInterface {
 	/** @var TermModelInterface */

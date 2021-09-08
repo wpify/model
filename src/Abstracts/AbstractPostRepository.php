@@ -1,19 +1,19 @@
 <?php
 
-namespace WpifyModel\Abstracts;
+namespace Wpify\Model\Abstracts;
 
 use WP_Post;
 use WP_Query;
-use WpifyModel\CategoryRepository;
-use WpifyModel\Exceptions\NotFoundException;
-use WpifyModel\Exceptions\NotPersistedException;
-use WpifyModel\Interfaces\PostModelInterface;
-use WpifyModel\Interfaces\PostRepositoryInterface;
-use WpifyModel\Interfaces\TermModelInterface;
-use WpifyModel\Interfaces\TermRepositoryInterface;
-use WpifyModel\Interfaces\UserRepositoryInterface;
-use WpifyModel\PostTagRepository;
-use WpifyModel\UserRepository;
+use Wpify\Model\CategoryRepository;
+use Wpify\Model\Exceptions\NotFoundException;
+use Wpify\Model\Exceptions\NotPersistedException;
+use Wpify\Model\Interfaces\PostModelInterface;
+use Wpify\Model\Interfaces\PostRepositoryInterface;
+use Wpify\Model\Interfaces\TermModelInterface;
+use Wpify\Model\Interfaces\TermRepositoryInterface;
+use Wpify\Model\Interfaces\UserRepositoryInterface;
+use Wpify\Model\PostTagRepository;
+use Wpify\Model\UserRepository;
 
 abstract class AbstractPostRepository extends AbstractRepository implements PostRepositoryInterface {
 	public $query;

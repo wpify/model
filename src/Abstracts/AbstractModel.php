@@ -1,19 +1,19 @@
 <?php
 
-namespace WpifyModel\Abstracts;
+namespace Wpify\Model\Abstracts;
 
 use ArrayAccess;
 use ArrayIterator;
 use IteratorAggregate;
 use ReflectionClass;
 use ReflectionProperty;
-use WpifyModel\Interfaces\ModelInterface;
-use WpifyModel\Interfaces\RepositoryInterface;
-use WpifyModel\PHPDocParser;
+use Wpify\Model\Interfaces\ModelInterface;
+use Wpify\Model\Interfaces\RepositoryInterface;
+use Wpify\Model\PHPDocParser;
 
 /**
  * Class AbstractModel
- * @package WpifyModel
+ * @package Wpify\Model
  */
 abstract class AbstractModel implements ModelInterface, IteratorAggregate, ArrayAccess {
 	/** @var int */
