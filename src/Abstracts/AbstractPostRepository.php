@@ -190,8 +190,6 @@ abstract class AbstractPostRepository extends AbstractRepository implements Post
 				}
 
 				$object_data['meta_input'][ $source_name ] = $model->$key;
-			} elseif ( $prop['source'] === 'relation' && isset( $prop['relation'] ) && method_exists( $prop['relation'], 'assign' ) && $prop['changed'] ) {
-				$prop['relation']->assign();
 			}
 		}
 
@@ -201,11 +199,21 @@ abstract class AbstractPostRepository extends AbstractRepository implements Post
 			$result = wp_insert_post( $object_data, true );
 		}
 
-		if ( ! is_wp_error( $result ) ) {
-			$model->refresh( $this->resolve_object( $result ) );
-		} else {
+		if ( is_wp_error( $result ) ) {
 			throw new NotPersistedException();
 		}
+
+		$model->id = $result;
+
+		// Save relations after we have model ID
+		foreach ( $model->own_props() as $prop ) {
+			if ( $prop['source'] === 'relation' && isset( $prop['relation'] ) && \method_exists( $prop['relation'], 'assign' ) && $prop['changed'] ) {
+				$prop['relation']->assign();
+			}
+		}
+
+		$model->refresh( $this->resolve_object( $result ) );
+
 
 		return $model;
 	}
