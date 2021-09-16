@@ -2,7 +2,6 @@
 
 namespace Wpify\Model;
 
-use Wpify\Model\Abstracts\AbstractPostRepository;
 use Wpify\Model\Abstracts\AbstractUserRepository;
 
 /**

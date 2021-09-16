@@ -82,18 +82,18 @@ class Order extends AbstractModel {
 	}
 
 	/**
-	 * @return OrderRepository
-	 */
-	public function model_repository(): OrderRepository {
-		return $this->_repository;
-	}
-
-	/**
 	 * Get order Line items
 	 * @return OrderItemsRelation
 	 */
 	public function line_items_relation() {
 		return new OrderItemsRelation( $this, $this->model_repository()->get_item_repository( OrderItemLine::class ), 'line_item' );
+	}
+
+	/**
+	 * @return OrderRepository
+	 */
+	public function model_repository(): OrderRepository {
+		return $this->_repository;
 	}
 
 	/**

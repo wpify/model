@@ -7,11 +7,9 @@ use WC_Order_Item;
 use Wpify\Model\Abstracts\AbstractPostModel;
 use Wpify\Model\Abstracts\AbstractRepository;
 use Wpify\Model\Exceptions\NotFoundException;
-use Wpify\Model\Exceptions\NotPersistedException;
 use Wpify\Model\Interfaces\ModelInterface;
 use Wpify\Model\Interfaces\PostModelInterface;
 use Wpify\Model\Interfaces\RepositoryInterface;
-use Wpify\Model\Interfaces\TermModelInterface;
 
 /**
  * Class BasePostRepository
@@ -78,6 +76,16 @@ class OrderItemRepository extends AbstractRepository implements RepositoryInterf
 	}
 
 	/**
+	 * @param PostModelInterface $model
+	 *
+	 * @return mixed
+	 * @throws \Exception
+	 */
+	public function delete( PostModelInterface $model ) {
+		return wc_delete_order_item( $model->id );
+	}
+
+	/**
 	 * @param $data
 	 *
 	 * @return WC_Order
@@ -105,15 +113,5 @@ class OrderItemRepository extends AbstractRepository implements RepositoryInterf
 
 	public function model(): string {
 		return $this->model;
-	}
-
-	/**
-	 * @param PostModelInterface $model
-	 *
-	 * @return mixed
-	 * @throws \Exception
-	 */
-	public function delete( PostModelInterface $model ) {
-		return wc_delete_order_item( $model->id );
 	}
 }

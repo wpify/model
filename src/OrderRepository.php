@@ -2,6 +2,7 @@
 
 namespace Wpify\Model;
 
+use WC_Order;
 use Wpify\Model\Abstracts\AbstractPostModel;
 use Wpify\Model\Abstracts\AbstractRepository;
 use Wpify\Model\Exceptions\NotFoundException;
@@ -16,7 +17,7 @@ use Wpify\Model\Interfaces\TermModelInterface;
  * @package Wpify\Model
  */
 class OrderRepository extends AbstractRepository implements RepositoryInterface {
-	private $item_repository;
+	protected $item_repository;
 
 	static function post_type(): string {
 		return 'shop_order';
@@ -90,7 +91,7 @@ class OrderRepository extends AbstractRepository implements RepositoryInterface 
 //
 			if ( $prop['source'] === 'meta' ) {
 				$order->update_meta_data( $key, $model->{$key} );
-			} elseif ( $prop['source'] === 'relation' && !empty($prop['assign']) && \is_callable( $prop['assign'] ) && $prop['changed'] ) {
+			} elseif ( $prop['source'] === 'relation' && ! empty( $prop['assign'] ) && \is_callable( $prop['assign'] ) && $prop['changed'] ) {
 				$prop['assign']( $model );
 			}
 		}
@@ -108,13 +109,13 @@ class OrderRepository extends AbstractRepository implements RepositoryInterface 
 	/**
 	 * @param $data
 	 *
-	 * @return \WC_Order
+	 * @return WC_Order
 	 * @throws NotFoundException
 	 */
-	protected function resolve_object( $data ): \WC_Order {
+	protected function resolve_object( $data ): WC_Order {
 		if ( is_object( $data ) && get_class( $data ) === $this->model() ) {
 			$object = $data->source_object();
-		} elseif ( $data instanceof \WC_Order ) {
+		} elseif ( $data instanceof WC_Order ) {
 			$object = $data;
 		} elseif ( is_null( $data ) ) {
 			$object = new WC_Order();
@@ -126,7 +127,7 @@ class OrderRepository extends AbstractRepository implements RepositoryInterface 
 			$object = wc_get_order( $data );
 		}
 
-		if ( ! ( $object instanceof \WC_Order ) ) {
+		if ( ! ( $object instanceof WC_Order ) ) {
 			throw new NotFoundException( 'The order was not found' );
 		}
 
@@ -149,7 +150,7 @@ class OrderRepository extends AbstractRepository implements RepositoryInterface 
 	/**
 	 * Assign the post to the terms
 	 *
-	 * @param PostModelInterface   $model
+	 * @param PostModelInterface $model
 	 * @param TermModelInterface[] $terms
 	 */
 	public function assign_post_to_term( PostModelInterface $model, array $terms ) {

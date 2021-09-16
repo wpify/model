@@ -23,12 +23,12 @@ class CategoryRepository extends AbstractTermRepository {
 	/** @var PostRepository */
 	protected $post_repository;
 
-	public function model(): string {
-		return Category::class;
-	}
-
 	static function taxonomy(): string {
 		return 'category';
+	}
+
+	public function model(): string {
+		return Category::class;
 	}
 
 	/**

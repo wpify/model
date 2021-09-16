@@ -8,9 +8,9 @@ use PHPStan\PhpDocParser\Parser\TokenIterator;
 use PHPStan\PhpDocParser\Parser\TypeParser;
 
 class PHPDocParser {
+	static $parsed;
 	public $lexer;
 	public $parser;
-	static $parsed;
 
 	public function __construct() {
 		$this->lexer     = new Lexer();
@@ -19,8 +19,8 @@ class PHPDocParser {
 	}
 
 	public function parse( $class, $type, $input, $name = '' ) {
-		if ( 'properties' === $type && isset( self::$parsed[ $class ][$type][ $name ] ) ) {
-			return self::$parsed[ $class ][$type][ $name ];
+		if ( 'properties' === $type && isset( self::$parsed[ $class ][ $type ][ $name ] ) ) {
+			return self::$parsed[ $class ][ $type ][ $name ];
 		}
 
 		$tokens = new TokenIterator( $this->lexer->tokenize( $input ) );

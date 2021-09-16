@@ -23,12 +23,12 @@ class PostTagRepository extends AbstractTermRepository {
 	/** @var PostRepository */
 	protected $post_repository;
 
-	public function model(): string {
-		return PostTag::class;
-	}
-
 	static function taxonomy(): string {
 		return 'post_tag';
+	}
+
+	public function model(): string {
+		return PostTag::class;
 	}
 
 	/**

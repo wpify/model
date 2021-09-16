@@ -19,13 +19,13 @@ abstract class AbstractPostRepository extends AbstractRepository implements Post
 	public $query;
 
 	/** @var ?UserRepositoryInterface */
-	private $user_repository;
+	protected $user_repository;
 
 	/** @var ?TermRepositoryInterface */
-	private $category_repository;
+	protected $category_repository;
 
 	/** @var ?TermRepositoryInterface */
-	private $post_tag_repository;
+	protected $post_tag_repository;
 
 	public function get_user_repository(): UserRepositoryInterface {
 		if ( empty( $this->user_repository ) ) {

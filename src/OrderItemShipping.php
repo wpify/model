@@ -2,7 +2,6 @@
 
 namespace Wpify\Model;
 
-use WC_Product;
 use Wpify\Model\Abstracts\AbstractOrderItemModel;
 
 /**

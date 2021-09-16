@@ -44,7 +44,7 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 		$reflection = new ReflectionClass( $this );
 		$properties = $reflection->getProperties( ReflectionProperty::IS_PUBLIC );
 		// TODO: Cache parsing the doc comment
-		$parser     = new PHPDocParser();
+		$parser = new PHPDocParser();
 
 		foreach ( $properties as $property ) {
 			$name = $property->name;
@@ -56,10 +56,25 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 				);
 			}
 
+			if ( $property->getDocComment() ) {
+				$parsed_doc = $parser->parse( get_class( $this ), 'properties', $property->getDocComment(), $name );
+			} else {
+				$parsed_doc = null;
+			}
+
 			if ( empty( $this->_props[ $name ]['type'] ) ) {
 				$this->_props[ $name ]['type'] = method_exists( $property, 'getType' )
 					? $property->getType()
 					: null;
+			}
+
+			if ( empty( $this->_props[ $name ]['type'] ) && $parsed_doc ) {
+				foreach ( $parsed_doc->children as $child ) {
+					if ( isset( $child->name ) && $child->name === '@var' ) {
+						$this->_props[ $name ]['type'] = isset( $child->value ) ? strval( $child->value ) : null;
+						break;
+					}
+				}
 			}
 
 			$object_vars = is_object( $this->_object )
@@ -98,15 +113,15 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 				$this->_props[ $name ]['setter'] = 'set_' . $name;
 			}
 
-			if ( $property->getDocComment() ) {
-				$parsed = $parser->parse( get_class($this), 'properties', $property->getDocComment(), $name );
-				foreach ( $parsed->children as $child ) {
+			if ( $parsed_doc ) {
+				foreach ( $parsed_doc->children as $child ) {
 					if ( isset( $child->name ) && $child->name === '@readonly' ) {
 						$this->_props[ $name ]['readonly'] = true;
 						break;
 					}
 				}
 			}
+
 			// unset property, so it's handled by magic methods __get and __set
 			unset( $this->$name );
 		}
@@ -211,11 +226,11 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 					$getter              = $prop['getter'];
 					$this->_data[ $key ] = $getter();
 				} elseif ( $prop['source'] === 'relation' ) {
-					$relation = $prop['relation'];
-
+					$relation            = $prop['relation'];
 					$this->_data[ $key ] = $relation->fetch();
 				} elseif ( $prop['source'] === 'object' ) {
 					$getter = 'get_' . $source_name;
+
 					if ( $this->_object && method_exists( $this->_object, $getter ) ) {
 						$this->_data[ $key ] = $this->_object->$getter();
 					} elseif ( isset( $this->_object->$source_name ) ) {
@@ -232,6 +247,8 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 				} else {
 					$this->_data[ $key ] = $this->$key ?? null;
 				}
+
+				$this->_data[ $key ] = $this->maybe_convert_to_type( $prop['type'], $this->_data[ $key ] );
 			}
 
 			return $this->_data[ $key ];
@@ -242,7 +259,7 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 
 	/**
 	 * @param string $key
-	 * @param mixed  $value
+	 * @param mixed $value
 	 */
 	public function __set( string $key, $value ) {
 		if ( isset( $this->_props[ $key ] ) ) {
@@ -280,6 +297,34 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 	 * @return mixed
 	 */
 	abstract static function meta_type();
+
+	private function maybe_convert_to_type( $type, $value ) {
+		if ( ( $type === 'int' || $type === 'integer' ) && ! is_int( $value ) ) {
+			return intval( $value );
+		}
+
+		if ( $type === 'float' && ! is_float( $value ) ) {
+			return floatval( $value );
+		}
+
+		if ( $type === 'string' && ! is_string( $value ) ) {
+			return strval( $value );
+		}
+
+		if ( ( $type === 'bool' || $type === 'boolean' ) && ! is_bool( $value ) ) {
+			return boolval( $value );
+		}
+
+		if ( $type === 'array' && is_string( $value ) ) {
+			return json_decode( $value, true, 512, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
+		}
+
+		if ( $type === 'object' && is_string( $value ) ) {
+			return json_decode( $value, false, 512, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
+		}
+
+		return $value;
+	}
 
 	/**
 	 * @param $key

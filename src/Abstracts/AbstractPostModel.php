@@ -33,7 +33,7 @@ abstract class AbstractPostModel extends AbstractModel implements PostModelInter
 	 * A numeric string, for compatibility reasons.
 	 *
 	 * @since 3.5.0
-	 * @var string
+	 * @var int
 	 */
 	public $author_id = 0;
 
