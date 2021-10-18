@@ -5,8 +5,8 @@ namespace Wpify\Model\Abstracts;
 use Wpify\Model\Interfaces\RepositoryInterface;
 
 abstract class AbstractDbRepository extends AbstractRepository implements RepositoryInterface {
-	private $db;
-	private $db_table;
+	public $db;
+	public $db_table;
 
 	public function __construct() {
 		global $wpdb;
