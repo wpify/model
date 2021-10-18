@@ -116,4 +116,12 @@ abstract class AbstractDbRepository extends AbstractRepository implements Reposi
 	public function create(): AbstractDbModel {
 		return $this->factory( null );
 	}
+
+	/**
+	 * @param ?object $object
+	 */
+	public function get( $object = null ) {
+		return ! empty( $object ) ? $this->factory( $object ) : null;
+	}
+
 }
