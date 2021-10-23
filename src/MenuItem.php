@@ -24,7 +24,6 @@ class MenuItem extends AbstractPostModel {
 		'date'             => array( 'source' => 'object', 'source_name' => 'post_date' ),
 		'date_gmt'         => array( 'source' => 'object', 'source_name' => 'post_date_gmt' ),
 		'content'          => array( 'source' => 'object', 'source_name' => 'post_content' ),
-		'title'            => array( 'source' => 'object', 'source_name' => 'post_title' ),
 		'excerpt'          => array( 'source' => 'object', 'source_name' => 'post_excerpt' ),
 		'status'           => array( 'source' => 'object', 'source_name' => 'post_status' ),
 		'password'         => array( 'source' => 'object', 'source_name' => 'post_password' ),
