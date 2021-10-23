@@ -11,7 +11,7 @@ use Wpify\Model\Interfaces\PostRepositoryInterface;
  *
  * @property PostRepositoryInterface $_repository
  */
-abstract class AbstractDbModel extends AbstractModel implements ModelInterface {
+abstract class AbstractDbTableModel extends AbstractModel implements ModelInterface {
 	public function get_db_data() {
 		$data = [];
 

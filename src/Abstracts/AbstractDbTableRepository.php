@@ -4,7 +4,7 @@ namespace Wpify\Model\Abstracts;
 
 use Wpify\Model\Interfaces\RepositoryInterface;
 
-abstract class AbstractDbRepository extends AbstractRepository implements RepositoryInterface {
+abstract class AbstractDbTableRepository extends AbstractRepository implements RepositoryInterface {
 	public $db;
 	public $db_table;
 
@@ -25,9 +25,9 @@ abstract class AbstractDbRepository extends AbstractRepository implements Reposi
 			'include_deleted' => false,
 		];
 
-		$args     = wp_parse_args( $args, $defaults );
-		$where    = 'WHERE 1 = 1';
-		$query    = "SELECT * FROM {$this->db_table} ";
+		$args  = wp_parse_args( $args, $defaults );
+		$where = 'WHERE 1 = 1';
+		$query = "SELECT * FROM {$this->db_table} ";
 		if ( ! empty( $args['where'] ) ) {
 			$where .= ' AND ' . $args['where'];
 		}
