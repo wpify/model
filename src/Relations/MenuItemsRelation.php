@@ -33,15 +33,30 @@ class MenuItemsRelation implements RelationInterface {
 
 	public function fetch() {
 		$menu_items = wp_get_nav_menu_items( $this->model->id );
-		foreach ( $menu_items as $menu_item ) {
-			$p = $this->post_repository->get($menu_item);
 
+		$items = [];
+		foreach ( $menu_items as $menu_item ) {
+			$items[] = $this->post_repository->get( $menu_item );
 		}
 
-		return $this->post_repository->all_by_term( $this->model );
+		return $this->sort_items( $items );
 	}
 
+	public function sort_items( $items ) {
+		$result = [];
+		foreach ( $items as $item ) {
+			if ( ! $item->menu_item_parent || $item->menu_item_parent == 0 ) {
+				$result[ $item->id ] = $item;
+			} else {
+				$result[ $item->menu_item_parent ]->item_children[] = $item;
+			}
+		}
+
+		return $result;
+	}
+
+
 	public function assign() {
-		$this->post_repository->assign_post_to_term( $this->model->{$this->key}, [ $this->model ], true );
+		// TODO
 	}
 }
