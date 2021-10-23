@@ -4,6 +4,7 @@ namespace Wpify\Model;
 
 use Wpify\Model\Abstracts\AbstractTermModel;
 use Wpify\Model\Interfaces\RepositoryInterface;
+use Wpify\Model\Relations\MenuItemsRelation;
 
 /**
  * Class BasicPost
@@ -16,8 +17,8 @@ class Menu extends AbstractTermModel {
 		parent::__construct( $object, $repository );
 	}
 
-	public function items_relation(  ) {
-
+	public function items_relation() {
+		return new MenuItemsRelation( $this, $this->model_repository()->get_menu_item_repository() );
 	}
 
 	/**
