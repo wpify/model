@@ -16,7 +16,7 @@ class MenuItem extends AbstractPostModel {
 	/**
 	 * @var array
 	 */
-	public $item_children = [];
+	public $item_children;
 
 	protected $_props = array(
 		'id'               => array( 'source' => 'object', 'source_name' => 'ID' ),
@@ -35,5 +35,26 @@ class MenuItem extends AbstractPostModel {
 		'parent_id'        => array( 'source' => 'object', 'source_name' => 'post_parent' ),
 		'mime_type'        => array( 'source' => 'object', 'source_name' => 'post_mime_type' ),
 		'menu_item_parent' => array( 'source' => 'object', 'source_name' => 'menu_item_parent' ),
+		'url'              => array( 'source' => 'object', 'source_name' => 'url' ),
+		'classes'          => array( 'source' => 'object', 'source_name' => 'classes' ),
+		'attr_title'       => array( 'source' => 'object', 'source_name' => 'attr_title' ),
+		'target'           => array( 'source' => 'object', 'source_name' => 'target' ),
+		'item_children'    => array( 'source' => 'custom' ),
 	);
+
+	public function get_children() {
+		return $this->item_children;
+	}
+
+	public function to_array( array $props = array() ): array {
+		$data = parent::to_array( $props );
+		if ( $data['children'] ) {
+			unset($data['item_children']);
+			$data['children'] = array_map( function ( $item ) {
+				return $item->to_array();
+			}, $data['children'] );
+		}
+
+		return $data;
+	}
 }
