@@ -248,7 +248,9 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 					$this->_data[ $key ] = $this->$key ?? null;
 				}
 
-				$this->_data[ $key ] = $this->maybe_convert_to_type( $prop['type'], $this->_data[ $key ] );
+				if (!empty($prop['type'])) {
+					$this->_data[ $key ] = $this->maybe_convert_to_type( $prop['type'], $this->_data[ $key ] );
+				}
 			}
 
 			return $this->_data[ $key ];
