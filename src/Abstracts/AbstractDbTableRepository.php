@@ -79,12 +79,12 @@ abstract class AbstractDbTableRepository extends AbstractRepository implements R
 	}
 
 	/**
-	 * @param AbstractDbModel $model
+	 * @param AbstractDbTableModel $model
 	 *
-	 * @return AbstractDbModel
+	 * @return AbstractDbTableModel
 	 * @throws \Exception
 	 */
-	public function save( $model ): AbstractDbModel {
+	public function save( $model ): AbstractDbTableModel {
 		if ( $model->id ) {
 			$result = $this->db->update(
 				$this->db_table,
@@ -113,7 +113,7 @@ abstract class AbstractDbTableRepository extends AbstractRepository implements R
 		return $this->find( [ 'where' => $this->db->prepare( "{$field} = %s", $value ) ] );
 	}
 
-	public function create(): AbstractDbModel {
+	public function create(): AbstractDbTableModel {
 		return $this->factory( null );
 	}
 
