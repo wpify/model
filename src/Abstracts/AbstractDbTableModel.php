@@ -2,8 +2,11 @@
 
 namespace Wpify\Model\Abstracts;
 
+use ReflectionClass;
+use ReflectionProperty;
 use Wpify\Model\Interfaces\ModelInterface;
 use Wpify\Model\Interfaces\PostRepositoryInterface;
+use Wpify\Model\Interfaces\RepositoryInterface;
 
 /**
  * Class AbstractPostModel
@@ -12,6 +15,17 @@ use Wpify\Model\Interfaces\PostRepositoryInterface;
  * @property PostRepositoryInterface $_repository
  */
 abstract class AbstractDbTableModel extends AbstractModel implements ModelInterface {
+	public function __construct( $object, RepositoryInterface $repository ) {
+		$reflection = new ReflectionClass($this);
+		$properties = $reflection->getProperties( ReflectionProperty::IS_PUBLIC);
+		foreach ( $properties as $property ) {
+			$key = $property->getName();
+			$this->_props[$key] = array( 'source' => 'object', 'source_name' => $key );
+		}
+
+		parent::__construct($object,  $repository);
+	}
+
 	public function get_db_data() {
 		$data = [];
 
