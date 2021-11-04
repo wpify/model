@@ -16,14 +16,18 @@ use Wpify\Model\Interfaces\RepositoryInterface;
  */
 abstract class AbstractDbTableModel extends AbstractModel implements ModelInterface {
 	public function __construct( $object, RepositoryInterface $repository ) {
-		$reflection = new ReflectionClass($this);
-		$properties = $reflection->getProperties( ReflectionProperty::IS_PUBLIC);
+		$reflection = new ReflectionClass( $this );
+		$properties = $reflection->getProperties( ReflectionProperty::IS_PUBLIC );
 		foreach ( $properties as $property ) {
-			$key = $property->getName();
-			$this->_props[$key] = array( 'source' => 'object', 'source_name' => $key );
+			$name = $property->getName();
+			if ( method_exists( $this, 'get_' . $name ) || method_exists( $this, $name . '_relation' ) || isset( $this->_props[ $name ] ) ) {
+				continue;
+			}
+
+			$this->_props[ $name ] = array( 'source' => 'object', 'source_name' => $name );
 		}
 
-		parent::__construct($object,  $repository);
+		parent::__construct( $object, $repository );
 	}
 
 	public function get_db_data() {
