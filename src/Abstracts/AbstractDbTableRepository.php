@@ -47,15 +47,28 @@ abstract class AbstractDbTableRepository extends AbstractRepository implements R
 	}
 
 
-	protected function resolve_object( $data ) {
+	protected function resolve_object( $data = null) {
+		$object = null;
 		if ( \is_object( $data ) && \get_class( $data ) === $this->model() ) {
 			$object = $data->source_object();
-		} else {
+		} else if ( is_object( $data ) ) {
 			$object = $data;
+		} else if ( is_numeric( $data ) ) {
+			$row = $this->get_db_row( 'id', $data );
+			if ( $row ) {
+				$object = $row;
+			}
 		}
 
 		return $object;
 	}
+
+	public function get_db_row( $column, $value ) {
+		return $this->db->get_row(
+			$this->db->prepare( "SELECT * FROM {$this->db_table} WHERE {$column} = %s", $value )
+		);
+	}
+
 
 	public function delete( $model, $force = true ) {
 		if ( $force ) {
@@ -123,5 +136,4 @@ abstract class AbstractDbTableRepository extends AbstractRepository implements R
 	public function get( $object = null ) {
 		return ! empty( $object ) ? $this->factory( $object ) : null;
 	}
-
 }
