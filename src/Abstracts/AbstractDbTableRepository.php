@@ -11,7 +11,7 @@ abstract class AbstractDbTableRepository extends AbstractRepository implements R
 	public function __construct() {
 		global $wpdb;
 		$this->db       = $wpdb;
-		$this->db_table = $this->db->prefix . $this::table();
+		$this->db_table = $this::table();
 	}
 
 	abstract public static function table(): string;
