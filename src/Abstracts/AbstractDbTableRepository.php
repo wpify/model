@@ -34,6 +34,11 @@ abstract class AbstractDbTableRepository extends AbstractRepository implements R
 		if ( ! $args['include_deleted'] ) {
 			$where .= ' AND deleted_at IS NULL';
 		}
+
+		if ( ! empty( $args['order_by'] ) ) {
+			$where .= ' ORDER BY ' . $args['order_by'];
+		}
+
 		$query .= $where;
 
 		$collection = array();
