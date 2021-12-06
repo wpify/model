@@ -18,6 +18,17 @@ class MenuItem extends AbstractPostModel {
 	 */
 	public $item_children;
 
+	/**
+	 * Object ID
+	 */
+	public $object_id;
+
+	/**
+	 * Is current item?
+	 */
+	public $current_item;
+
+
 	protected $_props = array(
 		'id'               => array( 'source' => 'object', 'source_name' => 'ID' ),
 		'author_id'        => array( 'source' => 'object', 'source_name' => 'post_author' ),
@@ -56,5 +67,12 @@ class MenuItem extends AbstractPostModel {
 		}
 
 		return $data;
+	}
+
+	public function get_object_id(  ) {
+		return (int) $this->source_object()->object_id;
+	}
+	public function get_current_item(  ) {
+		return $this->object_id === get_the_ID();
 	}
 }
