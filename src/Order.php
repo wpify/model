@@ -61,6 +61,17 @@ class Order extends AbstractModel {
 	 */
 	public $weight;
 
+	/**
+	 * @var WC_Order
+	 * @readonly
+	 */
+	public $wc_order;
+
+	/**
+	 * @readonly
+	 */
+	public $total;
+
 	public function __construct( $object, OrderRepository $repository ) {
 		parent::__construct( $object, $repository );
 	}
@@ -168,4 +179,14 @@ class Order extends AbstractModel {
 		return in_array( $shipping_method_ids, $methods );
 	}
 
+	public function get_wc_order() {
+		return $this->source_object();
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function get_total() {
+		return $this->wc_order->get_total();
+	}
 }
