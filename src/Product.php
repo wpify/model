@@ -13,7 +13,6 @@ use Wpify\Model\Abstracts\AbstractModel;
 class Product extends AbstractModel {
 	/**
 	 * Post ID.
-	 *
 	 * @since 3.5.0
 	 * @var int
 	 */
@@ -21,7 +20,6 @@ class Product extends AbstractModel {
 
 	/**
 	 * ID of a post's parent post.
-	 *
 	 * @since 3.5.0
 	 * @var int
 	 */
@@ -29,25 +27,65 @@ class Product extends AbstractModel {
 
 	/**
 	 * Parent post
-	 *
 	 * @var self
 	 */
 	public $parent;
 
 	/**
 	 * Product type
-	 *
 	 * @var string
 	 */
 	public $type;
 
 	/**
+	 * Product name
+	 * @var string
+	 */
+	public $name;
+
+	/**
+	 * Stock quantity
+	 * @var int
+	 */
+	public $stock_quantity;
+
+	/**
+	 * Is in stock
+	 * @var bool
+	 */
+	public $is_in_stock;
+
+	/**
+	 * Price
+	 * @var float
+	 */
+	public $price;
+
+	/**
+	 * Image ID
+	 * @var int
+	 */
+	public $image_id;
+
+	/**
+	 * WC_Product
+	 */
+	public $wc_product;
+
+
+	/**
 	 * @var string[][]
 	 */
 	protected $_props = array(
-		'id'        => array( 'source' => 'object', 'source_name' => 'id' ),
-		'parent_id' => array( 'source' => 'object', 'source_name' => 'parent_id' ),
-		'type'      => array( 'source' => 'object', 'source_name' => 'type' ),
+		'id'             => array( 'source' => 'object', 'source_name' => 'id' ),
+		'parent_id'      => array( 'source' => 'object', 'source_name' => 'parent_id' ),
+		'type'           => array( 'source' => 'object', 'source_name' => 'type' ),
+		'name'           => array( 'source' => 'object', 'source_name' => 'name' ),
+		'stock_quantity' => array( 'source' => 'object', 'source_name' => 'stock_quantity' ),
+		'is_in_stock'    => array( 'source' => 'object', 'source_name' => 'is_in_stock' ),
+		'price'          => array( 'source' => 'object', 'source_name' => 'price' ),
+		'image_id'       => array( 'source' => 'object', 'source_name' => 'image_id' ),
+
 	);
 
 	public function __construct( $object, ProductRepository $repository ) {
@@ -75,5 +113,9 @@ class Product extends AbstractModel {
 	 */
 	public function model_repository(): ProductRepository {
 		return $this->_repository;
+	}
+
+	public function get_wc_product() {
+		return $this->source_object();
 	}
 }
