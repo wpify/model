@@ -27,7 +27,7 @@ abstract class AbstractTermRepository extends AbstractRepository implements Term
 	 * @return mixed
 	 */
 	public function find( array $args = array() ) {
-		$defaults   = array( 'taxonomy' => $this::taxonomy() );
+		$defaults   = array( 'taxonomy' => $this->taxonomy() );
 		$args       = wp_parse_args( $args, $defaults );
 		$collection = array();
 		$terms      = get_terms( $args );
@@ -39,7 +39,7 @@ abstract class AbstractTermRepository extends AbstractRepository implements Term
 		return $this->collection_factory( $collection );
 	}
 
-	abstract static function taxonomy(): string;
+	abstract public function taxonomy(): string;
 
 	/**
 	 * @return AbstractTermModel[]
@@ -63,7 +63,7 @@ abstract class AbstractTermRepository extends AbstractRepository implements Term
 	 * @return mixed
 	 */
 	public function delete( $model ) {
-		return wp_delete_term( $model->id, $this::taxonomy() );
+		return wp_delete_term( $model->id, $this->taxonomy() );
 	}
 
 	/**
@@ -109,7 +109,7 @@ abstract class AbstractTermRepository extends AbstractRepository implements Term
 	 */
 	public function terms_of_post( int $post_id ) {
 		$collection = array();
-		$terms      = get_the_terms( $post_id, $this::taxonomy() );
+		$terms      = get_the_terms( $post_id, $this->taxonomy() );
 
 		if ( ! empty( $terms ) ) {
 			foreach ( $terms as $term ) {
@@ -193,21 +193,21 @@ abstract class AbstractTermRepository extends AbstractRepository implements Term
 			$object = $data;
 		} elseif ( empty( $data ) ) {
 			$object           = new WP_Term( new stdClass() );
-			$object->taxonomy = $this::taxonomy();
+			$object->taxonomy = $this->taxonomy();
 		} elseif ( isset( $data->id ) ) {
-			$object = get_term_by( 'ID', $data->id, $this::taxonomy() );
+			$object = get_term_by( 'ID', $data->id, $this->taxonomy() );
 		} elseif ( is_numeric( $data ) ) {
-			$object = get_term_by( 'ID', (int) $data, $this::taxonomy() );
+			$object = get_term_by( 'ID', (int) $data, $this->taxonomy() );
 		} elseif ( is_string( $data ) ) {
-			$object = get_term_by( 'slug', $data, $this::taxonomy() );
+			$object = get_term_by( 'slug', $data, $this->taxonomy() );
 		} elseif ( is_int( $data ) ) {
-			$object = get_term_by( 'ID', $data, $this::taxonomy() );
+			$object = get_term_by( 'ID', $data, $this->taxonomy() );
 		} elseif ( is_array( $data ) && isset( $data['field'] ) && isset( $data['value'] ) ) {
-			$object = get_term_by( $data['field'], $data['value'], $this::taxonomy() );
+			$object = get_term_by( $data['field'], $data['value'], $this->taxonomy() );
 		}
 
 		if ( ! is_object( $object ) ) {
-			throw new NotFoundException( "The term (" . $this::taxonomy() . ") was not found\n\n" . print_r( $data, true ) );
+			throw new NotFoundException( "The term (" . $this->taxonomy() . ") was not found\n\n" . print_r( $data, true ) );
 		}
 
 		return $object;

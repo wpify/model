@@ -23,7 +23,7 @@ class PostTagRepository extends AbstractTermRepository {
 	/** @var PostRepository */
 	protected $post_repository;
 
-	static function taxonomy(): string {
+	public function taxonomy(): string {
 		return 'post_tag';
 	}
 

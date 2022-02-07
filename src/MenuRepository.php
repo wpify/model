@@ -96,7 +96,7 @@ class MenuRepository extends AbstractTermRepository {
 		return new MenuItemRepository();
 	}
 
-	static function taxonomy(): string {
+	public function taxonomy(): string {
 		return 'nav_menu';
 	}
 }

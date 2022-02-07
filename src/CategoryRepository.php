@@ -23,7 +23,7 @@ class CategoryRepository extends AbstractTermRepository {
 	/** @var PostRepository */
 	protected $post_repository;
 
-	static function taxonomy(): string {
+	public function taxonomy(): string {
 		return 'category';
 	}
 
