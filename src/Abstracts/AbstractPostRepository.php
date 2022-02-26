@@ -180,6 +180,10 @@ abstract class AbstractPostRepository extends AbstractRepository implements Post
 		$object_data = array();
 
 		foreach ( $model->own_props() as $key => $prop ) {
+			if ( ! empty( $prop['readonly'] ) ) {
+				continue;
+			}
+
 			$source_name = $prop['source_name'];
 
 			if ( $prop['source'] === 'object' ) {
