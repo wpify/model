@@ -15,7 +15,6 @@ use Wpify\Model\Interfaces\TermModelInterface;
 /**
  * Class BasePostRepository
  * @package Wpify\Model
- *
  */
 class ProductRepository extends AbstractRepository implements RepositoryInterface {
 	static function post_type(): string {
@@ -79,6 +78,10 @@ class ProductRepository extends AbstractRepository implements RepositoryInterfac
 		$object_data = array();
 
 		foreach ( $model->own_props() as $key => $prop ) {
+			if ( ! empty( $prop['readonly'] ) ) {
+				continue;
+			}
+
 			$source_name = $prop['source_name'];
 
 			if ( $prop['source'] === 'object' ) {
@@ -95,6 +98,9 @@ class ProductRepository extends AbstractRepository implements RepositoryInterfac
 		}
 
 		if ( $model->id > 0 ) {
+			if ( empty( $object_data['ID'] ) ) {
+				$object_data['ID'] = $model->id;
+			}
 			$result = wp_update_post( $object_data, true );
 		} else {
 			$result = wp_insert_post( $object_data, true );
@@ -151,7 +157,7 @@ class ProductRepository extends AbstractRepository implements RepositoryInterfac
 	/**
 	 * Assign the post to the terms
 	 *
-	 * @param PostModelInterface $model
+	 * @param PostModelInterface   $model
 	 * @param TermModelInterface[] $terms
 	 */
 	public function assign_post_to_term( PostModelInterface $model, array $terms ) {
