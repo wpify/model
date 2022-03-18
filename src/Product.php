@@ -82,7 +82,6 @@ class Product extends AbstractModel {
 		'type'           => array( 'source' => 'object', 'source_name' => 'type' ),
 		'name'           => array( 'source' => 'object', 'source_name' => 'name' ),
 		'stock_quantity' => array( 'source' => 'object', 'source_name' => 'stock_quantity' ),
-		'is_in_stock'    => array( 'source' => 'object', 'source_name' => 'is_in_stock' ),
 		'price'          => array( 'source' => 'object', 'source_name' => 'price' ),
 		'image_id'       => array( 'source' => 'object', 'source_name' => 'image_id' ),
 
@@ -118,4 +117,8 @@ class Product extends AbstractModel {
 	public function get_wc_product() {
 		return $this->source_object();
 	}
+
+	public function get_is_in_stock() {
+        return $this->get_wc_product()->is_in_stock();
+    }
 }
