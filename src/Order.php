@@ -72,6 +72,13 @@ class Order extends AbstractModel {
 	 */
 	public $total;
 
+	protected $_props = array(
+		'id' => array(
+			'source'      => 'object',
+			'source_name' => 'id',
+		),
+	);
+
 	public function __construct( $object, OrderRepository $repository ) {
 		parent::__construct( $object, $repository );
 	}
