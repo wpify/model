@@ -152,7 +152,7 @@ abstract class AbstractPostRepository extends AbstractRepository implements Post
 		$args = array(
 			'tax_query' => array(
 				array(
-					'taxonomy' => $term->model_repository()::taxonomy(),
+					'taxonomy' => $term->model_repository()->taxonomy(),
 					'field'    => 'term_id',
 					'terms'    => array( $term->id ),
 				)
