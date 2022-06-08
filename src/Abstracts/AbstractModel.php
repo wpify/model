@@ -248,7 +248,7 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 					$this->_data[ $key ] = $this->$key ?? null;
 				}
 
-				if (!empty($prop['type'])) {
+				if ( ! empty( $prop['type'] ) ) {
 					$this->_data[ $key ] = $this->maybe_convert_to_type( $prop['type'], $this->_data[ $key ] );
 				}
 			}
@@ -261,7 +261,7 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 
 	/**
 	 * @param string $key
-	 * @param mixed $value
+	 * @param mixed  $value
 	 */
 	public function __set( string $key, $value ) {
 		if ( isset( $this->_props[ $key ] ) ) {
@@ -276,8 +276,8 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 				$this->_data[ $key ] = $value;
 			}
 
-			if ( $prop['source'] === 'object' && property_exists( $this->source_object(), $prop['source_name'] ) ) {
-				$this->source_object()->{$prop['source_name']} = $this->_data[ $key ];
+			if ( $prop['source'] === 'object' && $this->_object && \property_exists( $this->_object, $prop['source_name'] ) ) {
+				$this->_object->{$prop['source_name']} = $this->_data[ $key ];
 			}
 
 			$this->_props[ $key ]['changed'] = true;
