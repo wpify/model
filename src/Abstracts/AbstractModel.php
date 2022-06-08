@@ -276,6 +276,10 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 				$this->_data[ $key ] = $value;
 			}
 
+			if ( $prop['source'] === 'object' && property_exists( $this->source_object(), $prop['source_name'] ) ) {
+				$this->source_object()->{$prop['source_name']} = $this->_data[ $key ];
+			}
+
 			$this->_props[ $key ]['changed'] = true;
 
 			$after_set_hook = sprintf( 'after_%s_set', $key );
