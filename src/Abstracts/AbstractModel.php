@@ -63,9 +63,9 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 			}
 
 			if ( empty( $this->_props[ $name ]['type'] ) ) {
-				$this->_props[ $name ]['type'] = method_exists( $property, 'getType' )
-					? $property->getType()
-					: null;
+				if ( method_exists( $property, 'getType' ) && $property->getType() ) {
+					$this->_props[ $name ]['type'] = $property->getType()->getName();
+				}
 			}
 
 			if ( empty( $this->_props[ $name ]['type'] ) && $parsed_doc ) {
