@@ -73,11 +73,12 @@ abstract class AbstractOrderItemModel extends AbstractModel {
 	 */
 	public function get_unit_price_tax_included()
 	{
-		if ($this->unit_price_tax_included) {
-			return $this->unit_price_tax_included;
+		static $price;
+		if (!$price) {
+			$price = $this->get_unit_price();
 		}
-		$this->unit_price_tax_included = $this->get_unit_price();
-		return $this->unit_price_tax_included;
+
+		return $price;
 	}
 
 	public function get_unit_price($inc_tax = true)
@@ -97,11 +98,12 @@ abstract class AbstractOrderItemModel extends AbstractModel {
 	 */
 	public function get_unit_price_tax_excluded()
 	{
-		if ($this->unit_price_tax_excluded) {
-			return $this->unit_price_tax_excluded;
+		static $price;
+		if (!$price) {
+			$price = $this->get_unit_price(false);
 		}
-		$this->unit_price_tax_excluded = $this->get_unit_price(false);
-		return $this->unit_price_tax_excluded;
+
+		return $price;
 	}
 
 	/**
@@ -109,16 +111,16 @@ abstract class AbstractOrderItemModel extends AbstractModel {
 	 */
 	public function get_vat_rate()
 	{
-		if ($this->vat_rate) {
-			return $this->vat_rate;
-		}
-		$tax = 0;
-		if ($this->source_object()->get_tax_status() == 'taxable') {
-			if ($this->source_object()->get_total_tax()) {
-				$tax = \round($this->source_object()->get_total_tax() / ($this->source_object()->get_total() / 100));
+		static $rate;
+		if (!$rate) {
+			$rate = 0;
+			if ($this->source_object()->get_tax_status() == 'taxable') {
+				if ($this->source_object()->get_total_tax()) {
+					$rate = \round($this->source_object()->get_total_tax() / ($this->source_object()->get_total() / 100));
+				}
 			}
 		}
-		$this->vat_rate = $tax;
-		return $this->vat_rate;
+
+		return $rate;
 	}
 }
