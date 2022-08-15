@@ -2,6 +2,7 @@
 
 namespace Wpify\Model;
 
+use WC_Tax;
 use Wpify\Model\Abstracts\AbstractModel;
 
 /**
@@ -121,4 +122,31 @@ class Product extends AbstractModel {
 	public function get_is_in_stock() {
         return $this->get_wc_product()->is_in_stock();
     }
+
+	/**
+	 * Product VAT rate
+	 * @param string $country_code
+	 * @return float|null
+	 */
+	public function get_vat_rate( string $country_code ): ?float {
+		$vat_rate = null;
+		$product = $this->get_wc_product();
+		if ( $product->is_taxable() ) {
+
+			$vat_rates_data = WC_Tax::find_rates( array(
+				'country'   => $country_code,
+				'tax_class' => $product->get_tax_class()
+			) );
+
+			if ( ! empty( $vat_rates_data ) ) {
+				$vat_rate = reset( $vat_rates_data )['rate'];
+			}
+			if ( ! $vat_rate ) {
+				$product_vat = (int) wc_get_price_including_tax( $product ) - (int) wc_get_price_excluding_tax( $product );
+				$vat_rate    = \round( $product_vat / ( (int) wc_get_price_including_tax( $product ) / 100 ) );
+			}
+		}
+
+		return $vat_rate;
+	}
 }
