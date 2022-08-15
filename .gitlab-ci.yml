@@ -13,3 +13,5 @@ php_unit:
   script:
     - composer install --quiet
     - ./vendor/bin/codecept run unit
+  when:
+    - never
