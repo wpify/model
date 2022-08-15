@@ -14,4 +14,4 @@ php_unit:
     - composer install --quiet
     - ./vendor/bin/codecept run unit
   when:
-    - never
+    - manual
