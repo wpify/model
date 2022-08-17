@@ -157,7 +157,7 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 	 * @param mixed $offset
 	 * @param mixed $value
 	 */
-	public function offsetSet( $offset, $value ) {
+	public function offsetSet( $offset, $value ): void {
 		$this->_data[ $offset ] = $value;
 	}
 
@@ -173,7 +173,7 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 	/**
 	 * @param mixed $offset
 	 */
-	public function offsetUnset( $offset ) {
+	public function offsetUnset( $offset ): void {
 		unset( $this->_data[ $offset ] );
 	}
 
@@ -182,7 +182,7 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 	 *
 	 * @return array|false|mixed|null
 	 */
-	public function offsetGet( $offset ) {
+	public function offsetGet( $offset ): mixed {
 		return isset( $this->_props[ $offset ] ) ? $this->$offset : null;
 	}
 
