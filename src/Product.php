@@ -52,6 +52,8 @@ class Product extends AbstractModel {
 
 	/**
 	 * Is in stock
+	 *
+	 * @readonly
 	 * @var bool
 	 */
 	public $is_in_stock;
@@ -70,6 +72,8 @@ class Product extends AbstractModel {
 
 	/**
 	 * WC_Product
+	 *
+	 * @readonly
 	 */
 	public $wc_product;
 
