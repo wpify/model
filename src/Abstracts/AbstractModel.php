@@ -269,7 +269,7 @@ abstract class AbstractModel implements ModelInterface, IteratorAggregate, Array
 
 			$prop = $this->_props[ $key ];
 
-			if ( isset( $prop['setter'] ) && is_callable( $this, $prop['setter'] ) ) {
+			if ( isset( $prop['setter'] ) && is_callable( array( $this, $prop['setter'] ) ) ) {
 				$setter              = $prop['setter'];
 				$this->_data[ $key ] = $setter( $value );
 			} else {
