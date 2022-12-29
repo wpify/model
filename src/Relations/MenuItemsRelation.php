@@ -47,7 +47,7 @@ class MenuItemsRelation implements RelationInterface {
 		foreach ( $items as $item ) {
 			if ( ! $item->menu_item_parent || $item->menu_item_parent == 0 ) {
 				$result[ $item->id ] = $item;
-			} else {
+			} elseif (isset($result[$item->menu_item_parent])) {
 				$children = $result[ $item->menu_item_parent ]->item_children ?: [];
 				$children[] = $item;
 				$result[ $item->menu_item_parent ]->item_children = $children;
