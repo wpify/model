@@ -42,21 +42,18 @@ class MenuItemsRelation implements RelationInterface {
 		return $this->sort_items( $items );
 	}
 
-	public function sort_items( $items ) {
-		$result = [];
+	public function sort_items( $items, $parent_id = 0 ) {
+		$result = array();
+
 		foreach ( $items as $item ) {
-			if ( ! $item->menu_item_parent || $item->menu_item_parent == 0 ) {
+			if ( $item->menu_item_parent == $parent_id ) {
+				$item->item_children = $this->sort_items( $items, $item->id );
 				$result[ $item->id ] = $item;
-			} elseif (isset($result[$item->menu_item_parent])) {
-				$children = $result[ $item->menu_item_parent ]->item_children ?: [];
-				$children[] = $item;
-				$result[ $item->menu_item_parent ]->item_children = $children;
 			}
 		}
 
 		return $result;
 	}
-
 
 	public function assign() {
 		// TODO
