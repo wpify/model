@@ -21,7 +21,7 @@ abstract class AbstractUserRepository extends AbstractRepository implements User
 	}
 
 	/**
-	 * @param array $args
+	 * @param  array  $args
 	 *
 	 * @return mixed
 	 */
@@ -46,7 +46,7 @@ abstract class AbstractUserRepository extends AbstractRepository implements User
 	}
 
 	/**
-	 * @param AbstractUserModel $model
+	 * @param  AbstractUserModel  $model
 	 *
 	 * @return mixed
 	 * @throws NotPersistedException
@@ -56,6 +56,10 @@ abstract class AbstractUserRepository extends AbstractRepository implements User
 		$object_data = array();
 
 		foreach ( $model->own_props() as $key => $prop ) {
+			if ( ! empty( $prop['readonly'] ) ) {
+				continue;
+			}
+
 			$source_name = $prop['source_name'];
 
 			if ( $prop['source'] === 'object' ) {
@@ -134,7 +138,7 @@ abstract class AbstractUserRepository extends AbstractRepository implements User
 	}
 
 	/**
-	 * @param AbstractUserModel $model
+	 * @param  AbstractUserModel  $model
 	 *
 	 * @return mixed
 	 */
@@ -151,7 +155,7 @@ abstract class AbstractUserRepository extends AbstractRepository implements User
 	}
 
 	/**
-	 * @param ?object $object
+	 * @param ?object  $object
 	 */
 	public function get( $object = null ) {
 		return ! empty( $object ) ? $this->factory( $object ) : null;
