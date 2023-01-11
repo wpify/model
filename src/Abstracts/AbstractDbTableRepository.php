@@ -17,7 +17,14 @@ abstract class AbstractDbTableRepository extends AbstractRepository implements R
 	abstract public static function table(): string;
 
 	public function all() {
-		return $this->db->query( "SELECT * FROM {$this->db_table}" );
+		$collection = array();
+
+		$data = $this->db->get_results( "SELECT * FROM {$this->db_table}" );
+		foreach ( $data as $item ) {
+			$collection[] = $this->factory( $item );
+		}
+
+		return $this->collection_factory( $collection );
 	}
 
 	public function find( array $args = array() ) {
