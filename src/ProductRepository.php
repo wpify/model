@@ -51,6 +51,10 @@ class ProductRepository extends AbstractRepository implements RepositoryInterfac
 		$args     = wp_parse_args( $args, $defaults );
 		$products = wc_get_products( $args );
 
+		if ( isset( $args['array_order_by'] ) && isset( $args['array_order'] ) ) {
+			$products = wc_products_array_orderby( $products, $args['array_order_by'], $args['array_order'] );
+		}
+
 		$collection = array();
 
 		foreach ( $products as $product ) {
@@ -157,7 +161,7 @@ class ProductRepository extends AbstractRepository implements RepositoryInterfac
 	/**
 	 * Assign the post to the terms
 	 *
-	 * @param PostModelInterface   $model
+	 * @param PostModelInterface $model
 	 * @param TermModelInterface[] $terms
 	 */
 	public function assign_post_to_term( PostModelInterface $model, array $terms ) {
