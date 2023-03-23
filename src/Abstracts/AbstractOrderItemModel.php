@@ -72,12 +72,7 @@ abstract class AbstractOrderItemModel extends AbstractModel {
 	 * @return mixed
 	 */
 	public function get_unit_price_tax_included() {
-		static $price;
-		if ( ! $price ) {
-			$price = $this->get_unit_price();
-		}
-
-		return $price;
+		return $this->get_unit_price();
 	}
 
 	public function get_unit_price( $inc_tax = true ) {
@@ -96,12 +91,7 @@ abstract class AbstractOrderItemModel extends AbstractModel {
 	 * @return mixed
 	 */
 	public function get_unit_price_tax_excluded() {
-		static $price;
-		if ( ! $price ) {
-			$price = $this->get_unit_price( false );
-		}
-
-		return $price;
+		return $this->get_unit_price( false );
 	}
 
 	/**
