@@ -28,12 +28,6 @@ class Order extends AbstractModel {
 	public $parent_id = 0;
 
 	/**
-	 * Parent post
-	 * @var self
-	 */
-	public $parent;
-
-	/**
 	 * Line items
 	 * @var OrderItemLine[]
 	 */
@@ -76,6 +70,10 @@ class Order extends AbstractModel {
 		'id' => array(
 			'source'      => 'object',
 			'source_name' => 'id',
+		),
+		'parent_id' => array(
+			'source'      => 'object',
+			'source_name' => 'parent_id',
 		),
 	);
 
