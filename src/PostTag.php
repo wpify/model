@@ -1,20 +1,16 @@
 <?php
+declare( strict_types=1 );
 
 namespace Wpify\Model;
 
-use Wpify\Model\Abstracts\AbstractTermModel;
-use Wpify\Model\Interfaces\PostModelInterface;
-use Wpify\Model\Relations\TermPostsRelation;
+use Wpify\Model\Attributes\TermPostsRelation;
 
-class PostTag extends AbstractTermModel {
-	/** @var PostModelInterface */
-	public $posts;
-
-	protected function posts_relation(): TermPostsRelation {
-		return new TermPostsRelation(
-			$this,
-			'posts',
-			$this->model_repository()->get_post_repository()
-		);
-	}
+class PostTag extends Term {
+	/**
+	 * Posts assigned to this tag.
+	 *
+	 * @var Post[]
+	 */
+	#[TermPostsRelation( Post::class )]
+	public array $posts = array();
 }

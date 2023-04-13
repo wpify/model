@@ -1,192 +1,169 @@
 <?php
 
+declare( strict_types=1 );
+
 namespace Wpify\Model;
 
 use WC_Order;
-use Wpify\Model\Abstracts\AbstractPostModel;
-use Wpify\Model\Abstracts\AbstractRepository;
-use Wpify\Model\Exceptions\NotFoundException;
-use Wpify\Model\Exceptions\NotPersistedException;
+use Wpify\Model\Exceptions\CouldNotSaveModelException;
+use Wpify\Model\Exceptions\RepositoryNotInitialized;
 use Wpify\Model\Interfaces\ModelInterface;
-use Wpify\Model\Interfaces\PostModelInterface;
-use Wpify\Model\Interfaces\RepositoryInterface;
-use Wpify\Model\Interfaces\TermModelInterface;
 
 /**
- * Class BasePostRepository
- * @package Wpify\Model
+ * Repository for Post models.
+ *
+ * @method Order create( array $data )
  */
-class OrderRepository extends AbstractRepository implements RepositoryInterface {
-	protected $item_repository;
-
-	static function post_type(): string {
-		return 'shop_order';
-	}
-
-	public function fetch_parent( AbstractPostModel $model ) {
-		return $this->get( $model->parent_id );
-	}
-
+class OrderRepository extends Repository {
 	/**
-	 * @param ?object $object
-	 */
-	public function get( $object = null ) {
-		return ! empty( $object ) ? $this->factory( $object ) : null;
-	}
-
-	/**
-	 * @return AbstractPostModel[]
-	 */
-	public function all() {
-		$args = array( 'limit' => - 1 );
-
-		return $this->find( $args );
-	}
-
-	/**
-	 * @param array $args
+	 * Returns the model class name.
 	 *
-	 * @return mixed
+	 * @return string
 	 */
-	public function find( array $args = array() ) {
-		$defaults = [];
-		$args     = wp_parse_args( $args, $defaults );
-		$items    = wc_get_orders( $args );
-
-		$collection = array();
-
-		foreach ( $items as $item ) {
-			$collection[] = $this->factory( $item );
-		}
-
-		return $this->collection_factory( $collection );
-	}
-
-	/**
-	 * @return AbstractPostModel
-	 */
-	public function create() {
-		return $this->factory( null );
-	}
-
-	/**
-	 * @param ModelInterface $model
-	 *
-	 * @return ModelInterface
-	 * @throws NotFoundException
-	 * @throws NotPersistedException
-	 */
-	public function save( $model ) {
-		$object_data = array();
-		$order       = $model->source_object();
-		foreach ( $model->own_props() as $key => $prop ) {
-			if ( ! empty( $prop['readonly'] ) ) {
-				continue;
-			}
-			// TODO: uncomment this if needed to set object data back
-//			$source_name = $prop['source_name'];
-//            if ($prop['source'] === 'object') {
-//                $object_data[$source_name] = $model->{$key};
-//            }
-//
-			if ( $prop['source'] === 'meta' ) {
-				$order->update_meta_data( $key, $model->{$key} );
-			} elseif ( $prop['source'] === 'relation' && ! empty( $prop['assign'] ) && \is_callable( $prop['assign'] ) && $prop['changed'] ) {
-				$prop['assign']( $model );
-			}
-		}
-
-		$result = $order->save();
-		if ( $result && ! is_wp_error( $result ) ) {
-			$model->refresh( $this->resolve_object( $result ) );
-		} else {
-			throw new NotPersistedException();
-		}
-
-		return $model;
-	}
-
-	/**
-	 * @param $data
-	 *
-	 * @return WC_Order
-	 * @throws NotFoundException
-	 */
-	protected function resolve_object( $data ): WC_Order {
-		if ( is_object( $data ) && get_class( $data ) === $this->model() ) {
-			$object = $data->source_object();
-		} elseif ( $data instanceof WC_Order ) {
-			$object = $data;
-		} elseif ( is_null( $data ) ) {
-			$object = new WC_Order();
-		} elseif ( is_numeric( $data ) ) {
-			$object = wc_get_order( $data );
-		} elseif ( isset( $data->id ) ) {
-			$object = wc_get_order( $data->id );
-		} else {
-			$object = wc_get_order( $data );
-		}
-
-		if ( ! ( $object instanceof WC_Order ) ) {
-			throw new NotFoundException( 'The order was not found' );
-		}
-
-		return $object;
-	}
-
 	public function model(): string {
 		return Order::class;
 	}
 
 	/**
-	 * @param PostModelInterface $model
+	 * Returns the Post model by the WP_Post object, id, slug or URL.
 	 *
-	 * @return mixed
+	 * @param mixed $source
+	 *
+	 * @return ?Order
+	 * @throws RepositoryNotInitialized
 	 */
-	public function delete( PostModelInterface $model ) {
-		return wp_delete_post( $model->id, true );
+	public function get( mixed $source ): ?ModelInterface {
+		$wc_order = null;
+		$order    = null;
+
+		if ( $source instanceof WC_Order ) {
+			$wc_order = $source;
+		}
+
+		if ( ! $wc_order ) {
+			$order = $this->storage()->get( $source );
+		}
+
+		if ( $order ) {
+			return $order;
+		}
+
+		if ( ! $wc_order && is_numeric( $source ) ) {
+			$wc_order = wc_get_order( $source );
+		}
+
+		if ( ! $wc_order && is_string( $source ) ) {
+			$wc_order = wc_get_order_id_by_order_key( $source );
+		}
+
+		if ( $wc_order ) {
+			$model_class = $this->model();
+			$order       = new $model_class( $this->manager() );
+
+			$order->source( $wc_order );
+			$this->storage()->save( $order->id, $order, array( $order->order_key ) );
+		}
+
+		return $order;
 	}
 
 	/**
-	 * Assign the post to the terms
+	 * Stores order into database.
 	 *
-	 * @param PostModelInterface $model
-	 * @param TermModelInterface[] $terms
+	 * @param Order $model
+	 *
+	 * @return Order
+	 * @throws CouldNotSaveModelException
 	 */
-	public function assign_post_to_term( PostModelInterface $model, array $terms ) {
-		$to_assign = [];
+	public function save( ModelInterface $model ): ModelInterface {
+		foreach ( $model->props() as $prop ) {
+			if ( empty( $prop['source'] ) || $prop['readonly'] ) {
+				continue;
+			}
 
-		foreach ( $terms as $term ) {
-			if ( isset( $to_assign[ $term->taxonomy_name ] ) && is_array( $to_assign[ $term->taxonomy_name ] ) ) {
-				$to_assign[ $term->taxonomy_name ][] = $term;
-			} else {
-				$to_assign[ $term->taxonomy_name ] = array( $term );
+			if ( method_exists( $model, 'persist_' . $prop['name'] ) ) {
+				$model->{'persist_' . $prop['name']}( $prop['value'] );
 			}
 		}
 
-		foreach ( $to_assign as $taxonomy => $assigns ) {
-			wp_set_post_terms( $model->id, array_values( array_map( function ( $term ) {
-				return $term->id;
-			}, $assigns ) ), $taxonomy );
+		$result = $model->source()->save();
+
+		if ( is_wp_error( $result ) ) {
+			throw new CouldNotSaveModelException( $result->get_error_message() );
 		}
+
+		$model->refresh( wc_get_order( $result ) );
+		$this->storage()->delete( $model->id );
+
+		return $model;
 	}
 
-	public function get_item_repository( $model = OrderItemLine::class ) {
-		// TODO: Cache this
-		return new OrderItemRepository( $model );
+	/**
+	 * Deletes the given order.
+	 *
+	 * @param Order $model
+	 *
+	 * @return bool
+	 */
+	public function delete( ModelInterface $model ): bool {
+		$this->storage()->delete( $model->id );
+
+		return boolval( $model->source()->delete( true ) );
 	}
 
-	public function count( $args = [] ) {
-		$args  = wp_parse_args(
-			$args,
-			[
-				'limit'  => - 1,
-				'return' => 'ids',
-			]
+
+	/**
+	 * Finds orders matching the given arguments.
+	 *
+	 * @param array $args
+	 *
+	 * @return Order[]
+	 * @throws RepositoryNotInitialized
+	 */
+	public function find( array $args = array() ): array {
+		$items      = wc_get_orders( $args );
+		$collection = array();
+
+		foreach ( $items as $item ) {
+			$collection[] = $this->get( $item );
+		}
+
+		return $collection;
+	}
+
+	/**
+	 * Finds all orders.
+	 *
+	 * @param array $args
+	 *
+	 * @return Order[]
+	 * @throws RepositoryNotInitialized
+	 */
+	public function find_all( array $args = array() ): array {
+		$defaults = array(
+			'limit' => - 1,
 		);
-		$items = wc_get_orders( $args );
 
-		return count( $items );
+		$args = wp_parse_args( $args, $defaults );
+
+		return $this->find( $args );
 	}
 
+	/**
+	 * Finds orders by ids.
+	 *
+	 * @param array $ids
+	 *
+	 * @return array
+	 * @throws RepositoryNotInitialized
+	 */
+	public function find_by_ids( array $ids ): array {
+		$orders = array();
+
+		foreach ( $ids as $id ) {
+			$orders[] = $this->get( $id );
+		}
+
+		return $orders;
+	}
 }

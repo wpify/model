@@ -1,78 +1,142 @@
 <?php
+declare( strict_types=1 );
 
 namespace Wpify\Model;
 
-use Wpify\Model\Abstracts\AbstractPostModel;
+use Wpify\Model\Attributes\ReadOnlyProperty;
+use Wpify\Model\Attributes\SourceObject;
 
-/**
- * Class BasicPost
- * @package Wpify\Model
- */
-class MenuItem extends AbstractPostModel {
+class MenuItem extends Post {
 	/**
-	 * @var int
+	 * The DB ID of this menu item.
 	 */
-	public $menu_item_parent;
-	/**
-	 * @var array
-	 */
-	public $item_children;
+	#[SourceObject]
+	public int $db_id = 0;
 
 	/**
-	 * Object ID
+	 * The ID of the menu item's parent if any.
 	 */
-	public $object_id;
+	#[SourceObject]
+	public int $menu_item_parent = 0;
 
 	/**
-	 * Is current item?
+	 * The DB ID of the original object this menu item represents, e.g. ID for posts and term_id for categories.
 	 */
-	public $current_item;
+	#[SourceObject]
+	public int $object_id = 0;
 
+	/**
+	 * The type of object originally represented, such as "category", "post", or "attachment".
+	 */
+	#[SourceObject]
+	public string $object = '';
 
-	protected $_props = array(
-		'id'               => array( 'source' => 'object', 'source_name' => 'ID' ),
-		'author_id'        => array( 'source' => 'object', 'source_name' => 'post_author' ),
-		'date'             => array( 'source' => 'object', 'source_name' => 'post_date' ),
-		'date_gmt'         => array( 'source' => 'object', 'source_name' => 'post_date_gmt' ),
-		'content'          => array( 'source' => 'object', 'source_name' => 'post_content' ),
-		'excerpt'          => array( 'source' => 'object', 'source_name' => 'post_excerpt' ),
-		'status'           => array( 'source' => 'object', 'source_name' => 'post_status' ),
-		'password'         => array( 'source' => 'object', 'source_name' => 'post_password' ),
-		'slug'             => array( 'source' => 'object', 'source_name' => 'post_name' ),
-		'modified_at'      => array( 'source' => 'object', 'source_name' => 'post_modified' ),
-		'modified_at_gmt'  => array( 'source' => 'object', 'source_name' => 'post_modified_gmt' ),
-		'content_filtered' => array( 'source' => 'object', 'source_name' => 'post_content_filtered' ),
-		'parent_id'        => array( 'source' => 'object', 'source_name' => 'post_parent' ),
-		'mime_type'        => array( 'source' => 'object', 'source_name' => 'post_mime_type' ),
-		'menu_item_parent' => array( 'source' => 'object', 'source_name' => 'menu_item_parent' ),
-		'title'            => array( 'source' => 'object', 'source_name' => 'title' ),
-		'url'              => array( 'source' => 'object', 'source_name' => 'url' ),
-		'classes'          => array( 'source' => 'object', 'source_name' => 'classes' ),
-		'attr_title'       => array( 'source' => 'object', 'source_name' => 'attr_title' ),
-		'target'           => array( 'source' => 'object', 'source_name' => 'target' ),
-		'item_children'    => array( 'source' => 'custom' ),
-	);
+	/**
+	 * Custom.
+	 */
+	#[SourceObject]
+	public string $custom = '';
 
-	public function get_children() {
-		return $this->item_children;
+	/**
+	 * The type of menu item.
+	 */
+	#[SourceObject]
+	public string $type_label = '';
+
+	/**
+	 * The title of the menu item.
+	 */
+	#[SourceObject]
+	public string $title = '';
+
+	/**
+	 * The URL to which this menu item points, if it is a custom link.
+	 */
+	#[SourceObject]
+	public string $url = '';
+
+	/**
+	 * The target attribute of the link element for this menu item.
+	 */
+	#[SourceObject]
+	public string $target = '';
+
+	/**
+	 * The title attribute of the link element for this menu item.
+	 */
+	#[SourceObject]
+	public string $attr_title = '';
+
+	/**
+	 * The description of this menu item.
+	 */
+	#[SourceObject]
+	public string $description = '';
+
+	/**
+	 * CSS classes to be added to the menu item's <li>.
+	 */
+	#[SourceObject]
+	public array $classes = array();
+
+	/**
+	 * Link relationship (XFN).
+	 */
+	#[SourceObject]
+	public string $xfn = '';
+
+	/**
+	 * Menu items that are children of this menu item.
+	 *
+	 * @var MenuItem[]
+	 */
+	#[ReadOnlyProperty]
+	public array $children = array();
+
+	/**
+	 * @deprecated Use $children instead
+	 * @var MenuItem[]
+	 */
+	#[ReadOnlyProperty]
+	public array $item_children = array();
+
+	/**
+	 * Whether this menu item is the current menu item or not.
+	 */
+	#[ReadOnlyProperty]
+	public bool $is_current = false;
+
+	/**
+	 * Whether this menu item or any of its children are the current menu item or not.
+	 */
+	#[ReadOnlyProperty]
+	public bool $is_highlighted = false;
+
+	/**
+	 * Whether this menu item is the current menu item or not.
+	 *
+	 * @return bool
+	 */
+	public function get_is_current(): bool {
+		return $this->object_id === get_the_ID();
 	}
 
-	public function to_array( array $props = array() ): array {
-		$data = parent::to_array( $props );
-		if ( $data['children'] ) {
-			unset( $data['item_children'] );
-			$data['children'] = array_map( function ( $item ) {
-				return $item->to_array();
-			}, $data['children'] );
+	/**
+	 * Whether this menu item or any of its children are the current menu item or not.
+	 *
+	 * @return bool
+	 */
+	public function get_is_highlighted(): bool {
+		if ( $this->is_current ) {
+			return true;
 		}
 
-		return $data;
-	}
+		foreach ( $this->children as $child ) {
+			if ( $child->is_highlighted ) {
+				return true;
+			}
+		}
 
-	public function get_object_id(  ) {
-		return (int) $this->source_object()->object_id;
-	}
-	public function get_current_item(  ) {
-		return $this->object_id === get_the_ID();
+		return false;
 	}
 }

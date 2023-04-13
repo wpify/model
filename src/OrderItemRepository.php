@@ -1,117 +1,163 @@
 <?php
 
+declare( strict_types=1 );
+
 namespace Wpify\Model;
 
-use WC_Order;
-use WC_Order_Item;
-use Wpify\Model\Abstracts\AbstractPostModel;
-use Wpify\Model\Abstracts\AbstractRepository;
-use Wpify\Model\Exceptions\NotFoundException;
+use Wpify\Model\Exceptions\CouldNotSaveModelException;
+use Wpify\Model\Exceptions\RepositoryNotInitialized;
 use Wpify\Model\Interfaces\ModelInterface;
-use Wpify\Model\Interfaces\PostModelInterface;
-use Wpify\Model\Interfaces\RepositoryInterface;
 
 /**
- * Class BasePostRepository
- * @package Wpify\Model
+ * Repository for Order Item models.
+ *
+ * @internal This class is not part of the public API and may change at any time.
  */
-class OrderItemRepository extends AbstractRepository implements RepositoryInterface {
+class OrderItemRepository extends Repository {
 	/**
-	 * @var string
-	 */
-	private $model;
-
-	public function __construct( string $model = OrderItemLine::class ) {
-		$this->model = $model;
-	}
-
-	/**
-	 * @param ?object $object
-	 */
-	public function get( $object = null ) {
-		return ! empty( $object ) ? $this->factory( $object ) : null;
-	}
-
-	/**
-	 * @return AbstractPostModel[]
-	 */
-	public function all() {
-		$args = array( 'limit' => - 1 );
-
-		return $this->find( $args );
-	}
-
-	/**
-	 * @param array $args
+	 * Returns the model class name.
 	 *
-	 * @return mixed
+	 * @return string
 	 */
-	public function find( array $args = array() ) {
-		$defaults = [];
-		$args     = wp_parse_args( $args, $defaults );
-		$items    = wc_get_orders( $args );
+	public function model(): string {
+		return OrderItem::class;
+	}
 
-		$collection = array();
+	/**
+	 * Returns the Post model by the WP_Post object, id, slug or URL.
+	 *
+	 * @param mixed $source
+	 *
+	 * @return ?OrderItemLine
+	 * @throws RepositoryNotInitialized
+	 */
+	public function get( mixed $source ): ?ModelInterface {
+		$wc_order_item = null;
+		$item          = null;
 
-		foreach ( $items as $item ) {
-			$collection[] = $this->factory( $item );
+		if ( $source instanceof \WC_Order_Item ) {
+			$wc_order_item = $source;
 		}
 
-		return $this->collection_factory( $collection );
+		if ( ! $wc_order_item ) {
+			$item = $this->storage()->get( $source );
+		}
+
+		if ( $item ) {
+			return $item;
+		}
+
+		if ( ! $wc_order_item && is_numeric( $source ) ) {
+			$wc_order_item = new \WC_Order_Item( $source );
+		}
+
+		if ( $wc_order_item ) {
+			$model_class = $this->model();
+			$item        = new $model_class( $this->manager() );
+
+			$item->source( $wc_order_item );
+			$this->storage()->save( $item->id, $item );
+		}
+
+		return $item;
 	}
 
 	/**
-	 * @return AbstractPostModel
+	 * Creates a new order item model.
+	 *
+	 * If the repository has multiple post types or no post types, this will throw an exception.
+	 *
+	 * @param array $data Data to set on the model.
+	 *
+	 * @return OrderItem
+	 * @throws RepositoryNotInitialized
 	 */
-	public function create() {
-		return $this->factory( null );
+	public function create( array $data = array() ): ModelInterface {
+		/** @var OrderItem $model */
+		return parent::create( $data );
 	}
 
 	/**
-	 * @param ModelInterface $model
-	 * // TODO: Implement this
+	 * Stores post into database.
+	 *
+	 * @param OrderItem $model
+	 *
+	 * @return OrderItem
+	 * @throws CouldNotSaveModelException
 	 */
-	public function save( $model ) {
+	public function save( ModelInterface $model ): ModelInterface {
+		foreach ( $model->props() as $prop ) {
+			if ( empty( $prop['source'] ) || $prop['readonly'] ) {
+				continue;
+			}
+
+			if ( method_exists( $model, 'persist_' . $prop['name'] ) ) {
+				$model->{'persist_' . $prop['name']}( $prop['value'] );
+			}
+		}
+
+		$result = $model->source()->save();
+
+		if ( is_wp_error( $result ) ) {
+			throw new CouldNotSaveModelException( $result->get_error_message() );
+		}
+
+		$model->refresh( $result );
+		$this->storage()->delete( $model->id );
+
 		return $model;
 	}
 
 	/**
-	 * @param PostModelInterface $model
+	 * Deletes the given product.
 	 *
-	 * @return mixed
-	 * @throws \Exception
+	 * @param OrderItem $model
+	 *
+	 * @return bool
 	 */
-	public function delete( PostModelInterface $model ) {
-		return wc_delete_order_item( $model->id );
+	public function delete( ModelInterface $model ): bool {
+		$this->storage()->delete( $model->id );
+
+		return boolval( $model->source()->delete( true ) );
+	}
+
+
+	/**
+	 * Not implemented, returns an empty array.
+	 *
+	 * @internal This method is not part of the public API and won't be implemented.
+	 *
+	 * @param array $args
+	 *
+	 * @return OrderItemLine[]
+	 */
+	public function find( array $args = array() ): array {
+		return array();
 	}
 
 	/**
-	 * @param $data
+	 * Not implemented, returns an empty array.
 	 *
-	 * @return WC_Order
-	 * @throws NotFoundException
+	 * @internal This method is not part of the public API and won't be implemented.
+	 *
+	 * @param array $args
+	 *
+	 * @return OrderItemLine[]
 	 */
-	protected function resolve_object( $data ): WC_Order_Item {
-		if ( is_object( $data ) && get_class( $data ) === $this::model() ) {
-			$object = $data->source_object();
-		} elseif ( $data instanceof WC_Order_Item ) {
-			$object = $data;
-		} elseif ( is_null( $data ) ) {
-			$object = new WC_Order_Item();
-		} elseif ( isset( $data->id ) ) {
-			$object = new WC_Order_Item( $data->id );
-		} else {
-			$object = null;
-		}
-
-		if ( ! ( $object instanceof WC_Order_Item ) ) {
-			throw new NotFoundException( 'The order was not found' );
-		}
-
-		return $object;
+	public function find_all( array $args = array() ): array {
+		return array();
 	}
 
-	public function model(): string {
-		return $this->model;
+	/**
+	 * Not implemented, returns an empty array.
+	 *
+	 * @internal This method is not part of the public API and won't be implemented.
+	 *
+	 * @param array $ids
+	 *
+	 * @return OrderItemLine[]
+	 */
+	public function find_by_ids( array $ids ): array {
+		return array();
 	}
 }

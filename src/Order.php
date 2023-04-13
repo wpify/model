@@ -1,151 +1,101 @@
 <?php
 
+declare( strict_types=1 );
+
 namespace Wpify\Model;
 
 use WC_Order;
-use Wpify\Model\Abstracts\AbstractModel;
-use Wpify\Model\Relations\OrderItemsRelation;
+use Wpify\Model\Attributes\AccessorObject;
+use Wpify\Model\Attributes\OrderItemsRelation;
+use Wpify\Model\Attributes\ReadOnlyProperty;
 
-/**
- * Class Order
- * @package Wpify\Model
- * @property OrderRepository $_repository
- * @method WC_Order source_object()
- */
-class Order extends AbstractModel {
+class Order extends Model {
 	/**
-	 * Post ID.
-	 * @since 3.5.0
-	 * @var int
+	 * Product ID.
 	 */
-	public $id;
+	#[AccessorObject]
+	public int $id = 0;
 
 	/**
-	 * ID of a post's parent post.
-	 * @since 3.5.0
-	 * @var int
+	 * Product Parent ID.
 	 */
-	public $parent_id = 0;
+	#[AccessorObject]
+	public int $parent_id = 0;
 
 	/**
-	 * Line items
-	 * @var OrderItemLine[]
+	 * Order weight.
 	 */
-	public $line_items;
+	#[AccessorObject]
+	public string $weight = '';
 
 	/**
-	 * Shipping items
-	 * @var OrderItemShipping[]
+	 * Order total.
 	 */
-	public $shipping_items;
+	#[AccessorObject]
+	public string $total = '';
 
 	/**
-	 * Fee items
-	 * @var OrderItemFee[]
+	 * Order key.
 	 */
-	public $fee_items;
+	#[AccessorObject]
+	public string $order_key = '';
 
 	/**
-	 * @readonly
+	 * WC Order.
 	 */
-	public $items;
+	#[ReadOnlyProperty]
+	public ?WC_Order $wc_order = null;
 
 	/**
-	 * @readonly
+	 * Order line items.
 	 */
-	public $weight;
+	#[OrderItemsRelation]
+	#[ReadOnlyProperty]
+	public array $line_items = array();
 
 	/**
-	 * @var WC_Order
-	 * @readonly
+	 * Order shipping items.
 	 */
-	public $wc_order;
+	#[OrderItemsRelation( 'shipping' )]
+	#[ReadOnlyProperty]
+	public array $shipping_items = array();
 
 	/**
-	 * @readonly
+	 * Order shipping items.
 	 */
-	public $total;
+	#[OrderItemsRelation( 'fee' )]
+	#[ReadOnlyProperty]
+	public array $fee_items = array();
 
-	protected $_props = array(
-		'id' => array(
-			'source'      => 'object',
-			'source_name' => 'id',
-		),
-		'parent_id' => array(
-			'source'      => 'object',
-			'source_name' => 'parent_id',
-		),
-	);
+	#[ReadOnlyProperty]
+	public array $items = array();
 
-	public function __construct( $object, OrderRepository $repository ) {
-		parent::__construct( $object, $repository );
-	}
 
 	/**
-	 * @return string
-	 */
-	static function meta_type(): string {
-		return 'order';
-	}
-
-	/**
-	 * @param $key
+	 * Get WC Order.
 	 *
-	 * @return array|false|mixed
+	 * @return WC_Order|null
 	 */
-	public function fetch_meta( $key ) {
-		return $this->source_object()->get_meta( $key, true );
+	public function get_wc_order(): WC_Order|null {
+		return $this->source();
 	}
 
 	/**
-	 * Get order Line items
-	 * @return OrderItemsRelation
+	 * Get total weight of order.
+	 *
+	 * @param string $unit
+	 *
+	 * @return float
 	 */
-	public function line_items_relation() {
-		return new OrderItemsRelation( $this, $this->model_repository()->get_item_repository( OrderItemLine::class ), 'line_item' );
-	}
-
-	/**
-	 * @return OrderRepository
-	 */
-	public function model_repository(): OrderRepository {
-		return $this->_repository;
-	}
-
-	/**
-	 * Get order Shipping items
-	 * @return OrderItemsRelation
-	 */
-	public function shipping_items_relation() {
-		return new OrderItemsRelation( $this, $this->model_repository()->get_item_repository( OrderItemShipping::class ), 'shipping' );
-	}
-
-
-	/**
-	 * Get order Shipping items
-	 * @return OrderItemsRelation
-	 */
-	public function fee_items_relation() {
-		return new OrderItemsRelation( $this, $this->model_repository()->get_item_repository( OrderItemFee::class ), 'fee' );
-	}
-
-	/**
-	 * @return array|OrderItem[]
-	 */
-	public function get_items() {
-		return array_merge( $this->line_items, $this->shipping_items, $this->fee_items );
-	}
-
-	/**
-	 * @return mixed
-	 */
-	public function get_weight( string $unit = 'kg' ) {
+	public function get_weight( string $unit = 'g' ): float {
 		// TODO: Cache this
 		$wc_weight_unit = get_option( 'woocommerce_weight_unit' );
 		$weight         = 0;
+
 		foreach ( $this->line_items as $item ) {
 			$prod = $item->product;
-			if ( \method_exists( $prod, 'get_weight' ) ) {
+
+			if ( method_exists( $prod, 'get_weight' ) ) {
 				if ( $prod->get_weight() ) {
 					$weight += $prod->get_weight();
 				}
@@ -162,18 +112,26 @@ class Order extends AbstractModel {
 	}
 
 	/**
-	 * @param string|[] $shipping_method_id Expects ID in method_id:instance_id format
+	 * Check if order has a shipping method.
+	 *
+	 * @param $shipping_method_ids
+	 *
+	 * @return bool
 	 */
-	public function has_shipping_method( $shipping_method_ids ) {
-		$methods = [];
+	public function has_shipping_method( $shipping_method_ids ): bool {
+		$methods = array();
+
 		foreach ( $this->shipping_items as $item ) {
-			$methods[] = \sprintf( '%s:%s', $item->method_id, $item->instance_id );
+			$methods[] = sprintf( '%s:%s', $item->method_id, $item->instance_id );
 		}
-		if ( \is_array( $shipping_method_ids ) ) {
-			$found = \false;
+
+		if ( is_array( $shipping_method_ids ) ) {
+			$found = false;
+
 			foreach ( $methods as $method ) {
 				if ( in_array( $method, $shipping_method_ids ) ) {
 					$found = true;
+
 					break;
 				}
 			}
@@ -184,14 +142,13 @@ class Order extends AbstractModel {
 		return in_array( $shipping_method_ids, $methods );
 	}
 
-	public function get_wc_order() {
-		return $this->source_object();
+	/**
+	 * Get order items.
+	 *
+	 * @return array
+	 */
+	public function get_items(): array {
+		return array_merge( $this->line_items, $this->shipping_items, $this->fee_items );
 	}
 
-	/**
-	 * @return mixed
-	 */
-	public function get_total() {
-		return $this->wc_order->get_total();
-	}
 }

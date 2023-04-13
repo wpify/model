@@ -1,46 +1,37 @@
 <?php
+declare( strict_types=1 );
 
 namespace Wpify\Model;
 
-use Wpify\Model\Abstracts\AbstractTermModel;
-use Wpify\Model\Interfaces\RepositoryInterface;
-use Wpify\Model\Relations\MenuItemsRelation;
+use Wpify\Model\Attributes\AliasOf;
+use Wpify\Model\Attributes\MenuItemsRelation;
 
-/**
- * Class BasicPost
- * @package Wpify\Model
- */
-class Menu extends AbstractTermModel {
-	public $items = [];
-
-	public function __construct( $object, RepositoryInterface $repository ) {
-		parent::__construct( $object, $repository );
-	}
-
-	public function items_relation() {
-		return new MenuItemsRelation( $this, $this->model_repository()->get_menu_item_repository() );
-	}
+class Menu extends Term {
+	/**
+	 * Menu items.
+	 *
+	 * @var MenuItem[] $children
+	 */
+	#[MenuItemsRelation( MenuItem::class )]
+	public array $children = array();
 
 	/**
-	 * @param array $menu
+	 * @deprecated Use $children instead.
 	 *
-	 * @internal
+	 * @var MenuItem[] $items
 	 */
-	protected function strip_to_depth_limit( $menu, $current = 1 ) {
-		$depth = (int) $this->depth; // Confirms still int.
-		if ( $depth <= 0 ) {
-			return $menu;
-		}
+	#[AliasOf( 'children' )]
+	public array $items = array();
 
-		foreach ( $menu as &$currentItem ) {
-			if ( $current == $depth ) {
-				$currentItem->children = false;
-				continue;
-			}
-
-			$currentItem->children = self::strip_to_depth_limit( $currentItem->children, $current + 1 );
-		}
-
-		return $menu;
+	/**
+	 * Converts the model to an array.
+	 *
+	 * @param array $props
+	 * @param array $recursive
+	 *
+	 * @return array
+	 */
+	public function to_array( array $props = array(), array $recursive = array() ): array {
+		return parent::to_array( $props, array_merge( array( 'children' ), $recursive ) );
 	}
 }

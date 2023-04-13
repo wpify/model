@@ -1,156 +1,111 @@
 <?php
 
+declare( strict_types=1 );
+
 namespace Wpify\Model;
 
-use WC_Tax;
-use Wpify\Model\Abstracts\AbstractModel;
+use WC_Product;
+use Wpify\Model\Attributes\AccessorObject;
+use Wpify\Model\Attributes\PostTermsRelation;
+use Wpify\Model\Attributes\ReadOnlyProperty;
+use Wpify\Model\Attributes\ManyToOneRelation;
 
-/**
- * Class BasicPost
- * @package Wpify\Model
- * @property ProductRepository $_repository
- * @method \WC_Product source_object()
- */
-class Product extends AbstractModel {
+class Product extends Model {
 	/**
-	 * Post ID.
-	 * @since 3.5.0
-	 * @var int
+	 * Product ID.
 	 */
-	public $id;
+	#[AccessorObject]
+	public int $id = 0;
 
 	/**
-	 * ID of a post's parent post.
-	 * @since 3.5.0
-	 * @var int
+	 * Product Parent ID.
 	 */
-	public $parent_id = 0;
+	#[AccessorObject]
+	public int $parent_id = 0;
 
 	/**
-	 * Parent post
-	 * @var self
+	 * Product Type.
 	 */
-	public $parent;
+	#[AccessorObject]
+	public string $type = '';
 
 	/**
-	 * Product type
-	 * @var string
+	 * Product Name.
 	 */
-	public $type;
+	#[AccessorObject]
+	public string $name = '';
 
 	/**
-	 * Product name
-	 * @var string
+	 * Product Stock Quantity.
 	 */
-	public $name;
+	#[AccessorObject]
+	public int $stock_quantity = 0;
 
 	/**
-	 * Stock quantity
-	 * @var int
+	 * Product Stock Quantity.
 	 */
-	public $stock_quantity;
+	#[AccessorObject]
+	public bool $is_in_stock;
 
 	/**
-	 * Is in stock
+	 * Product Stock Quantity.
+	 */
+	#[AccessorObject]
+	public float $price;
+
+	/**
+	 * The post's author.
+	 */
+	#[ReadOnlyProperty]
+	public WC_Product|null $wc_product = null;
+
+	/**
+	 * The product's permalink.
+	 */
+	#[AccessorObject]
+	public string $permalink = '';
+
+	/**
+	 * The post's slug.
+	 */
+	#[AccessorObject]
+	public string $slug = '';
+
+	/**
+	 * Product Category IDs.
+	 */
+	#[AccessorObject]
+	public array $category_ids = array();
+
+	/**
+	 * Product SKU.
+	 */
+	#[AccessorObject]
+	public string $sku = '';
+	
+	/**
+	 * Featured image ID.
+	 */
+	#[AccessorObject]
+	public int $image_id = 0;
+
+	/**
+	 * Featured image.
+	 */
+	#[ReadOnlyProperty]
+	#[ManyToOneRelation( 'featured_image_id' )]
+	public ?Attachment $featured_image = null;
+
+	#[PostTermsRelation( target_entity: ProductCat::class )]
+	public array $categories = array();
+
+
+	/**
+	 * Get WC Product.
 	 *
-	 * @readonly
-	 * @var bool
+	 * @return WC_Product|null
 	 */
-	public $is_in_stock;
-
-	/**
-	 * Price
-	 * @var float
-	 */
-	public $price;
-
-	/**
-	 * Image ID
-	 * @var int
-	 */
-	public $image_id;
-
-	/**
-	 * WC_Product
-	 *
-	 * @readonly
-	 */
-	public $wc_product;
-
-
-	/**
-	 * @var string[][]
-	 */
-	protected $_props = array(
-		'id'             => array( 'source' => 'object', 'source_name' => 'id' ),
-		'parent_id'      => array( 'source' => 'object', 'source_name' => 'parent_id' ),
-		'type'           => array( 'source' => 'object', 'source_name' => 'type' ),
-		'name'           => array( 'source' => 'object', 'source_name' => 'name' ),
-		'stock_quantity' => array( 'source' => 'object', 'source_name' => 'stock_quantity' ),
-		'price'          => array( 'source' => 'object', 'source_name' => 'price' ),
-		'image_id'       => array( 'source' => 'object', 'source_name' => 'image_id' ),
-
-	);
-
-	public function __construct( $object, ProductRepository $repository ) {
-		parent::__construct( $object, $repository );
-	}
-
-	/**
-	 * @return string
-	 */
-	static function meta_type(): string {
-		return 'product';
-	}
-
-	/**
-	 * @param $key
-	 *
-	 * @return array|false|mixed
-	 */
-	public function fetch_meta( $key ) {
-		return $this->source_object()->get_meta( $key, true );
-	}
-
-	/**
-	 * @return ProductRepository
-	 */
-	public function model_repository(): ProductRepository {
-		return $this->_repository;
-	}
-
-	public function get_wc_product() {
-		return $this->source_object();
-	}
-
-	public function get_is_in_stock() {
-        return $this->get_wc_product()->is_in_stock();
-    }
-
-	/**
-	 * Product VAT rate
-	 * @param string $country_code
-	 * @return float|null
-	 */
-	public function get_vat_rate( string $country_code ): ?float {
-		$vat_rate = null;
-		$product = $this->get_wc_product();
-		if ( $product->is_taxable() ) {
-
-			$vat_rates_data = WC_Tax::find_rates( array(
-				'country'   => $country_code,
-				'tax_class' => $product->get_tax_class()
-			) );
-
-			if ( ! empty( $vat_rates_data ) ) {
-				$vat_rate = reset( $vat_rates_data )['rate'];
-			}
-			if ( ! $vat_rate ) {
-				$product_vat = (int) wc_get_price_including_tax( $product ) - (int) wc_get_price_excluding_tax( $product );
-				$vat_rate    = \round( $product_vat / ( (int) wc_get_price_including_tax( $product ) / 100 ) );
-			}
-		}
-
-		return $vat_rate;
+	public function get_wc_product(): WC_Product|null {
+		return $this->source();
 	}
 }

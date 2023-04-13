@@ -1,35 +1,30 @@
 <?php
 
+declare( strict_types=1 );
+
 namespace Wpify\Model;
 
-use WC_Order_Item_Product;
-use Wpify\Model\Abstracts\AbstractOrderItemModel;
+use WC_Product;
+use Wpify\Model\Attributes\AccessorObject;
 
-/**
- * Class Order
- * @package Wpify\Model
- * @property ProductRepository $_repository
- * @method WC_Order_Item_Product source_object()
- */
-class OrderItemLine extends AbstractOrderItemModel {
-	public $product;
-	public $product_id;
-	public $variation_id;
+class OrderItemLine extends OrderItem {
+	/**
+	 * WC Product.
+	 */
+	#[AccessorObject]
+	public ?WC_Product $product = null;
 
 	/**
-	 * @var string[][]
+	 * Product ID.
 	 */
-	protected $_props = array(
-		'id'           => array( 'source' => 'object', 'source_name' => 'id' ),
-		'type'         => array( 'source' => 'object', 'source_name' => 'type' ),
-		'name'         => array( 'source' => 'object', 'source_name' => 'name' ),
-		'quantity'     => array( 'source' => 'object', 'source_name' => 'quantity' ),
-		'tax_total'    => array( 'source' => 'object', 'source_name' => 'tax_total' ),
-		'tax_class'    => array( 'source' => 'object', 'source_name' => 'tax_class' ),
-		'product'      => array( 'source' => 'object', 'source_name' => 'product' ),
-		'product_id'   => array( 'source' => 'object', 'source_name' => 'product_id' ),
-		'variation_id' => array( 'source' => 'object', 'source_name' => 'variation_id' ),
-	);
+	#[AccessorObject]
+	public int $product_id = 0;
+
+	/**
+	 * Variation ID.
+	 */
+	#[AccessorObject]
+	public int $variation_id = 0;
 
 
 }

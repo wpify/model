@@ -1,9 +1,23 @@
 <?php
+declare( strict_types=1 );
 
 namespace Wpify\Model\Interfaces;
 
-interface ModelInterface {
-	public function refresh( $object = null );
+use ReflectionObject;
+use Wpify\Model\Manager;
 
-	public function model_repository();
+interface ModelInterface {
+	public function __construct( Manager $repository_manager, array $data = array() );
+
+	public function manager(): Manager;
+
+	public function source( mixed $source = null );
+
+	public function reflection( ?ReflectionObject $reflection = null ): ReflectionObject;
+
+	public function props(): array;
+
+	public function refresh( mixed $source = null ): void;
+
+	public function to_array( array $props = array(), array $recursive = array() ): array;
 }
