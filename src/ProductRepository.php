@@ -1,184 +1,188 @@
 <?php
 
+declare( strict_types=1 );
+
 namespace Wpify\Model;
 
 use WC_Product;
-use Wpify\Model\Abstracts\AbstractPostModel;
-use Wpify\Model\Abstracts\AbstractRepository;
-use Wpify\Model\Exceptions\NotFoundException;
-use Wpify\Model\Exceptions\NotPersistedException;
+use Wpify\Model\Exceptions\CouldNotSaveModelException;
+use Wpify\Model\Exceptions\RepositoryNotInitialized;
 use Wpify\Model\Interfaces\ModelInterface;
-use Wpify\Model\Interfaces\PostModelInterface;
-use Wpify\Model\Interfaces\RepositoryInterface;
-use Wpify\Model\Interfaces\TermModelInterface;
 
 /**
- * Class BasePostRepository
- * @package Wpify\Model
+ * Repository for Post models.
+ *
+ * @method Product create( array $data = array() )
  */
-class ProductRepository extends AbstractRepository implements RepositoryInterface {
-	static function post_type(): string {
-		return 'product';
-	}
-
-	public function fetch_parent( AbstractPostModel $model ) {
-		return $this->get( $model->parent_id );
-	}
-
+class ProductRepository extends Repository {
 	/**
-	 * @param ?object $object
-	 */
-	public function get( $object = null ) {
-		return ! empty( $object ) ? $this->factory( $object ) : null;
-	}
-
-	/**
-	 * @return AbstractPostModel[]
-	 */
-	public function all() {
-		$args = array( 'limit' => - 1 );
-
-		return $this->find( $args );
-	}
-
-	/**
-	 * @param array $args
+	 * Returns the model class name.
 	 *
-	 * @return mixed
+	 * @return string
 	 */
-	public function find( array $args = array() ) {
-		$defaults = [];
-		$args     = wp_parse_args( $args, $defaults );
-		$products = wc_get_products( $args );
-
-		if ( isset( $args['array_order_by'] ) && isset( $args['array_order'] ) ) {
-			$products = wc_products_array_orderby( $products, $args['array_order_by'], $args['array_order'] );
-		}
-
-		$collection = array();
-
-		foreach ( $products as $product ) {
-			$collection[] = $this->factory( $product );
-		}
-
-		return $this->collection_factory( $collection );
-	}
-
-	/**
-	 * @return AbstractPostModel
-	 */
-	public function create() {
-		return $this->factory( null );
-	}
-
-	/**
-	 * @param ModelInterface $model
-	 *
-	 * @return ModelInterface
-	 * @throws NotFoundException
-	 * @throws NotPersistedException
-	 */
-	public function save( $model ) {
-		$object_data = array();
-
-		foreach ( $model->own_props() as $key => $prop ) {
-			if ( ! empty( $prop['readonly'] ) ) {
-				continue;
-			}
-
-			$source_name = $prop['source_name'];
-
-			if ( $prop['source'] === 'object' ) {
-				$object_data[ $source_name ] = $model->$key;
-			} elseif ( $prop['source'] === 'meta' ) {
-				if ( ! isset( $object_data['meta_input'] ) ) {
-					$object_data['meta_input'] = array();
-				}
-
-				$object_data['meta_input'][ $source_name ] = $model->$key;
-			} elseif ( $prop['source'] === 'relation' && is_callable( $prop['assign'] ) && $prop['changed'] ) {
-				$prop['assign']( $model );
-			}
-		}
-
-		if ( $model->id > 0 ) {
-			if ( empty( $object_data['ID'] ) ) {
-				$object_data['ID'] = $model->id;
-			}
-			$result = wp_update_post( $object_data, true );
-		} else {
-			$result = wp_insert_post( $object_data, true );
-		}
-
-		if ( ! is_wp_error( $result ) ) {
-			$model->refresh( $this->resolve_object( $result ) );
-		} else {
-			throw new NotPersistedException();
-		}
-
-		return $model;
-	}
-
-	/**
-	 * @param $data
-	 *
-	 * @return WC_Product
-	 * @throws NotFoundException
-	 */
-	protected function resolve_object( $data ): WC_Product {
-		if ( is_object( $data ) && get_class( $data ) === $this::model() ) {
-			$object = $data->source_object();
-		} elseif ( $data instanceof WC_Product ) {
-			$object = $data;
-		} elseif ( is_null( $data ) ) {
-			$object = new WC_Product();
-		} elseif ( isset( $data->id ) ) {
-			$object = wc_get_product( $data->id );
-		} else {
-			$object = wc_get_product( $data );
-		}
-
-		if ( ! ( $object instanceof WC_Product ) ) {
-			throw new NotFoundException( 'The product was not found' );
-		}
-
-		return $object;
-	}
-
 	public function model(): string {
 		return Product::class;
 	}
 
 	/**
-	 * @param PostModelInterface $model
+	 * Returns the Post model by the WP_Post object, id, slug or URL.
 	 *
-	 * @return mixed
-	 */
-	public function delete( PostModelInterface $model ) {
-		return wp_delete_post( $model->id, true );
-	}
-
-	/**
-	 * Assign the post to the terms
+	 * @param mixed $source
 	 *
-	 * @param PostModelInterface $model
-	 * @param TermModelInterface[] $terms
+	 * @return ?Post
+	 * @throws RepositoryNotInitialized
 	 */
-	public function assign_post_to_term( PostModelInterface $model, array $terms ) {
-		$to_assign = [];
+	public function get( mixed $source ): ?ModelInterface {
+		$wc_product = null;
+		$product    = null;
 
-		foreach ( $terms as $term ) {
-			if ( isset( $to_assign[ $term->taxonomy_name ] ) && is_array( $to_assign[ $term->taxonomy_name ] ) ) {
-				$to_assign[ $term->taxonomy_name ][] = $term;
-			} else {
-				$to_assign[ $term->taxonomy_name ] = array( $term );
+		if ( $source instanceof WC_Product ) {
+			$wc_product = $source;
+		}
+
+		if ( ! $wc_product ) {
+			$product = $this->storage()->get( $source );
+		}
+
+		if ( $product ) {
+			return $product;
+		}
+
+		if ( ! $wc_product && is_numeric( $source ) ) {
+			$wc_product = wc_get_product( $source );
+		}
+
+		if ( ! $wc_product ) {
+			$wc_products = wc_get_products( array(
+				'sku'            => $source,
+				'posts_per_page' => 1,
+			) );
+
+			if ( ! is_wp_error( $wc_products ) && count( $wc_products ) > 0 ) {
+				$wc_product = $wc_products[0];
 			}
 		}
 
-		foreach ( $to_assign as $taxonomy => $assigns ) {
-			wp_set_post_terms( $model->id, array_values( array_map( function ( $term ) {
-				return $term->id;
-			}, $assigns ) ), $taxonomy );
+		if ( ! $wc_product && is_string( $source ) ) {
+			$wc_product = get_page_by_path( $source, OBJECT, 'product' );
+
+			if ( $wc_product && ! is_wp_error( $wc_product ) ) {
+				$wc_product = wc_get_product( $wc_product->ID );
+			}
 		}
+
+		if ( $wc_product ) {
+			$model_class = $this->model();
+			$product     = new $model_class( $this->manager() );
+
+			$product->source( $wc_product );
+			$this->storage()->save( $product->id, $product, array( $product->slug, $product->permalink ) );
+		}
+
+		return $product;
 	}
+
+	/**
+	 * Stores post into database.
+	 *
+	 * @param Post $model
+	 *
+	 * @return Post
+	 * @throws CouldNotSaveModelException
+	 */
+	public function save( ModelInterface $model ): ModelInterface {
+		foreach ( $model->props() as $prop ) {
+			if ( empty( $prop['source'] ) || $prop['readonly'] ) {
+				continue;
+			}
+
+			if ( method_exists( $model, 'persist_' . $prop['name'] ) ) {
+				$model->{'persist_' . $prop['name']}( $prop['value'] );
+			}
+		}
+
+		$result = $model->source()->save();
+
+		if ( is_wp_error( $result ) ) {
+			throw new CouldNotSaveModelException( $result->get_error_message() );
+		}
+
+		$model->refresh( wc_get_product( $result ) );
+		$this->storage()->delete( $model->id );
+
+		return $model;
+	}
+
+	/**
+	 * Deletes the given product.
+	 *
+	 * @param Post $model
+	 *
+	 * @return bool
+	 */
+	public function delete( ModelInterface $model ): bool {
+		$this->storage()->delete( $model->id );
+
+		return boolval( $model->source()->delete( true ) );
+	}
+
+	/**
+	 * Finds products matching the given arguments.
+	 *
+	 * @see https://github.com/woocommerce/woocommerce/wiki/wc_get_products-and-WC_Product_Query
+	 *
+	 * @param array $args
+	 *
+	 * @return Post[]
+	 * @throws RepositoryNotInitialized
+	 */
+	public function find( array $args = array() ): array {
+		$items      = wc_get_products( $args );
+		$collection = array();
+
+		foreach ( $items as $item ) {
+			$collection[] = $this->get( $item );
+		}
+
+		return $collection;
+	}
+
+	/**
+	 * Finds all posts.
+	 *
+	 * @param array $args
+	 *
+	 * @return Post[]
+	 * @throws RepositoryNotInitialized
+	 */
+	public function find_all( array $args = array() ): array {
+		$defaults = array(
+			'limit' => - 1,
+		);
+
+		$args = wp_parse_args( $args, $defaults );
+
+		return $this->find( $args );
+	}
+
+	/**
+	 * Find all posts with the given ids.
+	 *
+	 * @param array $ids
+	 * @param array $args
+	 *
+	 * @return Post[]
+	 * @throws RepositoryNotInitialized
+	 */
+	public function find_by_ids( array $ids, array $args = array() ): array {
+		$defaults = array(
+			'limit'   => - 1,
+			'include' => $ids,
+		);
+
+		$args = wp_parse_args( $args, $defaults );
+
+		return $this->find( $args );
+	}
+
 }

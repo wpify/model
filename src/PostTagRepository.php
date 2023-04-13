@@ -1,44 +1,37 @@
 <?php
+declare( strict_types=1 );
 
 namespace Wpify\Model;
 
-use Wpify\Model\Abstracts\AbstractTermRepository;
-
 /**
- * Class Categories
+ * Post tag repository.
  *
- * @package Test
- *
- * @method PostTag[] all( array $args = array() )
- * @method PostTag[] children_of( ?int $parent_id )
- * @method PostTag[] not_empty()
- * @method PostTag[] find( array $args = array() )
- * @method PostTag create()
- * @method PostTag get( $object = null )
- * @method mixed save( $model )
- * @method mixed delete( $model )
+ * @method PostTag create( array $data )
+ * @method PostTag|null get( mixed $source )
+ * @method PostTag save( PostTag $model )
+ * @method bool delete( PostTag $model )
+ * @method PostTag[] find( array $args )
+ * @method PostTag[] find_all()
+ * @method PostTag[] find_not_empty( array $args = array() )
+ * @method PostTag[] find_children_of( int $parent_id = 0, array $args = array() )
+ * @method PostTag[] find_terms_of_post( int $post_id )
  */
-class PostTagRepository extends AbstractTermRepository {
-
-	/** @var PostRepository */
-	protected $post_repository;
-
-	public function taxonomy(): string {
-		return 'post_tag';
-	}
-
+class PostTagRepository extends TermRepository {
+	/**
+	 * Returns the model class name.
+	 *
+	 * @return string
+	 */
 	public function model(): string {
 		return PostTag::class;
 	}
 
 	/**
-	 * @return PostRepository
+	 * Returns taxonomy for the repository.
+	 *
+	 * @return string
 	 */
-	public function get_post_repository(): PostRepository {
-		if ( empty( $this->post_repository ) ) {
-			$this->post_repository = new PostRepository();
-		}
-
-		return $this->post_repository;
+	public function taxonomy(): string {
+		return 'post_tag';
 	}
 }

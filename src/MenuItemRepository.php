@@ -1,26 +1,39 @@
 <?php
+declare( strict_types=1 );
 
 namespace Wpify\Model;
 
-use Wpify\Model\Abstracts\AbstractPostRepository;
-
 /**
- * Class BasePostRepository
- * @package Wpify\Model
+ * Menu item repository.
  *
- * @method Post[] all()
- * @method Post[] find( array $args = array() )
- * @method Post create()
- * @method Post get( $object = null )
- * @method mixed save( $model )
- * @method mixed delete( $model )
+ * Don't use it directly, use MenuRepository instead.
+ *
+ * @internal This class is not part of the public API.
+ *
+ * @method MenuItem|null get( mixed $source )
+ * @method MenuItem create( array $data )
+ * @method MenuItem save( MenuItem $model )
+ * @method bool delete( MenuItem $model )
+ * @method MenuItem[] find( array $args = [] )
+ * @method MenuItem[] find_all( array $args = array() )
+ * @method MenuItem[] find_published( array $args = array() )
  */
-class MenuItemRepository extends AbstractPostRepository {
-	static function post_type(): string {
-		return 'nav_menu_item';
-	}
-
+class MenuItemRepository extends PostRepository {
+	/**
+	 * Returns the model class name.
+	 *
+	 * @return string
+	 */
 	public function model(): string {
 		return MenuItem::class;
+	}
+
+	/**
+	 * Returns post types for the repository.
+	 *
+	 * @return string[]
+	 */
+	public function post_types(): array {
+		return array( 'nav_menu_item' );
 	}
 }

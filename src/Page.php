@@ -1,12 +1,7 @@
 <?php
+declare( strict_types=1 );
 
 namespace Wpify\Model;
 
-use Wpify\Model\Abstracts\AbstractPostModel;
-
-/**
- * Class BasicPage
- * @package Wpify\Model
- */
-class Page extends AbstractPostModel {
+class Page extends Post {
 }

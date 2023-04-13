@@ -1,48 +1,32 @@
 <?php
+declare( strict_types=1 );
 
 namespace Wpify\Model\Interfaces;
 
-/**
- * Class AbstractRepository
- *
- * @package Wpify\Model
- */
+use Wpify\Model\Manager;
+
 interface RepositoryInterface {
-	/**
-	 * @return class-string
-	 */
+	public function manager( ?Manager $manager = null ): Manager;
+
+	public function storage( ?StorageInterface $storage = null ): StorageInterface;
+
 	public function model(): string;
 
-	/**
-	 * @param array $args
-	 *
-	 * @return mixed
-	 */
-	public function find( array $args = array() );
+	public function resolve_property( array $property, ModelInterface $model );
 
-	/**
-	 * @param mixed $object
-	 *
-	 * @return mixed
-	 */
-	public function get( $object = null );
+	public function maybe_convert_to_type( $type, $value );
 
-	/**
-	 * @return mixed
-	 */
-	public function all();
+	public function get( mixed $source ): ?ModelInterface;
 
-	/**
-	 * @param PostModelInterface $model
-	 *
-	 * @return mixed
-	 */
-	public function delete( PostModelInterface $model );
+	public function create( array $data ): ModelInterface;
 
-	/**
-	 * @param $model
-	 *
-	 * @return mixed
-	 */
-	public function save( $model );
+	public function save( ModelInterface $model ): ModelInterface;
+
+	public function delete( ModelInterface $model ): bool;
+
+	public function find( array $args = [] ): array;
+
+	public function find_by_ids( array $ids ): array;
+
+	public function find_all( array $args = [] ): array;
 }

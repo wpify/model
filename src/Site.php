@@ -1,190 +1,146 @@
 <?php
+declare( strict_types=1 );
 
 namespace Wpify\Model;
 
+use Wpify\Model\Attributes\ManyToOneRelation;
+use Wpify\Model\Attributes\Meta;
+use Wpify\Model\Attributes\ReadOnlyProperty;
+use Wpify\Model\Attributes\SourceObject;
 
-use Wpify\Model\Abstracts\AbstractModel;
-
-/**
- * @method \WP_Site source_object()
- */
-class Site extends AbstractModel {
+class Site extends Model {
 	/**
 	 * Site ID.
 	 *
 	 * Named "blog" vs. "site" for legacy reasons.
-	 *
-	 * A numeric string, for compatibility reasons.
-	 *
-	 * @since 4.5.0
-	 * @var string
 	 */
-	public $blog_id;
+	#[SourceObject( 'blog_id' )]
+	public int $id;
 
 	/**
 	 * Domain of the site.
-	 *
-	 * @since 4.5.0
-	 * @var string
 	 */
-	public $domain = '';
+	#[SourceObject( 'domain' )]
+	public string $domain = '';
 
 	/**
 	 * Path of the site.
-	 *
-	 * @since 4.5.0
-	 * @var string
 	 */
-	public $path = '';
+	#[SourceObject( 'path' )]
+	public string $path = '';
 
 	/**
 	 * The ID of the site's parent network.
 	 *
 	 * Named "site" vs. "network" for legacy reasons. An individual site's "site" is
 	 * its network.
-	 *
-	 * A numeric string, for compatibility reasons.
-	 *
-	 * @since 4.5.0
-	 * @var string
 	 */
-	public $site_id = '0';
+	#[SourceObject( 'site_id' )]
+	public int $site_id = 0;
 
 	/**
 	 * The date and time on which the site was created or registered.
-	 *
-	 * @since 4.5.0
-	 * @var string Date in MySQL's datetime format.
 	 */
-	public $registered = '0000-00-00 00:00:00';
+	#[SourceObject( 'registered' )]
+	public string $registered = '0000-00-00 00:00:00';
 
 	/**
 	 * The date and time on which site settings were last updated.
-	 *
-	 * @since 4.5.0
-	 * @var string Date in MySQL's datetime format.
 	 */
-	public $last_updated = '0000-00-00 00:00:00';
+	#[SourceObject( 'last_updated' )]
+	public string $last_updated = '0000-00-00 00:00:00';
 
 	/**
 	 * Whether the site should be treated as public.
-	 *
-	 * A numeric string, for compatibility reasons.
-	 *
-	 * @since 4.5.0
-	 * @var string
 	 */
-	public $public = '1';
+	#[SourceObject( 'public' )]
+	public bool $public = true;
 
 	/**
 	 * Whether the site should be treated as archived.
-	 *
-	 * A numeric string, for compatibility reasons.
-	 *
-	 * @since 4.5.0
-	 * @var string
 	 */
-	public $archived = '0';
+	#[SourceObject( 'archived' )]
+	public bool $archived = false;
 
 	/**
 	 * Whether the site should be treated as mature.
 	 *
 	 * Handling for this does not exist throughout WordPress core, but custom
 	 * implementations exist that require the property to be present.
-	 *
-	 * A numeric string, for compatibility reasons.
-	 *
-	 * @since 4.5.0
-	 * @var string
 	 */
-	public $mature = '0';
+	#[SourceObject( 'mature' )]
+	public bool $mature = false;
 
 	/**
 	 * Whether the site should be treated as spam.
-	 *
-	 * A numeric string, for compatibility reasons.
-	 *
-	 * @since 4.5.0
-	 * @var string
 	 */
-	public $spam = '0';
+	#[SourceObject( 'spam' )]
+	public bool $spam = false;
 
 	/**
 	 * Whether the site should be treated as deleted.
-	 *
-	 * A numeric string, for compatibility reasons.
-	 *
-	 * @since 4.5.0
-	 * @var string
 	 */
-	public $deleted = '0';
+	#[SourceObject( 'deleted' )]
+	public bool $deleted = false;
 
 	/**
 	 * The language pack associated with this site.
-	 *
-	 * A numeric string, for compatibility reasons.
-	 *
-	 * @since 4.5.0
-	 * @var string
 	 */
-	public $lang_id = '0';
+	#[SourceObject( 'lang_id' )]
+	public int $lang_id = 0;
 
-	protected $_props = array(
-		'id'           => array(
-			'source'      => 'object',
-			'source_name' => 'blog_id'
-		),
-		'domain'       => array(
-			'source'      => 'object',
-			'source_name' => 'domain'
-		),
-		'path'         => array(
-			'source'      => 'object',
-			'source_name' => 'path'
-		),
-		'site_id'      => array(
-			'source'      => 'object',
-			'source_name' => 'site_id'
-		),
-		'registered'   => array(
-			'source'      => 'object',
-			'source_name' => 'registered'
-		),
-		'last_updated' => array(
-			'source'      => 'object',
-			'source_name' => 'last_updated'
-		),
-		'public'       => array(
-			'source'      => 'object',
-			'source_name' => 'public'
-		),
-		'archived'     => array(
-			'source'      => 'object',
-			'source_name' => 'archived'
-		),
-		'mature'       => array(
-			'source'      => 'object',
-			'source_name' => 'mature'
-		),
-		'spam'         => array(
-			'source'      => 'object',
-			'source_name' => 'spam'
-		),
-		'deleted'      => array(
-			'source'      => 'object',
-			'source_name' => 'deleted'
-		),
-		'lang_id'      => array(
-			'source'      => 'object',
-			'source_name' => 'lang_id'
-		),
-	);
+	/**
+	 * The site's current theme.
+	 */
+	#[Meta('site_name')]
+	public string $site_name = '';
 
-	static function meta_type() {
-		return 'blog';
-	}
+	/**
+	 * The site's administrator's email address.
+	 */
+	#[Meta('admin_email')]
+	public string $admin_email = '';
 
-	public function model_repository() {
-		// TODO: Implement model_repository() method.
-	}
+	/**
+	 * The site's administrator's user ID.
+	 */
+	#[Meta('admin_user_id')]
+	public int $admin_user_id = 0;
+
+	/**
+	 * The site's administrator's user object.
+	 */
+	#[ManyToOneRelation(User::class, 'admin_user_id')]
+	#[ReadOnlyProperty]
+	public ?User $admin_user;
+
+	/**
+	 * The site's URL.
+	 */
+	#[Meta('siteurl')]
+	public string $site_url = '';
+
+	/**
+	 * Site's administrators.
+	 */
+	#[Meta('site_admins')]
+	public array $site_admins = array();
+
+	/**
+	 * Whether the site is the main site in the network.
+	 */
+	#[Meta('main_site')]
+	public bool $is_main_site = false;
+
+	/**
+	 * Child sites of the site.
+	 */
+	#[Meta('blog_count')]
+	public int $blog_count = 0;
+
+	/**
+	 * Users count of the site.
+	 */
+	#[Meta('user_count')]
+	public int $user_count = 0;
 }
