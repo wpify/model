@@ -48,13 +48,43 @@ class Product extends Model {
 	public bool $is_in_stock;
 
 	/**
-	 * Product Stock Quantity.
+	 * Product Price.
 	 */
 	#[AccessorObject]
 	public float $price;
 
 	/**
-	 * The post's author.
+	 * Regular Price.
+	 */
+	#[AccessorObject]
+	public float $regular_price;
+
+	/**
+	 * Sale Price.
+	 */
+	#[AccessorObject]
+	public float $sale_price;
+
+	/**
+	 * Manage stock.
+	 */
+	#[AccessorObject]
+	public bool $manage_stock;
+
+	/**
+	 * Stock Status.
+	 */
+	#[AccessorObject]
+	public string $stock_status;
+
+	/**
+	 * Catalog Visibility.
+	 */
+	#[AccessorObject]
+	public string $catalog_visibility;
+
+	/**
+	 * Source Product.
 	 */
 	#[ReadOnlyProperty]
 	public WC_Product|null $wc_product = null;
@@ -63,6 +93,7 @@ class Product extends Model {
 	 * The product's permalink.
 	 */
 	#[AccessorObject]
+	#[ReadOnlyProperty]
 	public string $permalink = '';
 
 	/**
@@ -82,12 +113,25 @@ class Product extends Model {
 	 */
 	#[AccessorObject]
 	public string $sku = '';
-	
+
 	/**
 	 * Featured image ID.
 	 */
 	#[AccessorObject]
 	public int $image_id = 0;
+
+
+	/**
+	 * Gallery Image IDs.
+	 */
+	#[AccessorObject]
+	public array $gallery_image_ids = array();
+
+	/**
+	 * Is product featured
+	 */
+	#[AccessorObject( key: 'featured' )]
+	public bool $is_featured = false;
 
 	/**
 	 * Featured image.
