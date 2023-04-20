@@ -23,14 +23,14 @@ class AccessorObject implements AccessorAttributeInterface {
 		}
 
 		if ( method_exists( $source, $getter ) ) {
-			$source = $source->$getter();
+			$value = $source->$getter();
 		} elseif ( method_exists( $source, $key ) ) {
-			$source = $source->$key();
+			$value = $source->$key();
 		} else {
-			return null;
+			$value = null;
 		}
 
-		return $source;
+		return $value;
 	}
 
 	public function set( ModelInterface $model, string $key, mixed $value ): mixed {

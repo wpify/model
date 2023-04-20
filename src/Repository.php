@@ -107,11 +107,11 @@ abstract class Repository implements RepositoryInterface {
 	 * @return mixed
 	 */
 	public function maybe_convert_to_type( $type, $value ): mixed {
-		if ( ( $type === 'int' || $type === 'integer' ) && is_numeric( $value ) ) {
+		if ( $type === 'int' || $type === 'integer' ) {
 			return intval( $value );
 		}
 
-		if ( $type === 'float' && is_numeric( $value ) ) {
+		if ( $type === 'float' ) {
 			return floatval( $value );
 		}
 
