@@ -43,14 +43,6 @@ class PostRepository extends Repository {
 			$wp_post = $source;
 		}
 
-		if ( ! $wp_post ) {
-			$post = $this->storage()->get( $source );
-		}
-
-		if ( $post ) {
-			return $post;
-		}
-
 		if ( ! $wp_post && is_numeric( $source ) ) {
 			$wp_post = get_post( $source );
 		}
@@ -80,7 +72,6 @@ class PostRepository extends Repository {
 			$post        = new $model_class( $this->manager() );
 
 			$post->source( $wp_post );
-			$this->storage()->save( $post->id, $post, array( $post->slug, $post->permalink ) );
 		}
 
 		return $post;
@@ -183,7 +174,6 @@ class PostRepository extends Repository {
 		}
 
 		$model->refresh( get_post( $result ) );
-		$this->storage()->delete( $model->id );
 
 		return $model;
 	}
@@ -196,8 +186,6 @@ class PostRepository extends Repository {
 	 * @return bool
 	 */
 	public function delete( ModelInterface $model ): bool {
-		$this->storage()->delete( $model->id );
-
 		return boolval( wp_delete_post( $model->id, true ) );
 	}
 

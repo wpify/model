@@ -32,17 +32,9 @@ class Manager {
 	private array $repositories = array();
 
 	/**
-	 * Storage factory that creates storage for repositories.
-	 *
-	 * @var StorageFactoryInterface
-	 */
-	private StorageFactoryInterface $storage_factory;
-
-	/**
 	 * Constructor for the Manager.
 	 *
 	 * It accepts dependencies with the following interfaces:
-	 * - StorageFactoryInterface: Storage factory that creates storage for repositories. (Only first one is used)
 	 * - RepositoryInterface: Custom repository for models.
 	 *
 	 * All other dependencies are ignored.
@@ -72,18 +64,6 @@ class Manager {
 			UserRepository::class,
 		);
 
-		// Resolve storage factory.
-
-		foreach ( $dependencies as $dependency ) {
-			if ( $dependency instanceof StorageFactoryInterface && empty( $this->storage_factory ) ) {
-				$this->storage_factory = $dependency;
-			}
-		}
-
-		if ( empty( $this->storage_factory ) ) {
-			$this->storage_factory = new DefaultStorageFactory();
-		}
-
 		// Resolve repositories.
 
 		foreach ( $default_repositories as $repository ) {
@@ -106,7 +86,6 @@ class Manager {
 	 */
 	public function register_repository( RepositoryInterface $repository ): void {
 		$repository->manager( $this );
-		$repository->storage( $this->storage_factory->create() );
 
 		$this->repositories[ get_class( $repository ) ]           = $repository;
 		$this->model_repository_relations[ $repository->model() ] = $repository;

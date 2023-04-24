@@ -37,14 +37,6 @@ class CommentRepository extends Repository {
 		}
 
 		if ( ! $wp_comment ) {
-			$comment = $this->storage()->get( $source );
-		}
-
-		if ( $comment ) {
-			return $comment;
-		}
-
-		if ( ! $wp_comment ) {
 			$wp_comment = get_comment( $source );
 		}
 
@@ -53,7 +45,6 @@ class CommentRepository extends Repository {
 			$comment     = new $model_class( $this->manager() );
 
 			$comment->source( $wp_comment );
-			$this->storage()->save( $comment->id, $comment );
 		}
 
 		return $comment;
@@ -99,7 +90,6 @@ class CommentRepository extends Repository {
 		}
 
 		$model->refresh( get_user_by( 'id', $result ) );
-		$this->storage()->delete( $model->id );
 
 		return $model;
 	}
@@ -112,8 +102,6 @@ class CommentRepository extends Repository {
 	 * @return bool
 	 */
 	public function delete( ModelInterface $model ): bool {
-		$this->storage()->delete( $model->id );
-
 		return wp_delete_comment( $model->id, true );
 	}
 

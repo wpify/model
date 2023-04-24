@@ -48,14 +48,6 @@ class TermRepository extends Repository {
 			$wp_term = $source;
 		}
 
-		if ( ! $wp_term ) {
-			$term = $this->storage()->get( $source );
-		}
-
-		if ( $term ) {
-			return $term;
-		}
-
 		if ( ! $wp_term && is_numeric( $source ) ) {
 			$wp_term = get_term( $source, $this->taxonomy() );
 		}
@@ -73,7 +65,6 @@ class TermRepository extends Repository {
 			$term        = new $model_class( $this->manager() );
 
 			$term->source( $wp_term );
-			$this->storage()->save( $term->id, $term, array( $term->slug, $term->name ) );
 		}
 
 		return $term;
@@ -133,7 +124,6 @@ class TermRepository extends Repository {
 		}
 
 		$model->refresh( get_post( $result ) );
-		$this->storage()->delete( $model->id );
 
 		return $model;
 	}
@@ -146,8 +136,6 @@ class TermRepository extends Repository {
 	 * @return bool
 	 */
 	public function delete( ModelInterface $model ): bool {
-		$this->storage()->delete( $model->id );
-
 		return ! is_wp_error( wp_delete_term( $model->id, $this->taxonomy() ) );
 	}
 

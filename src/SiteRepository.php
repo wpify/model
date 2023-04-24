@@ -37,14 +37,6 @@ class SiteRepository extends Repository {
 		}
 
 		if ( ! $wp_site ) {
-			$site = $this->storage()->get( $source );
-		}
-
-		if ( $site ) {
-			return $site;
-		}
-
-		if ( ! $wp_site ) {
 			$wp_site = get_site( $source );
 		}
 
@@ -53,7 +45,6 @@ class SiteRepository extends Repository {
 			$site        = new $model_class( $this->manager() );
 
 			$site->source( $wp_site );
-			$this->storage()->save( $site->id, $site );
 		}
 
 		return $site;
@@ -99,7 +90,6 @@ class SiteRepository extends Repository {
 		}
 
 		$model->refresh( get_user_by( 'id', $result ) );
-		$this->storage()->delete( $model->id );
 
 		return $model;
 	}
@@ -112,8 +102,6 @@ class SiteRepository extends Repository {
 	 * @return bool
 	 */
 	public function delete( ModelInterface $model ): bool {
-		$this->storage()->delete( $model->id );
-
 		return ! is_wp_error( wp_delete_site( $model->id ) );
 	}
 

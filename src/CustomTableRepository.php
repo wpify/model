@@ -330,11 +330,8 @@ abstract class CustomTableRepository extends Repository {
 			if ( ! isset( $source->$primary_key ) ) {
 				throw new PrimaryKeyException( 'The source must contain a primary key ' . $primary_key );
 			}
-
-			$storage_key = $source->$primary_key;
 		} else {
-			$db_item     = $this->query_single( $source );
-			$storage_key = $source;
+			$db_item = $this->query_single( $source );
 		}
 
 		if ( empty( $db_item ) ) {
@@ -345,10 +342,6 @@ abstract class CustomTableRepository extends Repository {
 		$item        = new $model_class( $this->manager() );
 
 		$item->source( $db_item );
-
-		if ( ! empty( $storage_key ) ) {
-			$this->storage()->save( $storage_key, $item );
-		}
 
 		return $item;
 	}
@@ -397,8 +390,6 @@ abstract class CustomTableRepository extends Repository {
 
 		if ( $model->source() ) {
 			$result = $this->db()->update( $this->prefixed_table_name(), $data, $where );
-
-			$this->storage()->delete( $this->primary_key( $model ) );
 		} else {
 			$result = $this->db()->insert( $this->prefixed_table_name(), array_merge( $where, $data ) );
 

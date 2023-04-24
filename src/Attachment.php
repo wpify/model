@@ -16,11 +16,11 @@ class Attachment extends Post {
 	 * Metadata for the attachment.
 	 */
 	#[Meta( '_wp_attachment_metadata' )]
-	public array $metadata;
+	public ?array $metadata;
 
 	/**
 	 * Alternative text for the image.
 	 */
 	#[Meta( '_wp_attachment_image_alt' )]
-	public string $alt;
+	public ?string $alt;
 }

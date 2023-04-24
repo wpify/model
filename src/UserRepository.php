@@ -42,14 +42,6 @@ class UserRepository extends Repository {
 		}
 
 		if ( ! $wp_user ) {
-			$user = $this->storage()->get( $source );
-		}
-
-		if ( $user ) {
-			return $user;
-		}
-
-		if ( ! $wp_user ) {
 			$wp_user = get_user_by( 'id', $source );
 		}
 
@@ -70,7 +62,6 @@ class UserRepository extends Repository {
 			$user        = new $model_class( $this->manager() );
 
 			$user->source( $wp_user );
-			$this->storage()->save( $user->id, $user, array( $user->login, $user->email, $user->nicename ) );
 		}
 
 		return $user;
@@ -132,7 +123,6 @@ class UserRepository extends Repository {
 		}
 
 		$model->refresh( get_user_by( 'id', $result ) );
-		$this->storage()->delete( $model->id );
 
 		return $model;
 	}
@@ -145,8 +135,6 @@ class UserRepository extends Repository {
 	 * @return bool
 	 */
 	public function delete( ModelInterface $model ): bool {
-		$this->storage()->delete( $model->id );
-
 		return wp_delete_user( $model->id );
 	}
 

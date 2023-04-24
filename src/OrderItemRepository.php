@@ -39,14 +39,6 @@ class OrderItemRepository extends Repository {
 			$wc_order_item = $source;
 		}
 
-		if ( ! $wc_order_item ) {
-			$item = $this->storage()->get( $source );
-		}
-
-		if ( $item ) {
-			return $item;
-		}
-
 		if ( ! $wc_order_item && is_numeric( $source ) ) {
 			$wc_order_item = new \WC_Order_Item( $source );
 		}
@@ -56,7 +48,6 @@ class OrderItemRepository extends Repository {
 			$item        = new $model_class( $this->manager() );
 
 			$item->source( $wc_order_item );
-			$this->storage()->save( $item->id, $item );
 		}
 
 		return $item;
@@ -103,7 +94,6 @@ class OrderItemRepository extends Repository {
 		}
 
 		$model->refresh( $result );
-		$this->storage()->delete( $model->id );
 
 		return $model;
 	}
@@ -116,8 +106,6 @@ class OrderItemRepository extends Repository {
 	 * @return bool
 	 */
 	public function delete( ModelInterface $model ): bool {
-		$this->storage()->delete( $model->id );
-
 		return boolval( $model->source()->delete( true ) );
 	}
 

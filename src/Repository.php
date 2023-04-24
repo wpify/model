@@ -11,9 +11,6 @@ use Wpify\Model\Interfaces\StorageInterface;
 
 abstract class Repository implements RepositoryInterface {
 	private ?Manager $manager = null;
-	private ?StorageInterface $storage = null;
-	private bool $use_storage = true;
-	private ?BlankStorage $blank_storage = null;
 
 	/**
 	 * Gets or sets the Manager.
@@ -36,47 +33,11 @@ abstract class Repository implements RepositoryInterface {
 	}
 
 	/**
-	 * Gets or sets the storage for the repository.
-	 *
-	 * If the storage is not set, or storage is disabled, then a blank storage is returned.
-	 *
-	 * @param StorageInterface|null $storage
-	 *
-	 * @return StorageInterface
-	 */
-	public function storage( ?StorageInterface $storage = null ): StorageInterface {
-		if ( $storage ) {
-			$this->storage = $storage;
-		}
-
-		if ( empty( $this->blank_storage ) ) {
-			$this->blank_storage = new BlankStorage();
-		}
-
-		if ( ! $this->storage || ! $this->use_storage ) {
-			return $this->blank_storage;
-		}
-
-		return $this->storage;
-	}
-
-	/**
 	 * Gets the model class for the repository.
 	 *
 	 * @return string
 	 */
 	abstract public function model(): string;
-
-	/**
-	 * Enables or disables the storage for the repository.
-	 *
-	 * @param bool $use_storage
-	 *
-	 * @return void
-	 */
-	public function use_storage( bool $use_storage = true ): void {
-		$this->use_storage = $use_storage;
-	}
 
 	/**
 	 * Resolve the property value from the source.

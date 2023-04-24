@@ -192,7 +192,7 @@ You can also register the repository in the constructor of the manager:
 $manager = new Manager( new BookRepository() );
 ```
 
-If you use a PHP-DI, you can register the repository in the container:
+If you use a [PHP-DI](https://php-di.org/), you can register the repository in the container:
 
 ```php
 use DI;
@@ -325,9 +325,9 @@ register_uninstall_hook( $main_php_file_path, array( $repository, 'drop_table' )
 
 # TODO:
 
-- better caching
 - make generated documentation
 - add tests
+- custom tables - caching, metadata
 - implement other WooCommerce models:
   - VariableProduct
   - SimpleProduct

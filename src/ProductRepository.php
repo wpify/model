@@ -6,6 +6,7 @@ namespace Wpify\Model;
 
 use WC_Product;
 use Wpify\Model\Exceptions\CouldNotSaveModelException;
+use Wpify\Model\Exceptions\IncorrectRepositoryException;
 use Wpify\Model\Exceptions\RepositoryNotInitialized;
 use Wpify\Model\Interfaces\ModelInterface;
 
@@ -40,14 +41,6 @@ class ProductRepository extends Repository {
 			$wc_product = $source;
 		}
 
-		if ( ! $wc_product ) {
-			$product = $this->storage()->get( $source );
-		}
-
-		if ( $product ) {
-			return $product;
-		}
-
 		if ( ! $wc_product && is_numeric( $source ) ) {
 			$wc_product = wc_get_product( $source );
 		}
@@ -76,7 +69,6 @@ class ProductRepository extends Repository {
 			$product     = new $model_class( $this->manager() );
 
 			$product->source( $wc_product );
-			$this->storage()->save( $product->id, $product, array( $product->slug, $product->permalink ) );
 		}
 
 		return $product;
@@ -108,7 +100,6 @@ class ProductRepository extends Repository {
 		}
 
 		$model->refresh( wc_get_product( $result ) );
-		$this->storage()->delete( $model->id );
 
 		return $model;
 	}
@@ -121,8 +112,6 @@ class ProductRepository extends Repository {
 	 * @return bool
 	 */
 	public function delete( ModelInterface $model ): bool {
-		$this->storage()->delete( $model->id );
-
 		return boolval( $model->source()->delete( true ) );
 	}
 
@@ -137,7 +126,12 @@ class ProductRepository extends Repository {
 	 * @throws RepositoryNotInitialized
 	 */
 	public function find( array $args = array() ): array {
-		$items      = wc_get_products( $args );
+		add_filter( 'woocommerce_product_data_store_cpt_get_products_query', array( $this, 'tax_query_filter' ), 10, 2 );
+
+		$items = wc_get_products( $args );
+
+		remove_filter( 'woocommerce_product_data_store_cpt_get_products_query', array( $this, 'tax_query_filter' ), 10, 2 );
+
 		$collection = array();
 
 		foreach ( $items as $item ) {
@@ -145,6 +139,22 @@ class ProductRepository extends Repository {
 		}
 
 		return $collection;
+	}
+
+	/**
+	 * Filters the query to include the tax query.
+	 *
+	 * @param $query
+	 * @param $query_vars
+	 *
+	 * @return mixed
+	 */
+	public function tax_query_filter( $query, $query_vars ) {
+		if ( ! empty( $query_vars['tax_query'] ) ) {
+			$query['tax_query'][] = $query_vars['tax_query'];
+		}
+
+		return $query;
 	}
 
 	/**
@@ -185,4 +195,31 @@ class ProductRepository extends Repository {
 		return $this->find( $args );
 	}
 
+	/**
+	 * Find all posts by the given term.
+	 *
+	 * @param Term $model
+	 *
+	 * @return Product[]
+	 * @throws Exceptions\RepositoryNotFoundException
+	 * @throws IncorrectRepositoryException
+	 * @throws RepositoryNotInitialized
+	 */
+	public function find_all_by_term( ModelInterface $model ): array {
+		$target_repository = $this->manager()->get_model_repository( get_class( $model ) );
+
+		if ( method_exists( $target_repository, 'taxonomy' ) ) {
+			return $this->find( array(
+				'tax_query' => array(
+					array(
+						'taxonomy' => $target_repository->taxonomy(),
+						'field'    => 'term_id',
+						'terms'    => array( $model->id ),
+					),
+				),
+			) );
+		}
+
+		throw new IncorrectRepositoryException( sprintf( 'The repository %s of model %s does not have a taxonomy method.', get_class( $target_repository ), get_class( $model ) ) );
+	}
 }

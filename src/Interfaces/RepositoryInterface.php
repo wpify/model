@@ -8,8 +8,6 @@ use Wpify\Model\Manager;
 interface RepositoryInterface {
 	public function manager( ?Manager $manager = null ): Manager;
 
-	public function storage( ?StorageInterface $storage = null ): StorageInterface;
-
 	public function model(): string;
 
 	public function resolve_property( array $property, ModelInterface $model );
