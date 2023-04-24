@@ -206,7 +206,7 @@ $container_builder->addDefinitions( array(
 	),
 ) );
 
-$container = $containerBuilder->build();
+$container = $container_builder->build();
 $manager   = $container->get( Manager::class );
 $book_repo = $manager->get_repository( BookRepository::class );
 ```
