@@ -192,6 +192,25 @@ You can also register the repository in the constructor of the manager:
 $manager = new Manager( new BookRepository() );
 ```
 
+If you use a PHP-DI, you can register the repository in the container:
+
+```php
+use DI;
+use Wpify\Model\Manager;
+
+$container_builder = new DI\ContainerBuilder();
+
+$container_builder->addDefinitions( array(
+	Manager::class => DI\create()->constructor(
+		DI\get( BookRepository::class ),
+	),
+) );
+
+$container = $containerBuilder->build();
+$manager   = $container->get( Manager::class );
+$book_repo = $manager->get_repository( BookRepository::class );
+```
+
 # Base model types
 
 You can use the following base models and repositories to define your custom models:
