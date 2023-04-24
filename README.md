@@ -211,19 +211,10 @@ $manager   = $container->get( Manager::class );
 $book_repo = $manager->get_repository( BookRepository::class );
 ```
 
-# Base model types
-
-You can use the following base models and repositories to define your custom models:
-
-* `Post` and `PostRepository` for custom post types.
-* `Term` and `TermRepository` for custom taxonomies.
-* `User` and `UserRepository` for custom user models.
-* `Comment` and `CommentRepository` for custom comment models.
-* `CustomTableRepository` for custom table models.
-
 # Built-in models
 
-The library provides a few built-in models and repositories:
+The library provides a few built-in models and repositories. 
+You can use them also to define your custom models by extending them.
 
 * `Post` and `PostRepository` for posts.
 * `Page` and `PageRepository` for pages.
