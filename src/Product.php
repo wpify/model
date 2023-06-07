@@ -84,6 +84,18 @@ class Product extends Model {
 	public string $catalog_visibility;
 
 	/**
+	 * Short Description
+	 */
+	#[AccessorObject]
+	public string $short_description;
+
+	/**
+	 * Description
+	 */
+	#[AccessorObject]
+	public string $description;
+
+	/**
 	 * Source Product.
 	 */
 	#[ReadOnlyProperty]
