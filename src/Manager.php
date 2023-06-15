@@ -15,32 +15,26 @@ use Wpify\Model\Interfaces\StorageFactoryInterface;
 class Manager {
 	/**
 	 * Registered model to repository relations.
-	 *
 	 * The key is the model class name, the value is its repository.
-	 *
 	 * @var RepositoryInterface[]
 	 */
 	private array $model_repository_relations = array();
 
 	/**
 	 * Registered repositories.
-	 *
 	 * The key is the model class name, the value is the repository.
-	 *
 	 * @var RepositoryInterface[]
 	 */
 	private array $repositories = array();
 
 	/**
 	 * Constructor for the Manager.
-	 *
 	 * It accepts dependencies with the following interfaces:
 	 * - RepositoryInterface: Custom repository for models.
-	 *
 	 * All other dependencies are ignored.
 	 * You can also register custom repositories after the manager is created by using the register_repository method.
 	 *
-	 * @param array $dependencies User defined repositories.
+	 * @param  array  $dependencies  User defined repositories.
 	 */
 	public function __construct( ...$dependencies ) {
 		$default_repositories = array(
@@ -80,7 +74,7 @@ class Manager {
 	/**
 	 * Registers the repository for models.
 	 *
-	 * @param RepositoryInterface $repository
+	 * @param  RepositoryInterface  $repository
 	 *
 	 * @return void
 	 */
@@ -94,7 +88,7 @@ class Manager {
 	/**
 	 * Returns the repository instance for the given model.
 	 *
-	 * @param string $model
+	 * @param  string  $model
 	 *
 	 * @return RepositoryInterface
 	 * @throws RepositoryNotFoundException
@@ -109,10 +103,9 @@ class Manager {
 
 	/**
 	 * Returns given repository instance.
-	 *
 	 * @template T
 	 *
-	 * @param string|class-string<T> $repository_class Repository class name.
+	 * @param  string|class-string<T>  $repository_class  Repository class name.
 	 *
 	 * @return mixed|T
 	 */
@@ -122,5 +115,13 @@ class Manager {
 		}
 
 		return $this->repositories[ $repository_class ];
+	}
+
+	/**
+	 * Get repositories.
+	 * @return array
+	 */
+	public function get_repositories(): array {
+		return $this->repositories;
 	}
 }

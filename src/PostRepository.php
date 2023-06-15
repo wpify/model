@@ -123,14 +123,6 @@ class PostRepository extends Repository {
 	 * @throws CouldNotSaveModelException
 	 */
 	public function save( ModelInterface $model ): ModelInterface {
-		if ( count( $this->post_types() ) > 1 ) {
-			throw new CouldNotSaveModelException( 'Cannot save an item with multiple post types.' );
-		}
-
-		if ( count( $this->post_types() ) < 1 ) {
-			throw new CouldNotSaveModelException( 'Cannot save an item with no post types.' );
-		}
-
 		$data = array();
 
 		foreach ( $model->props() as $prop ) {
@@ -142,11 +134,11 @@ class PostRepository extends Repository {
 			$key    = $source->key ?? $prop['name'];
 
 			if ( method_exists( $model, 'persist_' . $prop['name'] ) ) {
-				$model->{'persist_' . $prop['name']}( $prop['value'] );
+				$model->{'persist_' . $prop['name']}( $model->{$prop['name']} );
 			} elseif ( $source instanceof SourceObject ) {
-				$data[ $key ] = $prop['value'];
+				$data[ $key ] = $model->{$prop['name']};
 			} elseif ( $source instanceof Meta ) {
-				$data['meta_input'][ $key ] = $prop['value'];
+				$data['meta_input'][ $key ] = $model->{$prop['name']};
 			}
 		}
 
@@ -169,7 +161,7 @@ class PostRepository extends Repository {
 			$key    = $source->key ?? $prop['name'];
 
 			if ( method_exists( $source, 'persist' ) ) {
-				$source->persist( $model, $key, $prop['value'] );
+				$source->persist( $model, $key, $model->{$prop['name']} );
 			}
 		}
 

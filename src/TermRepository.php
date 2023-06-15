@@ -115,11 +115,11 @@ class TermRepository extends Repository {
 			$source = $prop['source'];
 
 			if ( method_exists( $model, 'persist_' . $prop['name'] ) ) {
-				$model->{'persist_' . $prop['name']}( $prop['value'] );
+				$model->{'persist_' . $prop['name']}( $model->{$prop['name']} );
 			} elseif ( $source instanceof Meta ) {
 				$meta_key = $source->key ?? $prop['name'];
 
-				update_term_meta( $term_id, $meta_key, $prop['value'] );
+				update_term_meta( $term_id, $meta_key, $model->{$prop['name']} );
 			}
 		}
 
