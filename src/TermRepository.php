@@ -136,7 +136,7 @@ class TermRepository extends Repository {
 	 * @return bool
 	 */
 	public function delete( ModelInterface $model ): bool {
-		return ! is_wp_error( wp_delete_term( $model->id, $this->taxonomy() ) );
+		return ! is_wp_error( wp_delete_term( $model->id, $model->taxonomy ?? $this->taxonomy() ) );
 	}
 
 	/**
