@@ -243,7 +243,7 @@ class TermRepository extends Repository {
 	 */
 	public function find_child_terms_of( ModelInterface $model ): array {
 		return $this->find( array(
-			'taxonomy'     => $this->taxonomy(),
+			'taxonomy'     => $model->taxonomy ?? $this->taxonomy(),
 			'hierarchical' => true,
 			'hide_empty'   => false,
 			'child_of'     => $model->id,
