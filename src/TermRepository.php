@@ -102,7 +102,7 @@ class TermRepository extends Repository {
 		}
 
 		if ( is_wp_error( $result ) ) {
-			throw new CouldNotSaveModelException( $result->get_error_message() );
+			throw new CouldNotSaveModelException( $result->get_error_message(), 0, $result );
 		}
 
 		$term_id = is_array( $result ) ? $result['term_id'] : $result;
