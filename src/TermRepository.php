@@ -123,7 +123,7 @@ class TermRepository extends Repository {
 			}
 		}
 
-		$model->refresh( get_post( $result ) );
+		$model->refresh( get_term($term_id, $taxonomy) );
 
 		return $model;
 	}
