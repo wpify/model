@@ -36,6 +36,11 @@ class Column implements SourceAttributeInterface {
 		public bool $auto_increment = false,
 		public bool $primary_key = false,
 		public bool $unique = false,
+		public array $foreign_key = array(
+			'foreign_table'  => '',
+			'foreign_column' => '',
+			'settings'       => '',
+		),
 	) {
 
 	}

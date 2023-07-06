@@ -59,8 +59,9 @@ abstract class CustomTableRepository extends Repository {
 		static $sql;
 
 		if ( empty( $sql ) ) {
-			$columns     = array();
-			$unique_keys = array();
+			$columns      = array();
+			$unique_keys  = array();
+			$foreign_keys = array();
 
 			foreach ( $this->columns() as $column ) {
 				$columns[] = $column['attribute']->create_column_sql( $column['name'], $column['type'] );
@@ -68,11 +69,32 @@ abstract class CustomTableRepository extends Repository {
 				if ( $column['attribute']->unique ) {
 					$unique_keys[] = $column['name'];
 				}
+				if ( is_array( $column['attribute']->foreign_key ) && ! empty( $column['attribute']->foreign_key ) ) {
+					$foreign_key = $column['attribute']->foreign_key;
+					if ( '' !== $foreign_key['foreign_table'] && '' !== $foreign_key['foreign_column'] ) {
+						$foreign_keys[ $column['name'] ] = $foreign_key;
+					}
+				}
 			}
 
 			if ( count( $unique_keys ) > 0 ) {
 				foreach ( $unique_keys as $unique_key ) {
 					$columns[] = sprintf( "UNIQUE KEY (%s)", $unique_key );
+				}
+			}
+			if ( count( $foreign_keys ) > 0 ) {
+				$foreign_keys_counter = 1;
+				foreach ( $foreign_keys as $column_name => $settings ) {
+					$columns[] = sprintf(
+						"CONSTRAINT `%s_ibfk_%d` FOREIGN KEY (`%s`) REFERENCES `%s` (`%s`) %s",
+						$this->prefixed_table_name(),
+						$foreign_keys_counter,
+						$column_name,
+						$settings['foreign_table'],
+						$settings['foreign_column'],
+						$settings['settings'] ?? ''
+					);
+					$foreign_keys_counter ++;
 				}
 			}
 
