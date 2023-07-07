@@ -222,6 +222,7 @@ abstract class CustomTableRepository extends Repository {
 	 * @throws ReflectionException
 	 */
 	public function migrate(): void {
+		global $wpdb;
 		static $migrated;
 
 		if ( $migrated ) {
@@ -237,6 +238,10 @@ abstract class CustomTableRepository extends Repository {
 		}
 
 		dbDelta( $this->create_table_sql() );
+
+		if ( '' !== $wpdb->last_error ) {
+			return;
+		}
 
 		$this->current_version( $this->version() );
 
