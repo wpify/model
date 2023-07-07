@@ -238,8 +238,6 @@ abstract class CustomTableRepository extends Repository {
 
 		dbDelta( $this->create_table_sql() );
 
-		dump( $this->create_table_sql() );
-
 		$this->current_version( $this->version() );
 
 		$migrated = true;
