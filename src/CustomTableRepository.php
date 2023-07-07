@@ -71,7 +71,7 @@ abstract class CustomTableRepository extends Repository {
 				}
 				if ( is_array( $column['attribute']->foreign_key ) && ! empty( $column['attribute']->foreign_key ) ) {
 					$foreign_key = $column['attribute']->foreign_key;
-					if ( '' !== $foreign_key['foreign_table'] && '' !== $foreign_key['foreign_column'] ) {
+					if ( '' !== $foreign_key[ Column::FOREIGN_TABLE ] && '' !== $foreign_key[ Column::FOREIGN_COLUMN ] ) {
 						$foreign_keys[ $column['name'] ] = $foreign_key;
 					}
 				}
@@ -90,9 +90,9 @@ abstract class CustomTableRepository extends Repository {
 						$this->prefixed_table_name(),
 						$foreign_keys_counter,
 						$column_name,
-						$settings['foreign_table'],
-						$settings['foreign_column'],
-						$settings['settings'] ?? ''
+						$this->db()->prefix . $settings[ Column::FOREIGN_TABLE ],
+						$settings[ Column::FOREIGN_COLUMN ],
+						$settings[ Column::FOREIGN_SETTINGS ] ?? ''
 					);
 					$foreign_keys_counter ++;
 				}

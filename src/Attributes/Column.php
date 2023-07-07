@@ -26,6 +26,9 @@ class Column implements SourceAttributeInterface {
 	const ENUM = 'enum';
 	const SET = 'set';
 	const JSON = 'json';
+	const FOREIGN_TABLE = 'foreign_table';
+	const FOREIGN_COLUMN = 'foreign_column';
+	const FOREIGN_SETTINGS = 'settings';
 
 	public function __construct(
 		public string $name = '',
@@ -37,9 +40,9 @@ class Column implements SourceAttributeInterface {
 		public bool $primary_key = false,
 		public bool $unique = false,
 		public array $foreign_key = array(
-			'foreign_table'  => '',
-			'foreign_column' => '',
-			'settings'       => '',
+			self::FOREIGN_TABLE    => '',
+			self::FOREIGN_COLUMN   => '',
+			self::FOREIGN_SETTINGS => '',
 		),
 	) {
 
