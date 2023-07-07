@@ -271,6 +271,7 @@ The Column attribute accepts the following parameters:
 - `auto_increment`: Whether the column is auto-increment. Default is false.
 - `primary_key`:    Whether the column is primary key. Default is false.
 - `unique`:         Whether the column is unique. Default is false.
+- `foreign_key`:    Array with data to set foreign key. 
 
 The model must contain exactly one primary key column.
 
@@ -291,6 +292,11 @@ Column can be one of the following types:
 - `Column::ENUM`      (`enum`)
 - `Column::SET`       (`set`)
 - `Column::JSON`      (`json`)
+
+Foreign key array contains these items:
+- `Column::FOREIGN_TABLE`: Foreign table name without WP prefix (e.g. `posts`).
+- `Column::FOREIGN_COLUMN`: Foreign column name (e.g. `ID`).
+- `Column::FOREIGN_SETTINGS`: Optional settings, for example `ON DELETE CASCADE`.
 
 The repository will automatically create the table when the repository is used. If you want to disable automatic migrations,
 you can pass `false` to the `auto_migrate` parameter in the constructor. You can then manually migrate the table by calling
