@@ -83,7 +83,7 @@ class OrderItemRepository extends Repository {
 			}
 
 			if ( method_exists( $model, 'persist_' . $prop['name'] ) ) {
-				$model->{'persist_' . $prop['name']}( $prop['value'] );
+				$model->{'persist_' . $prop['name']}( $model->{$prop['name']} );
 			}
 		}
 

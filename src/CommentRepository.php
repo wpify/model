@@ -69,13 +69,13 @@ class CommentRepository extends Repository {
 			$source = $prop['source'];
 
 			if ( method_exists( $model, 'persist_' . $prop['name'] ) ) {
-				$model->{'persist_' . $prop['name']}( $prop['value'] );
+				$model->{'persist_' . $prop['name']}( $model->{$prop['name']} );
 			} elseif ( $source instanceof SourceObject ) {
 				$key          = $source->key ?? $prop['name'];
-				$data[ $key ] = $prop['value'];
+				$data[ $key ] = $model->{$prop['name']};
 			} elseif ( $source instanceof Meta ) {
 				$key                          = $source->key ?? $prop['name'];
-				$data['comment_meta'][ $key ] = $prop['value'];
+				$data['comment_meta'][ $key ] = $model->{$prop['name']};
 			}
 		}
 

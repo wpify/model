@@ -102,20 +102,20 @@ class UserRepository extends Repository {
 			$source = $prop['source'];
 
 			if ( method_exists( $model, 'persist_' . $prop['name'] ) ) {
-				$model->{'persist_' . $prop['name']}( $prop['value'] );
+				$model->{'persist_' . $prop['name']}( $model->{$prop['name']} );
 			} elseif ( $source instanceof SourceObject ) {
 				$key          = preg_replace( '/^data\./', '', $source->key ?? $prop['name'] );
-				$data[ $key ] = $prop['value'];
+				$data[ $key ] = $model->{$prop['name']};
 			} elseif ( $source instanceof Meta ) {
 				$key                        = $source->key ?? $prop['name'];
-				$data['meta_input'][ $key ] = $prop['value'];
+				$data['meta_input'][ $key ] = $model->{$prop['name']};
 			}
 		}
 
 		if ( $data['ID'] > 0 ) {
-			$result = wp_update_user( $data, true );
+			$result = wp_update_user( $data );
 		} else {
-			$result = wp_insert_user( $data, true );
+			$result = wp_insert_user( $data );
 		}
 
 		if ( is_wp_error( $result ) ) {
