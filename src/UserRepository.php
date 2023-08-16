@@ -107,7 +107,7 @@ class UserRepository extends Repository {
 				$key          = preg_replace( '/^data\./', '', $source->key ?? $prop['name'] );
 				$data[ $key ] = $model->{$prop['name']};
 			} elseif ( $source instanceof Meta ) {
-				$key                        = $source->key ?? $prop['name'];
+				$key                        = $source->meta_key ?? $prop['name'];
 				$data['meta_input'][ $key ] = $model->{$prop['name']};
 			}
 		}
