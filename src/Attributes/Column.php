@@ -36,6 +36,8 @@ class Column implements SourceAttributeInterface {
 		public $params = null,
 		public bool $unsigned = false,
 		public bool $nullable = false,
+		public string $default = '',
+		public string $on_update = '',
 		public bool $auto_increment = false,
 		public bool $primary_key = false,
 		public bool $unique = false,
@@ -104,10 +106,18 @@ class Column implements SourceAttributeInterface {
 			$sql .= ' UNSIGNED';
 		}
 
-		if ( $this->nullable ) {
-			$sql .= ' NULL';
+		if ( '' !== $this->default ) {
+			$sql .= ' DEFAULT ' . $this->default;
 		} else {
-			$sql .= ' NOT NULL';
+			if ( $this->nullable ) {
+				$sql .= ' NULL';
+			} else {
+				$sql .= ' NOT NULL';
+			}
+		}
+
+		if ( '' !== $this->on_update ) {
+			$sql .= ' ON UPDATE ' . $this->on_update;
 		}
 
 		if ( $this->auto_increment ) {

@@ -268,6 +268,8 @@ The Column attribute accepts the following parameters:
 - `params`:         The parameters for the column type. For example, for VARCHAR, you can specify the length.
 - `unsigned`:       Whether the column is unsigned. Default is false.
 - `nullable`:       Whether the column is nullable. Default is false.
+- `default`:        Column default value.
+- `on_update`:      Column default value on update.
 - `auto_increment`: Whether the column is auto-increment. Default is false.
 - `primary_key`:    Whether the column is primary key. Default is false.
 - `unique`:         Whether the column is unique. Default is false.
