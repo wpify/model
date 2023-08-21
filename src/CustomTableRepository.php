@@ -453,10 +453,7 @@ abstract class CustomTableRepository extends Repository {
 			return false;
 		}
 
-		$result = $this->db()->delete( $this->prefixed_table_name(), array(
-			'where' => array( $this->primary_key() => $this->primary_key( $model ) ),
-			'limit' => 1,
-		) );
+		$result = $this->db()->delete( $this->prefixed_table_name(), array( $this->primary_key() => $this->primary_key( $model ) ) );
 
 		if ( false === $result ) {
 			throw new SqlException( $this->db()->last_error );
