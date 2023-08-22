@@ -1,4 +1,5 @@
 <?php
+
 declare( strict_types=1 );
 
 namespace Wpify\Model;
@@ -15,7 +16,7 @@ abstract class Repository implements RepositoryInterface {
 	/**
 	 * Gets or sets the Manager.
 	 *
-	 * @param Manager|null $manager
+	 * @param  Manager|null  $manager
 	 *
 	 * @return Manager
 	 * @throws RepositoryNotInitialized
@@ -34,7 +35,6 @@ abstract class Repository implements RepositoryInterface {
 
 	/**
 	 * Gets the model class for the repository.
-	 *
 	 * @return string
 	 */
 	abstract public function model(): string;
@@ -42,8 +42,8 @@ abstract class Repository implements RepositoryInterface {
 	/**
 	 * Resolve the property value from the source.
 	 *
-	 * @param array $property
-	 * @param Post $model
+	 * @param  array  $property
+	 * @param  Post  $model
 	 *
 	 * @return mixed
 	 */
@@ -56,7 +56,7 @@ abstract class Repository implements RepositoryInterface {
 			$value = $property['source']->get( $model, $property['name'] );
 		}
 
-		return $this->maybe_convert_to_type( $property['type'], $value );
+		return $this->maybe_convert_to_type( $property['type'], $value, $property['default'] );
 	}
 
 	/**
@@ -67,7 +67,10 @@ abstract class Repository implements RepositoryInterface {
 	 *
 	 * @return mixed
 	 */
-	public function maybe_convert_to_type( $type, $value ): mixed {
+	public function maybe_convert_to_type( $type, $value, $default ): mixed {
+		if ( empty( $value ) ) {
+			return $default;
+		}
 		if ( $type === 'int' || $type === 'integer' ) {
 			return intval( $value );
 		}
@@ -110,7 +113,7 @@ abstract class Repository implements RepositoryInterface {
 	/**
 	 * Creates a new model, optionally setting the properties.
 	 *
-	 * @param array $data
+	 * @param  array  $data
 	 *
 	 * @return ModelInterface
 	 * @throws RepositoryNotInitialized
