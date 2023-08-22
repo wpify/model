@@ -12,7 +12,7 @@ interface RepositoryInterface {
 
 	public function resolve_property( array $property, ModelInterface $model );
 
-	public function maybe_convert_to_type( $type, $value );
+	public function maybe_convert_to_type( $type, $value, $default );
 
 	public function get( mixed $source ): ?ModelInterface;
 
