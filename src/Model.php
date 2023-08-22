@@ -47,6 +47,7 @@ abstract class Model implements ModelInterface, IteratorAggregate, ArrayAccess {
 				'type'     => $type ? $type->getName() : 'string',
 				'readonly' => false,
 				'default'  => $this->{$property->getName()} ?? null,
+				'allows_null' => $type ? $type->allowsNull() : false,
 			);
 
 			foreach ( $property->getAttributes( SourceAttributeInterface::class, ReflectionAttribute::IS_INSTANCEOF ) as $attribute ) {

@@ -56,24 +56,23 @@ abstract class Repository implements RepositoryInterface {
 			$value = $property['source']->get( $model, $property['name'] );
 		}
 
-		return $this->maybe_convert_to_type( $property['type'], $value, $property['default'] );
+		return $this->maybe_convert_to_type( $property, $value );
 	}
 
 	/**
 	 * Convert the value to the type.
 	 *
-	 * @param $type
+	 * @param $property
 	 * @param $value
 	 *
 	 * @return mixed
 	 */
-	public function maybe_convert_to_type( $type, $value, $default ): mixed {
-		if ( empty( $value ) ) {
-			return $default;
+	public function maybe_convert_to_type( $property, $value): mixed {
+		if ( empty( $value ) && $property['allows_null'] ) {
+			return $property['default'];
 		}
-		if ( $type === 'int' || $type === 'integer' ) {
-			return intval( $value );
-		}
+
+		$type = $property['type'];
 
 		if ( $type === 'float' ) {
 			return floatval( $value );
