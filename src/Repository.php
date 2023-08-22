@@ -74,6 +74,10 @@ abstract class Repository implements RepositoryInterface {
 
 		$type = $property['type'];
 
+		if ( $type === 'int' || $type === 'integer' ) {
+			return intval( $value );
+		}
+
 		if ( $type === 'float' ) {
 			return floatval( $value );
 		}
