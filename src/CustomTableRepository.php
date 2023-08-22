@@ -404,6 +404,10 @@ abstract class CustomTableRepository extends Repository {
 			/** @var Column $attribute */
 			$attribute = $column['attribute'];
 
+			if (!empty($attribute->on_update)) {
+				continue;
+			}
+
 			if ( $attribute->primary_key ) {
 				$where[ $column['name'] ] = maybe_serialize( $model->{$column['property']} ?? null );
 			} elseif ( $column['attribute']->type === Column::JSON ) {
