@@ -120,7 +120,7 @@ abstract class CustomTableRepository extends Repository {
 	 * @throws PrimaryKeyException
 	 * @throws ReflectionException
 	 */
-	private function primary_key( ?ModelInterface $model = null ): mixed {
+	public function primary_key( ?ModelInterface $model = null ): mixed {
 		static $primary_keys;
 
 		if ( empty( $primary_keys ) ) {
@@ -206,7 +206,7 @@ abstract class CustomTableRepository extends Repository {
 	 *
 	 * @return string
 	 */
-	private function prefixed_table_name(): string {
+	public function prefixed_table_name(): string {
 		if ( $this->use_prefix ) {
 			return $this->db()->prefix . $this->table_name();
 		}
