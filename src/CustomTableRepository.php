@@ -23,8 +23,8 @@ abstract class CustomTableRepository extends Repository {
 	/**
 	 * Repository constructor.
 	 *
-	 * @param  bool  $auto_migrate  Whether to automatically migrate the table when the repository is used. Default is true.
-	 * @param  bool  $use_prefix  Whether to use the WordPress table prefix for the table name. Default is true.
+	 * @param bool $auto_migrate Whether to automatically migrate the table when the repository is used. Default is true.
+	 * @param bool $use_prefix Whether to use the WordPress table prefix for the table name. Default is true.
 	 */
 	public function __construct(
 		private bool $auto_migrate = true,
@@ -112,7 +112,7 @@ abstract class CustomTableRepository extends Repository {
 	/**
 	 * Returns the primary key for the table. If the model is passed in, it will return the value of the primary key.
 	 *
-	 * @param  ModelInterface|null  $model  The model to get the primary key value from.
+	 * @param ModelInterface|null $model The model to get the primary key value from.
 	 *
 	 * @return string
 	 * @throws PrimaryKeyException
@@ -165,7 +165,7 @@ abstract class CustomTableRepository extends Repository {
 	/**
 	 * Returns or sets the installed version of the table.
 	 *
-	 * @param  string  $new_version  If a new version is passed in, it will be saved.
+	 * @param string $new_version If a new version is passed in, it will be saved.
 	 *
 	 * @return string
 	 */
@@ -296,7 +296,7 @@ abstract class CustomTableRepository extends Repository {
 	/**
 	 * Returns a single result from the database by its primary key(s).
 	 *
-	 * @param  mixed  $source
+	 * @param mixed $source
 	 *
 	 * @return object|null
 	 * @throws KeyNotFoundException
@@ -311,9 +311,9 @@ abstract class CustomTableRepository extends Repository {
 		}
 
 		$items = $this->find( array(
-			                      'where' => sprintf( '`%s` = \'%s\'', $this->primary_key(), esc_sql( $source ) ),
-			                      'limit' => 1,
-		                      ) );
+			'where' => sprintf( '`%s` = \'%s\'', $this->primary_key(), esc_sql( $source ) ),
+			'limit' => 1,
+		) );
 
 		foreach ( $items as $item ) {
 			return $item;
@@ -325,7 +325,7 @@ abstract class CustomTableRepository extends Repository {
 	/**
 	 * Returns a model instance from the source by its primary key.
 	 *
-	 * @param  mixed  $source
+	 * @param mixed $source
 	 *
 	 * @return ModelInterface|null
 	 * @throws KeyNotFoundException
@@ -374,7 +374,7 @@ abstract class CustomTableRepository extends Repository {
 	 * Updates or inserts a model into the database.
 	 * If the model has a source, it will be updated, otherwise it will be inserted. If the model has a primary key, it will be used to find the row to update.
 	 *
-	 * @param  ModelInterface  $model
+	 * @param ModelInterface $model
 	 *
 	 * @return ModelInterface
 	 * @throws KeyNotFoundException
@@ -438,7 +438,7 @@ abstract class CustomTableRepository extends Repository {
 	/**
 	 * Deletes a model from the database. The model must have a primary key.
 	 *
-	 * @param  ModelInterface  $model
+	 * @param ModelInterface $model
 	 *
 	 * @return bool
 	 * @throws PrimaryKeyException
@@ -473,7 +473,7 @@ abstract class CustomTableRepository extends Repository {
 	 * - distinct: bool
 	 * - count: bool
 	 *
-	 * @param  array  $args
+	 * @param array $args
 	 *
 	 * @return ModelInterface[]
 	 * @throws KeyNotFoundException
@@ -497,11 +497,7 @@ abstract class CustomTableRepository extends Repository {
 		}
 
 		if ( ! empty( $args['where'] ) ) {
-			if ( is_array( $args['where'] ) ) {
-				$args['where'] = join( ' AND ', $args['where'] );
-			}
-
-			$query .= ' WHERE ' . $args['where'];
+			$query .= ' WHERE ' . $this->transform_where( $args['where'] );
 		}
 
 		if ( ! empty( $args['order_by'] ) ) {
@@ -529,11 +525,7 @@ abstract class CustomTableRepository extends Repository {
 		}
 
 		if ( ! empty( $args['having'] ) ) {
-			if ( is_array( $args['having'] ) ) {
-				$args['having'] = join( ' AND ', $args['having'] );
-			}
-
-			$query .= ' HAVING ' . $args['having'];
+			$query .= ' HAVING ' . $this->transform_where( $args['having'] );
 		}
 
 		$data = $this->db()->get_results( $query );
@@ -551,11 +543,119 @@ abstract class CustomTableRepository extends Repository {
 		return $items;
 	}
 
+	private function transform_where( string|array $conditions, $glue = 'AND' ): string {
+		if ( is_string( $conditions ) ) {
+			return $conditions;
+		}
+
+		$clauses   = array();
+		$next_glue = $glue;
+		$is_first  = true;
+
+		foreach ( $conditions as $key => $condition ) {
+			$regex_select = "/^SELECT\s+/i";
+
+			if ( is_int( $key ) && is_string( $condition ) && in_array( strtoupper( $condition ), array( 'AND', 'OR' ) ) ) {
+				// the condition is a glue, so we need to change the next used glue
+				$next_glue = strtoupper( $condition );
+
+				// if the glue is at the beginning, we use it as a default glue
+				if ( $is_first ) {
+					$glue = $next_glue;
+				}
+
+				continue;
+			}
+
+			// the condition is not the first one, so we need to add the glue
+			if ( ! $is_first ) {
+				$clauses[] = $next_glue;
+				$next_glue = $glue;
+			}
+
+			if ( is_int( $key ) && is_string( $condition ) ) {
+				// the condition is a SQL snippet, so we don't need to do anything
+				$clauses[] = '(' . $condition . ')';
+
+			} else if ( is_int( $key ) && is_array( $condition ) ) {
+				// the condition is an array with other conditions, so we need to process it recursively
+				$clauses[] = '(' . $this->transform_where( $condition ) . ')';
+
+			} else if ( is_string( $key ) ) {
+				// the condition is for a particular columns
+				$parts    = preg_split( '/\s+/', trim( $key ), 2 );
+				$column   = $parts[0] ?? null;
+				$operator = $parts[1] ?? null;
+
+				if ( is_string( $condition ) ) {
+					$condition = trim( $condition );
+				}
+
+				if ( empty( $operator ) ) {
+					if ( is_array( $condition ) ) {
+						$operator = 'IN';
+					} else {
+						$operator = '=';
+					}
+				} else {
+					$operator = strtoupper( $operator );
+				}
+
+				if ( is_string( $condition ) && preg_match( $regex_select, $condition ) ) {
+					$condition = '(' . $condition . ')';
+
+					// we need to remove operator, because column name itself is an operator
+					if ( in_array( strtoupper( $column ), array( 'EXISTS', 'NOT EXISTS' ) ) ) {
+						$operator = '';
+					}
+				} else if ( in_array( $operator, array( 'BETWEEN', 'NOT BETWEEN' ) ) ) {
+					if ( is_array( $condition ) && count( $condition ) === 2 ) {
+						$condition = $this->convert_value_for_sql( $condition[0] ) . ' AND ' . $this->convert_value_for_sql( $condition[1] );
+					} else {
+						throw new SqlException( 'The condition for the column ' . $column . ' must be an array with two values.' );
+					}
+				} else {
+					$condition = $this->convert_value_for_sql( $condition );
+				}
+
+				$clauses[] = join( ' ', array_filter( array( $column, $operator, $condition ) ) );
+			}
+
+			$is_first = false;
+		}
+
+		return join( ' ', $clauses );
+	}
+
+	private function convert_value_for_sql( $value ) {
+		if ( is_bool( $value ) ) {
+			$value = $value ? 'TRUE' : 'FALSE';
+		} else if ( is_string( $value ) ) {
+			$value = "'" . esc_sql( $value ) . "'";
+		} else if ( is_array( $value ) ) {
+			$value = '(' . join( ',',
+					array_map( function ( $part ) {
+						return $this->convert_value_for_sql( $part );
+					}, $value )
+				) . ')';
+		} else if ( is_null( $value ) ) {
+			$value = 'NULL';
+		} else if ( is_numeric( $value ) ) {
+			// keep the value as it is
+		} else if ( is_null( $value ) ) {
+			$value = 'NULL';
+		} else {
+			$value = "''";
+		}
+
+		return $value;
+	}
+
 	/**
 	 * Returns a list of models by their primary keys.
 	 * If the model has a composite primary key, the ids must be an array of arrays.
 	 *
-	 * @param  array  $ids
+	 * @param array $ids
 	 *
 	 * @return ModelInterface[]
 	 * @throws KeyNotFoundException
@@ -568,16 +668,16 @@ abstract class CustomTableRepository extends Repository {
 		$primary_key = $this->primary_key();
 
 		return $this->find( array(
-			                    'where' => array(
-				                    "{$primary_key} IN (" . join( ',', $ids ) . ')',
-			                    ),
-		                    ) );
+			'where' => array(
+				"{$primary_key} IN (" . join( ',', $ids ) . ')',
+			),
+		) );
 	}
 
 	/**
 	 * Returns all items from the database.
 	 *
-	 * @param  array  $args
+	 * @param array $args
 	 *
 	 * @return ModelInterface[]
 	 * @throws KeyNotFoundException

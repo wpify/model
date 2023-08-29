@@ -331,6 +331,41 @@ $manager->register_repository( $repository );
 register_uninstall_hook( $main_php_file_path, array( $repository, 'drop_table' ) );
 ```
 
+## Querying the custom table
+
+You can query custom tables with find function:
+
+```php
+$items = $repository->find( array(
+  'where' => "name = '" . esc_sql( 'Alex' ) . "'",
+) );
+```
+
+Even this works, it is not recommended to use this method, because it is vulnerable to SQL injection. 
+Instead, you should use array as arguments, that sanitizes the values, and you can use complex queries:
+
+```php
+$items = $repository->find( array(
+    array(
+        'table.col0 <>' => true,
+        'OR',
+        'table.col1' => true,
+        'or',
+        array(
+            'table.col2' => 'active',
+            'table.col3 <>' => 'active'
+        )
+    ),
+    'table.col4' => array( 1, 2, 3 ),
+    'table.col5 NOT IN' => array( 'test', 'test2', 'test3' ),
+    'table.col6 BETWEEN 1 AND 10',
+    'table.col7 BETWEEN' => array( 1, 10 ),
+    'EXISTS' => 'SELECT * FROM table2 WHERE table.id = table2.table_id',
+) );
+```
+
+As you can see, you can use even nested queries or specify the operator in the key. You can also define, whether to use OR, or AND operator.
+
 # TODO:
 
 - make generated documentation
