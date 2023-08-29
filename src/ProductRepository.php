@@ -93,6 +93,7 @@ class ProductRepository extends Repository {
 			}
 		}
 
+		$action = $model->source()->get_id() ? 'update' : 'insert';
 		$result = $model->source()->save();
 
 		if ( is_wp_error( $result ) ) {
@@ -102,6 +103,8 @@ class ProductRepository extends Repository {
 		if ( apply_filters( 'wpify_model_refresh_model_after_save', true, $model, $this ) ) {
 			$model->refresh( wc_get_product( $result ) );
 		}
+
+		do_action( 'wpify_model_repository_save_' . $action, $model, $this );
 
 		return $model;
 	}

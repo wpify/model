@@ -1,4 +1,5 @@
 <?php
+
 declare( strict_types=1 );
 
 namespace Wpify\Model;
@@ -20,7 +21,6 @@ class PostRepository extends Repository {
 
 	/**
 	 * Returns the model class name.
-	 *
 	 * @return string
 	 */
 	public function model(): string {
@@ -30,7 +30,7 @@ class PostRepository extends Repository {
 	/**
 	 * Returns the Post model by the WP_Post object, id, slug or URL.
 	 *
-	 * @param mixed $source
+	 * @param  mixed  $source
 	 *
 	 * @return ?Post
 	 * @throws RepositoryNotInitialized
@@ -49,10 +49,10 @@ class PostRepository extends Repository {
 
 		if ( ! $wp_post && is_string( $source ) ) {
 			$wp_posts = get_posts( array(
-				'name'           => $source,
-				'post_type'      => $this->post_types(),
-				'posts_per_page' => 1,
-			) );
+				                       'name'           => $source,
+				                       'post_type'      => $this->post_types(),
+				                       'posts_per_page' => 1,
+			                       ) );
 
 			if ( ! is_wp_error( $wp_posts ) && count( $wp_posts ) > 0 ) {
 				$wp_post = $wp_posts[0];
@@ -79,7 +79,6 @@ class PostRepository extends Repository {
 
 	/**
 	 * Returns post types for the repository.
-	 *
 	 * @return string[]
 	 */
 	public function post_types(): array {
@@ -88,10 +87,9 @@ class PostRepository extends Repository {
 
 	/**
 	 * Creates a new post model.
-	 *
 	 * If the repository has multiple post types or no post types, this will throw an exception.
 	 *
-	 * @param array $data Data to set on the model.
+	 * @param  array  $data  Data to set on the model.
 	 *
 	 * @return Post
 	 * @throws CouldNotSaveModelException
@@ -117,7 +115,7 @@ class PostRepository extends Repository {
 	/**
 	 * Stores post into database.
 	 *
-	 * @param Post $model
+	 * @param  Post  $model
 	 *
 	 * @return Post
 	 * @throws CouldNotSaveModelException
@@ -144,8 +142,10 @@ class PostRepository extends Repository {
 
 		if ( $data['ID'] > 0 ) {
 			$result = wp_update_post( $data, true );
+			$action = 'update';
 		} else {
 			$result = wp_insert_post( $data, true );
+			$action = 'insert';
 		}
 
 		if ( is_wp_error( $result ) ) {
@@ -169,13 +169,15 @@ class PostRepository extends Repository {
 			$model->refresh( get_post( $result ) );
 		}
 
+		do_action( 'wpify_model_repository_save_' . $action, $model, $this );
+
 		return $model;
 	}
 
 	/**
 	 * Deletes the given post.
 	 *
-	 * @param Post $model
+	 * @param  Post  $model
 	 *
 	 * @return bool
 	 */
@@ -185,10 +187,9 @@ class PostRepository extends Repository {
 
 	/**
 	 * Retrieves paginated links for archive post pages.
-	 *
 	 * @see https://developer.wordpress.org/reference/functions/paginate_links/
 	 *
-	 * @param array $args
+	 * @param  array  $args
 	 *
 	 * @return string|string[]|null
 	 */
@@ -196,7 +197,7 @@ class PostRepository extends Repository {
 		$pagination   = $this->get_pagination();
 		$default_args = array(
 			'total'   => $pagination['total_pages'],
-			'current' => $pagination['current_page']
+			'current' => $pagination['current_page'],
 		);
 
 		return paginate_links( wp_parse_args( $args, $default_args ) );
@@ -204,7 +205,6 @@ class PostRepository extends Repository {
 
 	/**
 	 * Retrieves information about pagination from the last query.
-	 *
 	 * @return array
 	 */
 	public function get_pagination(): array {
@@ -212,16 +212,15 @@ class PostRepository extends Repository {
 			'found_posts'  => $this->query->found_posts,
 			'current_page' => $this->query->query_vars['paged'] ?: 1,
 			'total_pages'  => $this->query->max_num_pages,
-			'per_page'     => $this->query->query_vars['posts_per_page']
+			'per_page'     => $this->query->query_vars['posts_per_page'],
 		);
 	}
 
 	/**
 	 * Finds posts matching the given arguments.
-	 *
 	 * @see https://developer.wordpress.org/reference/classes/wp_query/
 	 *
-	 * @param array $args
+	 * @param  array  $args
 	 *
 	 * @return Post[]
 	 * @throws RepositoryNotInitialized
@@ -253,7 +252,7 @@ class PostRepository extends Repository {
 	/**
 	 * Finds all posts.
 	 *
-	 * @param array $args
+	 * @param  array  $args
 	 *
 	 * @return Post[]
 	 * @throws RepositoryNotInitialized
@@ -261,7 +260,7 @@ class PostRepository extends Repository {
 	public function find_all( array $args = array() ): array {
 		$defaults = array(
 			'posts_per_page' => - 1,
-			'post_status'    => 'any'
+			'post_status'    => 'any',
 		);
 
 		$args = wp_parse_args( $args, $defaults );
@@ -272,7 +271,7 @@ class PostRepository extends Repository {
 	/**
 	 * Finds all published posts.
 	 *
-	 * @param array $args
+	 * @param  array  $args
 	 *
 	 * @return Post[]
 	 * @throws RepositoryNotInitialized
@@ -280,7 +279,7 @@ class PostRepository extends Repository {
 	public function find_published( array $args = array() ): array {
 		$defaults = array(
 			'posts_per_page' => - 1,
-			'post_status'    => 'publish'
+			'post_status'    => 'publish',
 		);
 
 		$args = wp_parse_args( $args, $defaults );
@@ -291,7 +290,7 @@ class PostRepository extends Repository {
 	/**
 	 * Find all posts by the given term.
 	 *
-	 * @param ModelInterface $model
+	 * @param  ModelInterface  $model
 	 *
 	 * @return Post[]
 	 * @throws Exceptions\RepositoryNotFoundException
@@ -303,14 +302,14 @@ class PostRepository extends Repository {
 
 		if ( method_exists( $target_repository, 'taxonomy' ) ) {
 			return $this->find( array(
-				'tax_query' => array(
-					array(
-						'taxonomy' => $target_repository->taxonomy(),
-						'field'    => 'term_id',
-						'terms'    => array( $model->id ),
-					),
-				),
-			) );
+				                    'tax_query' => array(
+					                    array(
+						                    'taxonomy' => $target_repository->taxonomy(),
+						                    'field'    => 'term_id',
+						                    'terms'    => array( $model->id ),
+					                    ),
+				                    ),
+			                    ) );
 		}
 
 		throw new IncorrectRepositoryException( sprintf( 'The repository %s of model %s does not have a taxonomy method.', get_class( $target_repository ), get_class( $model ) ) );
@@ -319,38 +318,38 @@ class PostRepository extends Repository {
 	/**
 	 * Finds all posts that have the given post as a parent.
 	 *
-	 * @param ModelInterface $model
+	 * @param  ModelInterface  $model
 	 *
 	 * @return Post[]
 	 * @throws RepositoryNotInitialized
 	 */
 	public function find_child_posts_of( ModelInterface $model ): array {
 		return $this->find( array(
-			'post_parent' => $model->id,
-		) );
+			                    'post_parent' => $model->id,
+		                    ) );
 	}
 
 	/**
 	 * Find all posts with the given ids.
 	 *
-	 * @param array $ids
-	 * @param array $args
+	 * @param  array  $ids
+	 * @param  array  $args
 	 *
 	 * @return Post[]
 	 * @throws RepositoryNotInitialized
 	 */
 	public function find_by_ids( array $ids, array $args = array() ): array {
 		return $this->find( array_merge( $args, array(
-			'post__in' => $ids
+			'post__in' => $ids,
 		) ) );
 	}
 
 	/**
 	 * Assign the post to the terms
 	 *
-	 * @param ModelInterface $model
-	 * @param Term[] $terms
-	 * @param bool $append
+	 * @param  ModelInterface  $model
+	 * @param  Term[]  $terms
+	 * @param  bool  $append
 	 */
 	public function assign_post_to_term( ModelInterface $model, array $terms, bool $append = false ): void {
 		$to_assign = array();
@@ -364,9 +363,12 @@ class PostRepository extends Repository {
 		}
 
 		foreach ( $to_assign as $taxonomy => $assigns ) {
-			wp_set_post_terms( $model->id, array_values( array_map( function ( $term ) {
-				return $term->id;
-			}, $assigns ) ), $taxonomy, $append );
+			wp_set_post_terms( $model->id,
+			                   array_values( array_map( function ( $term ) {
+				                   return $term->id;
+			                   }, $assigns ) ),
+			                   $taxonomy,
+			                   $append );
 		}
 	}
 }

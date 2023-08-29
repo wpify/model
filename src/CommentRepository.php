@@ -1,4 +1,5 @@
 <?php
+
 declare( strict_types=1 );
 
 namespace Wpify\Model;
@@ -13,7 +14,6 @@ use Wpify\Model\Interfaces\ModelInterface;
 class CommentRepository extends Repository {
 	/**
 	 * Returns the model class name.
-	 *
 	 * @return string
 	 */
 	public function model(): string {
@@ -23,7 +23,7 @@ class CommentRepository extends Repository {
 	/**
 	 * Returns the Comment model by the WP_Comment object or id.
 	 *
-	 * @param mixed $source
+	 * @param  mixed  $source
 	 *
 	 * @return ModelInterface|null
 	 * @throws Exceptions\RepositoryNotInitialized
@@ -53,7 +53,7 @@ class CommentRepository extends Repository {
 	/**
 	 * Saves the comment to the database.
 	 *
-	 * @param ModelInterface $model
+	 * @param  ModelInterface  $model
 	 *
 	 * @return ModelInterface
 	 * @throws CouldNotSaveModelException
@@ -81,8 +81,10 @@ class CommentRepository extends Repository {
 
 		if ( $data['comment_ID'] > 0 ) {
 			$result = wp_update_comment( $data, true );
+			$action = 'update';
 		} else {
 			$result = wp_insert_comment( $data );
+			$action = 'insert';
 		}
 
 		if ( is_wp_error( $result ) ) {
@@ -93,13 +95,15 @@ class CommentRepository extends Repository {
 			$model->refresh( get_user_by( 'id', $result ) );
 		}
 
+		do_action( 'wpify_model_repository_save_' . $action, $model, $this );
+
 		return $model;
 	}
 
 	/**
 	 * Deletes the comment from the database.
 	 *
-	 * @param ModelInterface $model
+	 * @param  ModelInterface  $model
 	 *
 	 * @return bool
 	 */
@@ -109,10 +113,9 @@ class CommentRepository extends Repository {
 
 	/**
 	 * Returns a collection of comments.
-	 *
 	 * @see https://developer.wordpress.org/reference/functions/get_comments/
 	 *
-	 * @param array $args
+	 * @param  array  $args
 	 *
 	 * @return array
 	 * @throws Exceptions\RepositoryNotInitialized
@@ -131,7 +134,7 @@ class CommentRepository extends Repository {
 	/**
 	 * Returns a collection of comments by the post id.
 	 *
-	 * @param int $post_id
+	 * @param  int  $post_id
 	 *
 	 * @return array
 	 * @throws Exceptions\RepositoryNotInitialized
@@ -143,22 +146,22 @@ class CommentRepository extends Repository {
 	/**
 	 * Find all comments with the given ids.
 	 *
-	 * @param array $ids
-	 * @param array $args
+	 * @param  array  $ids
+	 * @param  array  $args
 	 *
 	 * @return Comment[]
 	 * @throws RepositoryNotInitialized
 	 */
 	public function find_by_ids( array $ids, array $args = array() ): array {
 		return $this->find( array_merge( $args, array(
-			'comment__in' => $ids
+			'comment__in' => $ids,
 		) ) );
 	}
 
 	/**
 	 * Returns a collection of all comments.
 	 *
-	 * @param array $args
+	 * @param  array  $args
 	 *
 	 * @return array
 	 * @throws RepositoryNotInitialized

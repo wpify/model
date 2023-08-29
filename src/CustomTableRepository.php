@@ -408,6 +408,7 @@ abstract class CustomTableRepository extends Repository {
 
 		if ( $model->source() ) {
 			$result = $this->db()->update( $this->prefixed_table_name(), $data, $where );
+			$action = 'update';
 		} else {
 			$result = $this->db()->insert( $this->prefixed_table_name(), array_merge( $where, $data ) );
 
@@ -418,6 +419,7 @@ abstract class CustomTableRepository extends Repository {
 			}
 
 			$model->{$this->primary_key()} = $this->db()->insert_id;
+			$action                        = 'insert';
 		}
 
 		if ( false === $result ) {
@@ -427,6 +429,8 @@ abstract class CustomTableRepository extends Repository {
 		if ( apply_filters( 'wpify_model_refresh_model_after_save', true, $model, $this ) ) {
 			$model->refresh( $this->query_single( $this->primary_key( $model ) ) );
 		}
+
+		do_action( 'wpify_model_repository_save_' . $action, $model, $this );
 
 		return $model;
 	}

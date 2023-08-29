@@ -1,4 +1,5 @@
 <?php
+
 declare( strict_types=1 );
 
 namespace Wpify\Model;
@@ -10,13 +11,11 @@ use Wpify\Model\Interfaces\ModelInterface;
 
 /**
  * Repository for Term models.
- *
  * @method Term create( array $data )
  */
 class TermRepository extends Repository {
 	/**
 	 * Returns the model class name.
-	 *
 	 * @return string
 	 */
 	public function model(): string {
@@ -25,7 +24,6 @@ class TermRepository extends Repository {
 
 	/**
 	 * Returns taxonomy for the repository.
-	 *
 	 * @return string
 	 */
 	public function taxonomy(): string {
@@ -35,7 +33,7 @@ class TermRepository extends Repository {
 	/**
 	 * Returns the Term model by the WP_Term object, id, slug or name.
 	 *
-	 * @param mixed $source
+	 * @param  mixed  $source
 	 *
 	 * @return ?Term
 	 * @throws RepositoryNotInitialized
@@ -73,7 +71,7 @@ class TermRepository extends Repository {
 	/**
 	 * Saves the term model.
 	 *
-	 * @param Term $model
+	 * @param  Term  $model
 	 *
 	 * @return Term
 	 * @throws CouldNotSaveModelException
@@ -91,6 +89,7 @@ class TermRepository extends Repository {
 				'parent'      => $model->parent,
 				'alias_of'    => $model->alias_of,
 			) );
+			$action = 'update';
 		} else {
 			$result = wp_insert_term( $model->name, $taxonomy, array(
 				'slug'        => $model->slug,
@@ -99,6 +98,7 @@ class TermRepository extends Repository {
 				'parent'      => $model->parent,
 				'alias_of'    => $model->alias_of,
 			) );
+			$action = 'insert';
 		}
 
 		if ( is_wp_error( $result ) ) {
@@ -124,8 +124,10 @@ class TermRepository extends Repository {
 		}
 
 		if ( apply_filters( 'wpify_model_refresh_model_after_save', true, $model, $this ) ) {
-			$model->refresh( get_term($term_id, $taxonomy) );
+			$model->refresh( get_term( $term_id, $taxonomy ) );
 		}
+
+		do_action( 'wpify_model_repository_save_' . $action, $model, $this );
 
 		return $model;
 	}
@@ -133,7 +135,7 @@ class TermRepository extends Repository {
 	/**
 	 * Deletes the given term.
 	 *
-	 * @param Term $model
+	 * @param  Term  $model
 	 *
 	 * @return bool
 	 */
@@ -144,7 +146,7 @@ class TermRepository extends Repository {
 	/**
 	 * Finds posts matching the given arguments.
 	 *
-	 * @param array $args
+	 * @param  array  $args
 	 *
 	 * @return Term[]
 	 * @throws RepositoryNotInitialized
@@ -170,7 +172,7 @@ class TermRepository extends Repository {
 	/**
 	 * Finds all terms whenever they are empty or not.
 	 *
-	 * @param array $args
+	 * @param  array  $args
 	 *
 	 * @return Term[]
 	 * @throws RepositoryNotInitialized
@@ -184,7 +186,7 @@ class TermRepository extends Repository {
 	/**
 	 * Finds all terms that are not empty.
 	 *
-	 * @param array $args
+	 * @param  array  $args
 	 *
 	 * @return Term[]
 	 * @throws RepositoryNotInitialized
@@ -198,8 +200,8 @@ class TermRepository extends Repository {
 	/**
 	 * Find all terms that are parent of the given term.
 	 *
-	 * @param int $parent_id
-	 * @param array $args
+	 * @param  int  $parent_id
+	 * @param  array  $args
 	 *
 	 * @return Term[]
 	 * @throws RepositoryNotInitialized
@@ -217,7 +219,7 @@ class TermRepository extends Repository {
 	/**
 	 * Finds all terms that are assigned to the given post.
 	 *
-	 * @param int $post_id
+	 * @param  int  $post_id
 	 *
 	 * @return Term[]
 	 * @throws RepositoryNotInitialized
@@ -238,32 +240,32 @@ class TermRepository extends Repository {
 	/**
 	 * Finds all terms that are assigned as a children.
 	 *
-	 * @param ModelInterface $model
+	 * @param  ModelInterface  $model
 	 *
 	 * @return Term[]
 	 * @throws RepositoryNotInitialized
 	 */
 	public function find_child_terms_of( ModelInterface $model ): array {
 		return $this->find( array(
-			'taxonomy'     => $model->taxonomy ?? $this->taxonomy(),
-			'hierarchical' => true,
-			'hide_empty'   => false,
-			'child_of'     => $model->id,
-		) );
+			                    'taxonomy'     => $model->taxonomy ?? $this->taxonomy(),
+			                    'hierarchical' => true,
+			                    'hide_empty'   => false,
+			                    'child_of'     => $model->id,
+		                    ) );
 	}
 
 	/**
 	 * Find all terms with the given ids.
 	 *
-	 * @param array $ids
-	 * @param array $args
+	 * @param  array  $ids
+	 * @param  array  $args
 	 *
 	 * @return Term[]
 	 * @throws RepositoryNotInitialized
 	 */
 	public function find_by_ids( array $ids, array $args = array() ): array {
 		return $this->find( array_merge( $args, array(
-			'include' => $ids
+			'include' => $ids,
 		) ) );
 	}
 }

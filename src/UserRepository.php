@@ -1,4 +1,5 @@
 <?php
+
 declare( strict_types=1 );
 
 namespace Wpify\Model;
@@ -12,13 +13,11 @@ use Wpify\Model\Interfaces\ModelInterface;
 
 /**
  * Repository for the User model.
- *
  * @method User create( array $data )
  */
 class UserRepository extends Repository {
 	/**
 	 * Returns the model class name.
-	 *
 	 * @return string
 	 */
 	public function model(): string {
@@ -28,7 +27,7 @@ class UserRepository extends Repository {
 	/**
 	 * Returns the User model by the WP_User object, id, login, email or slug
 	 *
-	 * @param mixed $source
+	 * @param  mixed  $source
 	 *
 	 * @return ?User
 	 * @throws RepositoryNotInitialized
@@ -69,7 +68,6 @@ class UserRepository extends Repository {
 
 	/**
 	 * Returns the current user.
-	 *
 	 * @return ?User
 	 * @throws RepositoryNotInitialized
 	 */
@@ -86,7 +84,7 @@ class UserRepository extends Repository {
 	/**
 	 * Saves the user to the database.
 	 *
-	 * @param ModelInterface $model
+	 * @param  ModelInterface  $model
 	 *
 	 * @return ModelInterface
 	 * @throws CouldNotSaveModelException
@@ -114,8 +112,10 @@ class UserRepository extends Repository {
 
 		if ( $data['ID'] > 0 ) {
 			$result = wp_update_user( $data );
+			$action = 'update';
 		} else {
 			$result = wp_insert_user( $data );
+			$action = 'insert';
 		}
 
 		if ( is_wp_error( $result ) ) {
@@ -126,13 +126,15 @@ class UserRepository extends Repository {
 			$model->refresh( get_user_by( 'id', $result ) );
 		}
 
+		do_action( 'wpify_model_repository_save_' . $action, $model, $this );
+
 		return $model;
 	}
 
 	/**
 	 * Deletes the given user.
 	 *
-	 * @param User $model
+	 * @param  User  $model
 	 *
 	 * @return bool
 	 */
@@ -142,10 +144,9 @@ class UserRepository extends Repository {
 
 	/**
 	 * Returns a collection of users.
-	 *
 	 * @see https://developer.wordpress.org/reference/functions/get_users/
 	 *
-	 * @param array $args
+	 * @param  array  $args
 	 *
 	 * @return array
 	 * @throws RepositoryNotInitialized
@@ -166,7 +167,7 @@ class UserRepository extends Repository {
 	/**
 	 * Returns all users.
 	 *
-	 * @param array $args
+	 * @param  array  $args
 	 *
 	 * @return array
 	 * @throws RepositoryNotInitialized
