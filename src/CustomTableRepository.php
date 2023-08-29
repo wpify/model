@@ -543,7 +543,7 @@ abstract class CustomTableRepository extends Repository {
 		return $items;
 	}
 
-	private function transform_where( string|array $conditions, $glue = 'AND' ): string {
+	private function transform_where( string|array $conditions, string $glue = 'AND' ): string {
 		if ( is_string( $conditions ) ) {
 			return $conditions;
 		}
