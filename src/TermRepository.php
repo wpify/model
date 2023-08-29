@@ -123,7 +123,9 @@ class TermRepository extends Repository {
 			}
 		}
 
-		$model->refresh( get_term($term_id, $taxonomy) );
+		if ( apply_filters( 'wpify_model_refresh_model_after_save', true, $model, $this ) ) {
+			$model->refresh( get_term($term_id, $taxonomy) );
+		}
 
 		return $model;
 	}

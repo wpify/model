@@ -1,4 +1,5 @@
 <?php
+
 declare( strict_types=1 );
 
 namespace Wpify\Model;
@@ -16,15 +17,14 @@ use wpdb;
 
 /**
  * Base class for custom table repositories.
- *
  * Extend this class to create a custom repository for your model from database table.
  */
 abstract class CustomTableRepository extends Repository {
 	/**
 	 * Repository constructor.
 	 *
-	 * @param bool $auto_migrate Whether to automatically migrate the table when the repository is used. Default is true.
-	 * @param bool $use_prefix Whether to use the WordPress table prefix for the table name. Default is true.
+	 * @param  bool  $auto_migrate  Whether to automatically migrate the table when the repository is used. Default is true.
+	 * @param  bool  $use_prefix  Whether to use the WordPress table prefix for the table name. Default is true.
 	 */
 	public function __construct(
 		private bool $auto_migrate = true,
@@ -34,7 +34,6 @@ abstract class CustomTableRepository extends Repository {
 
 	/**
 	 * Gets the model class reflection.
-	 *
 	 * @return ReflectionClass
 	 * @throws ReflectionException
 	 */
@@ -50,7 +49,6 @@ abstract class CustomTableRepository extends Repository {
 
 	/**
 	 * Generates the SQL for the table creation.
-	 *
 	 * @return string
 	 * @throws PrimaryKeyException
 	 * @throws ReflectionException
@@ -114,7 +112,7 @@ abstract class CustomTableRepository extends Repository {
 	/**
 	 * Returns the primary key for the table. If the model is passed in, it will return the value of the primary key.
 	 *
-	 * @param ModelInterface|null $model The model to get the primary key value from.
+	 * @param  ModelInterface|null  $model  The model to get the primary key value from.
 	 *
 	 * @return string
 	 * @throws PrimaryKeyException
@@ -150,7 +148,6 @@ abstract class CustomTableRepository extends Repository {
 
 	/**
 	 * Returns the version of the table.
-	 *
 	 * @return string
 	 * @throws PrimaryKeyException
 	 * @throws ReflectionException
@@ -168,7 +165,7 @@ abstract class CustomTableRepository extends Repository {
 	/**
 	 * Returns or sets the installed version of the table.
 	 *
-	 * @param string $new_version If a new version is passed in, it will be saved.
+	 * @param  string  $new_version  If a new version is passed in, it will be saved.
 	 *
 	 * @return string
 	 */
@@ -196,14 +193,12 @@ abstract class CustomTableRepository extends Repository {
 
 	/**
 	 * Returns the table name without WordPress table prefix.
-	 *
 	 * @return string
 	 */
 	abstract public function table_name(): string;
 
 	/**
 	 * Returns prefixed table name. If the prefix is disabled, it will return the table name without prefix.
-	 *
 	 * @return string
 	 */
 	public function prefixed_table_name(): string {
@@ -216,7 +211,6 @@ abstract class CustomTableRepository extends Repository {
 
 	/**
 	 * Migrates the table to the latest version if it is not already.
-	 *
 	 * @return void
 	 * @throws PrimaryKeyException
 	 * @throws ReflectionException
@@ -250,7 +244,6 @@ abstract class CustomTableRepository extends Repository {
 
 	/**
 	 * Migrates the table if auto migration is enabled.
-	 *
 	 * @return void
 	 * @throws PrimaryKeyException
 	 * @throws ReflectionException
@@ -263,7 +256,6 @@ abstract class CustomTableRepository extends Repository {
 
 	/**
 	 * Returns the database object.
-	 *
 	 * @return wpdb
 	 */
 	protected function db(): wpdb {
@@ -274,7 +266,6 @@ abstract class CustomTableRepository extends Repository {
 
 	/**
 	 * Returns the columns for the table.
-	 *
 	 * @return array{ property:string, name:string, type:string, attribute:Column }[]
 	 * @throws ReflectionException
 	 */
@@ -305,7 +296,7 @@ abstract class CustomTableRepository extends Repository {
 	/**
 	 * Returns a single result from the database by its primary key(s).
 	 *
-	 * @param mixed $source
+	 * @param  mixed  $source
 	 *
 	 * @return object|null
 	 * @throws KeyNotFoundException
@@ -320,9 +311,9 @@ abstract class CustomTableRepository extends Repository {
 		}
 
 		$items = $this->find( array(
-			'where' => sprintf( '`%s` = \'%s\'', $this->primary_key(), esc_sql( $source ) ),
-			'limit' => 1,
-		) );
+			                      'where' => sprintf( '`%s` = \'%s\'', $this->primary_key(), esc_sql( $source ) ),
+			                      'limit' => 1,
+		                      ) );
 
 		foreach ( $items as $item ) {
 			return $item;
@@ -334,7 +325,7 @@ abstract class CustomTableRepository extends Repository {
 	/**
 	 * Returns a model instance from the source by its primary key.
 	 *
-	 * @param mixed $source
+	 * @param  mixed  $source
 	 *
 	 * @return ModelInterface|null
 	 * @throws KeyNotFoundException
@@ -373,7 +364,6 @@ abstract class CustomTableRepository extends Repository {
 
 	/**
 	 * Drops the table from the database.
-	 *
 	 * @return bool
 	 */
 	public function drop_table(): bool {
@@ -382,10 +372,9 @@ abstract class CustomTableRepository extends Repository {
 
 	/**
 	 * Updates or inserts a model into the database.
-	 *
 	 * If the model has a source, it will be updated, otherwise it will be inserted. If the model has a primary key, it will be used to find the row to update.
 	 *
-	 * @param ModelInterface $model
+	 * @param  ModelInterface  $model
 	 *
 	 * @return ModelInterface
 	 * @throws KeyNotFoundException
@@ -404,7 +393,7 @@ abstract class CustomTableRepository extends Repository {
 			/** @var Column $attribute */
 			$attribute = $column['attribute'];
 
-			if (!empty($attribute->on_update)) {
+			if ( ! empty( $attribute->on_update ) ) {
 				continue;
 			}
 
@@ -435,7 +424,9 @@ abstract class CustomTableRepository extends Repository {
 			throw new SqlException( $this->db()->last_error );
 		}
 
-		$model->refresh( $this->query_single( $this->primary_key( $model ) ) );
+		if ( apply_filters( 'wpify_model_refresh_model_after_save', true, $model, $this ) ) {
+			$model->refresh( $this->query_single( $this->primary_key( $model ) ) );
+		}
 
 		return $model;
 	}
@@ -443,7 +434,7 @@ abstract class CustomTableRepository extends Repository {
 	/**
 	 * Deletes a model from the database. The model must have a primary key.
 	 *
-	 * @param ModelInterface $model
+	 * @param  ModelInterface  $model
 	 *
 	 * @return bool
 	 * @throws PrimaryKeyException
@@ -468,7 +459,6 @@ abstract class CustomTableRepository extends Repository {
 
 	/**
 	 * Returns a list of models from the database based on the given arguments.
-	 *
 	 * Arguments:
 	 * - where: string|array
 	 * - order_by: string|array
@@ -479,7 +469,7 @@ abstract class CustomTableRepository extends Repository {
 	 * - distinct: bool
 	 * - count: bool
 	 *
-	 * @param array $args
+	 * @param  array  $args
 	 *
 	 * @return ModelInterface[]
 	 * @throws KeyNotFoundException
@@ -559,10 +549,9 @@ abstract class CustomTableRepository extends Repository {
 
 	/**
 	 * Returns a list of models by their primary keys.
-	 *
 	 * If the model has a composite primary key, the ids must be an array of arrays.
 	 *
-	 * @param array $ids
+	 * @param  array  $ids
 	 *
 	 * @return ModelInterface[]
 	 * @throws KeyNotFoundException
@@ -575,16 +564,16 @@ abstract class CustomTableRepository extends Repository {
 		$primary_key = $this->primary_key();
 
 		return $this->find( array(
-			'where' => array(
-				"{$primary_key} IN (" . join( ',', $ids ) . ')'
-			)
-		) );
+			                    'where' => array(
+				                    "{$primary_key} IN (" . join( ',', $ids ) . ')',
+			                    ),
+		                    ) );
 	}
 
 	/**
 	 * Returns all items from the database.
 	 *
-	 * @param array $args
+	 * @param  array  $args
 	 *
 	 * @return ModelInterface[]
 	 * @throws KeyNotFoundException

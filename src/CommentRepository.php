@@ -89,7 +89,9 @@ class CommentRepository extends Repository {
 			throw new CouldNotSaveModelException( $result->get_error_message() );
 		}
 
-		$model->refresh( get_user_by( 'id', $result ) );
+		if ( apply_filters( 'wpify_model_refresh_model_after_save', true, $model, $this ) ) {
+			$model->refresh( get_user_by( 'id', $result ) );
+		}
 
 		return $model;
 	}

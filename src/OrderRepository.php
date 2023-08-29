@@ -11,13 +11,11 @@ use Wpify\Model\Interfaces\ModelInterface;
 
 /**
  * Repository for Post models.
- *
  * @method Order create( array $data )
  */
 class OrderRepository extends Repository {
 	/**
 	 * Returns the model class name.
-	 *
 	 * @return string
 	 */
 	public function model(): string {
@@ -27,7 +25,7 @@ class OrderRepository extends Repository {
 	/**
 	 * Returns the Post model by the WP_Post object, id, slug or URL.
 	 *
-	 * @param mixed $source
+	 * @param  mixed  $source
 	 *
 	 * @return ?Order
 	 * @throws RepositoryNotInitialized
@@ -61,7 +59,7 @@ class OrderRepository extends Repository {
 	/**
 	 * Stores order into database.
 	 *
-	 * @param Order $model
+	 * @param  Order  $model
 	 *
 	 * @return Order
 	 * @throws CouldNotSaveModelException
@@ -83,7 +81,9 @@ class OrderRepository extends Repository {
 			throw new CouldNotSaveModelException( $result->get_error_message() );
 		}
 
-		$model->refresh( wc_get_order( $result ) );
+		if ( apply_filters( 'wpify_model_refresh_model_after_save', true, $model, $this ) ) {
+			$model->refresh( wc_get_order( $result ) );
+		}
 
 		return $model;
 	}
@@ -91,7 +91,7 @@ class OrderRepository extends Repository {
 	/**
 	 * Deletes the given order.
 	 *
-	 * @param Order $model
+	 * @param  Order  $model
 	 *
 	 * @return bool
 	 */
@@ -103,7 +103,7 @@ class OrderRepository extends Repository {
 	/**
 	 * Finds orders matching the given arguments.
 	 *
-	 * @param array $args
+	 * @param  array  $args
 	 *
 	 * @return Order[]
 	 * @throws RepositoryNotInitialized
@@ -122,7 +122,7 @@ class OrderRepository extends Repository {
 	/**
 	 * Finds all orders.
 	 *
-	 * @param array $args
+	 * @param  array  $args
 	 *
 	 * @return Order[]
 	 * @throws RepositoryNotInitialized
@@ -140,7 +140,7 @@ class OrderRepository extends Repository {
 	/**
 	 * Finds orders by ids.
 	 *
-	 * @param array $ids
+	 * @param  array  $ids
 	 *
 	 * @return array
 	 * @throws RepositoryNotInitialized
