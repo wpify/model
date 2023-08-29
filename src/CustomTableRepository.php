@@ -618,6 +618,10 @@ abstract class CustomTableRepository extends Repository {
 					$condition = $this->convert_value_for_sql( $condition );
 				}
 
+				if ( $condition === 'NULL' && ! in_array( $operator, array( 'IS', 'IS NOT' ) ) ) {
+					$operator = 'IS';
+				}
+
 				$clauses[] = join( ' ', array_filter( array( $column, $operator, $condition ) ) );
 			}
 
