@@ -26,8 +26,8 @@ abstract class CustomTableRepository extends Repository {
 	/**
 	 * Repository constructor.
 	 *
-	 * @param  bool  $auto_migrate  Whether to automatically migrate the table when the repository is used. Default is true.
-	 * @param  bool  $use_prefix  Whether to use the WordPress table prefix for the table name. Default is true.
+	 * @param bool $auto_migrate Whether to automatically migrate the table when the repository is used. Default is true.
+	 * @param bool $use_prefix Whether to use the WordPress table prefix for the table name. Default is true.
 	 */
 	public function __construct(
 		private bool $auto_migrate = true,
@@ -113,7 +113,7 @@ abstract class CustomTableRepository extends Repository {
 	/**
 	 * Returns the primary key for the table. If the model is passed in, it will return the value of the primary key.
 	 *
-	 * @param  ModelInterface|null  $model  The model to get the primary key value from.
+	 * @param ModelInterface|null $model The model to get the primary key value from.
 	 *
 	 * @return string
 	 * @throws PrimaryKeyException
@@ -166,7 +166,7 @@ abstract class CustomTableRepository extends Repository {
 	/**
 	 * Returns or sets the installed version of the table.
 	 *
-	 * @param  string  $new_version  If a new version is passed in, it will be saved.
+	 * @param string $new_version If a new version is passed in, it will be saved.
 	 *
 	 * @return string
 	 */
@@ -296,7 +296,7 @@ abstract class CustomTableRepository extends Repository {
 	/**
 	 * Returns a single result from the database by its primary key(s).
 	 *
-	 * @param  mixed  $source
+	 * @param mixed $source
 	 *
 	 * @return object|null
 	 * @throws KeyNotFoundException
@@ -311,9 +311,9 @@ abstract class CustomTableRepository extends Repository {
 		}
 
 		$items = $this->find( array(
-			                      'where' => sprintf( '`%s` = \'%s\'', $this->primary_key(), esc_sql( $source ) ),
-			                      'limit' => 1,
-		                      ) );
+			'where' => sprintf( '`%s` = \'%s\'', $this->primary_key(), esc_sql( $source ) ),
+			'limit' => 1,
+		) );
 
 		foreach ( $items as $item ) {
 			return $item;
@@ -325,7 +325,7 @@ abstract class CustomTableRepository extends Repository {
 	/**
 	 * Returns a model instance from the source by its primary key.
 	 *
-	 * @param  mixed  $source
+	 * @param mixed $source
 	 *
 	 * @return ModelInterface|null
 	 * @throws KeyNotFoundException
@@ -374,7 +374,7 @@ abstract class CustomTableRepository extends Repository {
 	 * Updates or inserts a model into the database.
 	 * If the model has a source, it will be updated, otherwise it will be inserted. If the model has a primary key, it will be used to find the row to update.
 	 *
-	 * @param  ModelInterface  $model
+	 * @param ModelInterface $model
 	 *
 	 * @return ModelInterface
 	 * @throws KeyNotFoundException
@@ -438,7 +438,7 @@ abstract class CustomTableRepository extends Repository {
 	/**
 	 * Deletes a model from the database. The model must have a primary key.
 	 *
-	 * @param  ModelInterface  $model
+	 * @param ModelInterface $model
 	 *
 	 * @return bool
 	 * @throws PrimaryKeyException
@@ -473,7 +473,7 @@ abstract class CustomTableRepository extends Repository {
 	 * - distinct: bool
 	 * - count: bool
 	 *
-	 * @param  array  $args
+	 * @param array $args
 	 *
 	 * @return ModelInterface[]
 	 * @throws KeyNotFoundException
@@ -599,7 +599,12 @@ abstract class CustomTableRepository extends Repository {
 					$operator = strtoupper( $operator );
 				}
 
-				if ( is_string( $condition ) && preg_match( $regex_select, $condition ) ) {
+
+				if ( is_string( $condition ) && $operator === 'LIKE' ) {
+					$condition = "'" . join( '%', array_map( function ( $part ) {
+						return esc_sql( $part );
+					}, explode( '%', $condition ) ) ) . "'";
+				} elseif ( is_string( $condition ) && preg_match( $regex_select, $condition ) ) {
 					$condition = '(' . $condition . ')';
 
 					// we need to remove operator, because column name itself is an operator
@@ -636,9 +641,9 @@ abstract class CustomTableRepository extends Repository {
 			$value = "'" . esc_sql( $value ) . "'";
 		} elseif ( is_array( $value ) ) {
 			$value = '(' . join( ',',
-			                     array_map( function ( $part ) {
-				                     return $this->convert_value_for_sql( $part );
-			                     }, $value )
+					array_map( function ( $part ) {
+						return $this->convert_value_for_sql( $part );
+					}, $value )
 				) . ')';
 		} elseif ( is_null( $value ) ) {
 			$value = 'NULL';
@@ -657,7 +662,7 @@ abstract class CustomTableRepository extends Repository {
 	 * Returns a list of models by their primary keys.
 	 * If the model has a composite primary key, the ids must be an array of arrays.
 	 *
-	 * @param  array  $ids
+	 * @param array $ids
 	 *
 	 * @return ModelInterface[]
 	 * @throws KeyNotFoundException
@@ -670,16 +675,16 @@ abstract class CustomTableRepository extends Repository {
 		$primary_key = $this->primary_key();
 
 		return $this->find( array(
-			                    'where' => array(
-				                    "{$primary_key} IN (" . join( ',', $ids ) . ')',
-			                    ),
-		                    ) );
+			'where' => array(
+				"{$primary_key} IN (" . join( ',', $ids ) . ')',
+			),
+		) );
 	}
 
 	/**
 	 * Returns all items from the database.
 	 *
-	 * @param  array  $args
+	 * @param array $args
 	 *
 	 * @return ModelInterface[]
 	 * @throws KeyNotFoundException
