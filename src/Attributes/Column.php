@@ -107,7 +107,11 @@ class Column implements SourceAttributeInterface {
 		}
 
 		if ( '' !== $this->default ) {
-			$sql .= ' DEFAULT ' . $this->default;
+			if ( in_array( $this->type, array( self::VARCHAR, self::TEXT ) ) ) {
+				$sql .= ' DEFAULT "' . $this->default . '"';
+			} else {
+				$sql .= ' DEFAULT ' . $this->default;
+			}
 		} else {
 			if ( $this->nullable ) {
 				$sql .= ' NULL';
