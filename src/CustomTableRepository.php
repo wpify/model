@@ -23,11 +23,20 @@ abstract class CustomTableRepository extends Repository {
 	private $reflection;
 	private $columns = [];
 
+	private string $sql;
+
+	private array $primary_keys;
+
+	private string $version;
+	private string $current_version;
+
+	private bool $migrated;
+
 	/**
 	 * Repository constructor.
 	 *
 	 * @param bool $auto_migrate Whether to automatically migrate the table when the repository is used. Default is true.
-	 * @param bool $use_prefix Whether to use the WordPress table prefix for the table name. Default is true.
+	 * @param bool $use_prefix   Whether to use the WordPress table prefix for the table name. Default is true.
 	 */
 	public function __construct(
 		private bool $auto_migrate = true,
@@ -55,9 +64,7 @@ abstract class CustomTableRepository extends Repository {
 	 * @throws ReflectionException
 	 */
 	private function create_table_sql(): string {
-		static $sql;
-
-		if ( empty( $sql ) ) {
+		if ( empty( $this->sql ) ) {
 			$columns      = array();
 			$unique_keys  = array();
 			$foreign_keys = array();
@@ -106,6 +113,7 @@ abstract class CustomTableRepository extends Repository {
 				$this->db()->get_charset_collate(),
 			);
 		}
+		$this->sql = $sql;
 
 		return $sql;
 	}
@@ -120,9 +128,7 @@ abstract class CustomTableRepository extends Repository {
 	 * @throws ReflectionException
 	 */
 	public function primary_key( ?ModelInterface $model = null ): mixed {
-		static $primary_keys;
-
-		if ( empty( $primary_keys ) ) {
+		if ( empty( $this->primary_keys ) ) {
 			$primary_keys = array();
 
 			foreach ( $this->columns() as $column ) {
@@ -130,6 +136,7 @@ abstract class CustomTableRepository extends Repository {
 					$primary_keys[ $column['property'] ] = $column['name'];
 				}
 			}
+			$this->primary_keys = $primary_keys;
 		}
 
 		if ( count( $primary_keys ) !== 1 ) {
@@ -154,13 +161,12 @@ abstract class CustomTableRepository extends Repository {
 	 * @throws ReflectionException
 	 */
 	private function version(): string {
-		static $version;
 
-		if ( empty( $version ) ) {
-			$version = md5( $this->create_table_sql() );
+		if ( empty( $this->version ) ) {
+			$this->version = md5( $this->create_table_sql() );
 		}
 
-		return $version;
+		return $this->version;
 	}
 
 	/**
@@ -171,7 +177,9 @@ abstract class CustomTableRepository extends Repository {
 	 * @return string
 	 */
 	private function current_version( string $new_version = '' ): string {
-		static $current_version;
+		if ( $this->current_version ) {
+			return $this->current_version;
+		}
 
 		$option_name = 'custom_table_' . $this->table_name() . '_version';
 
@@ -189,7 +197,9 @@ abstract class CustomTableRepository extends Repository {
 			$current_version = '';
 		}
 
-		return $current_version;
+		$this->current_version = $current_version;
+
+		return $this->current_version;
 	}
 
 	/**
@@ -218,9 +228,8 @@ abstract class CustomTableRepository extends Repository {
 	 */
 	public function migrate(): void {
 		global $wpdb;
-		static $migrated;
 
-		if ( $migrated ) {
+		if ( $this->migrated ) {
 			return;
 		}
 
@@ -240,7 +249,7 @@ abstract class CustomTableRepository extends Repository {
 
 		$this->current_version( $this->version() );
 
-		$migrated = true;
+		$this->migrated = true;
 	}
 
 	/**
@@ -555,7 +564,10 @@ abstract class CustomTableRepository extends Repository {
 		foreach ( $conditions as $key => $condition ) {
 			$regex_select = "/^SELECT\s+/i";
 
-			if ( is_int( $key ) && is_string( $condition ) && in_array( strtoupper( $condition ), array( 'AND', 'OR' ) ) ) {
+			if ( is_int( $key ) && is_string( $condition ) && in_array( strtoupper( $condition ), array(
+					'AND',
+					'OR'
+				) ) ) {
 				// the condition is a glue, so we need to change the next used glue
 				$next_glue = strtoupper( $condition );
 
@@ -602,8 +614,8 @@ abstract class CustomTableRepository extends Repository {
 
 				if ( is_string( $condition ) && $operator === 'LIKE' ) {
 					$condition = "'" . join( '%', array_map( function ( $part ) {
-						return esc_sql( $part );
-					}, explode( '%', $condition ) ) ) . "'";
+							return esc_sql( $part );
+						}, explode( '%', $condition ) ) ) . "'";
 				} elseif ( is_string( $condition ) && preg_match( $regex_select, $condition ) ) {
 					$condition = '(' . $condition . ')';
 
