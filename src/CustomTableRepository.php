@@ -23,14 +23,14 @@ abstract class CustomTableRepository extends Repository {
 	private $reflection;
 	private $columns = [];
 
-	private string $sql;
+	private string $sql = '';
 
-	private array $primary_keys;
+	private array $primary_keys = [];
 
-	private string $version;
-	private string $current_version;
+	private string $version = '';
+	private string $current_version = '';
 
-	private bool $migrated;
+	private bool $migrated = false;
 
 	/**
 	 * Repository constructor.
@@ -112,10 +112,11 @@ abstract class CustomTableRepository extends Repository {
 				implode( ",\n\t", $columns ),
 				$this->db()->get_charset_collate(),
 			);
+			$this->sql = $sql;
 		}
-		$this->sql = $sql;
 
-		return $sql;
+
+		return $this->sql;
 	}
 
 	/**
@@ -139,11 +140,11 @@ abstract class CustomTableRepository extends Repository {
 			$this->primary_keys = $primary_keys;
 		}
 
-		if ( count( $primary_keys ) !== 1 ) {
+		if ( count( $this->primary_keys ) !== 1 ) {
 			throw new PrimaryKeyException( 'The model ' . $this->model() . ' must contain at exactly one primary key column.' );
 		}
 
-		foreach ( $primary_keys as $property => $column ) {
+		foreach ( $this->primary_keys as $property => $column ) {
 			if ( $model ) {
 				return $model->$property;
 			} else {
