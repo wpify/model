@@ -29,6 +29,8 @@ class PostTermsRelation implements SourceAttributeInterface {
 		/** @var PostRepository $repository */
 		$repository = $manager->get_model_repository( $this->target_entity );
 
-		$repository->assign_post_to_term( $post, $terms );
+		if ( method_exists( $repository, 'assign_post_to_term' ) ) {
+			$repository->assign_post_to_term( $post, $terms );
+		}
 	}
 }
