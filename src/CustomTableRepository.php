@@ -106,7 +106,7 @@ abstract class CustomTableRepository extends Repository {
 
 			$columns[] = sprintf( "PRIMARY KEY  (%s)", $this->primary_key() );
 
-			$sql = sprintf(
+			$sql       = sprintf(
 				"CREATE TABLE %s (\n\t%s\n) %s;",
 				$this->prefixed_table_name(),
 				implode( ",\n\t", $columns ),
@@ -495,8 +495,13 @@ abstract class CustomTableRepository extends Repository {
 	public function find( array $args = array() ): array {
 		$this->auto_migrate();
 
-		$columns = implode( ',', array_map( fn( $column ) => $column['name'], $this->columns() ) );
-		$query   = "SELECT {$columns} FROM {$this->prefixed_table_name()}";
+		$columns = implode( ',', array_map( fn( $column ) => $this->prefixed_table_name() . '.' . $column['name'], $this->columns() ) );
+
+		if ( ! empty( $args['select'] ) ) {
+			$query = $args['select'];
+		} else {
+			$query = "SELECT {$columns} FROM {$this->prefixed_table_name()}";
+		}
 
 		if ( ! empty( $args['count'] ) ) {
 			$query = str_replace( 'SELECT', 'SELECT COUNT(*)', $query );
@@ -504,6 +509,10 @@ abstract class CustomTableRepository extends Repository {
 
 		if ( ! empty( $args['distinct'] ) ) {
 			$query = str_replace( 'SELECT', 'SELECT DISTINCT', $query );
+		}
+
+		if ( ! empty( $args['join'] ) ) {
+			$query = $query . ' ' . $args['join'];
 		}
 
 		if ( ! empty( $args['where'] ) ) {
