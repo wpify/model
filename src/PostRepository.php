@@ -30,7 +30,7 @@ class PostRepository extends Repository {
 	/**
 	 * Returns the Post model by the WP_Post object, id, slug or URL.
 	 *
-	 * @param  mixed  $source
+	 * @param mixed $source
 	 *
 	 * @return ?Post
 	 * @throws RepositoryNotInitialized
@@ -49,10 +49,10 @@ class PostRepository extends Repository {
 
 		if ( ! $wp_post && is_string( $source ) ) {
 			$wp_posts = get_posts( array(
-				                       'name'           => $source,
-				                       'post_type'      => $this->post_types(),
-				                       'posts_per_page' => 1,
-			                       ) );
+				'name'           => $source,
+				'post_type'      => $this->post_types(),
+				'posts_per_page' => 1,
+			) );
 
 			if ( ! is_wp_error( $wp_posts ) && count( $wp_posts ) > 0 ) {
 				$wp_post = $wp_posts[0];
@@ -89,7 +89,7 @@ class PostRepository extends Repository {
 	 * Creates a new post model.
 	 * If the repository has multiple post types or no post types, this will throw an exception.
 	 *
-	 * @param  array  $data  Data to set on the model.
+	 * @param array $data Data to set on the model.
 	 *
 	 * @return Post
 	 * @throws CouldNotSaveModelException
@@ -115,7 +115,7 @@ class PostRepository extends Repository {
 	/**
 	 * Stores post into database.
 	 *
-	 * @param  Post  $model
+	 * @param Post $model
 	 *
 	 * @return Post
 	 * @throws CouldNotSaveModelException
@@ -177,7 +177,7 @@ class PostRepository extends Repository {
 	/**
 	 * Deletes the given post.
 	 *
-	 * @param  Post  $model
+	 * @param Post $model
 	 *
 	 * @return bool
 	 */
@@ -189,7 +189,7 @@ class PostRepository extends Repository {
 	 * Retrieves paginated links for archive post pages.
 	 * @see https://developer.wordpress.org/reference/functions/paginate_links/
 	 *
-	 * @param  array  $args
+	 * @param array $args
 	 *
 	 * @return string|string[]|null
 	 */
@@ -220,7 +220,7 @@ class PostRepository extends Repository {
 	 * Finds posts matching the given arguments.
 	 * @see https://developer.wordpress.org/reference/classes/wp_query/
 	 *
-	 * @param  array  $args
+	 * @param array $args
 	 *
 	 * @return Post[]
 	 * @throws RepositoryNotInitialized
@@ -250,9 +250,49 @@ class PostRepository extends Repository {
 	}
 
 	/**
+	 * Find paginated posts matching the given arguments.
+	 *
+	 * @param array $args
+	 *
+	 * @return array
+	 * @throws RepositoryNotInitialized
+	 */
+	public function find_paginated( array $args = array() ): array {
+		$defaults = array(
+			'paged'          => get_query_var( 'paged' ) ?: 1,
+			'post_type'      => $this->post_types(),
+			'post_status'    => 'any',
+			'posts_per_page' => - 1,
+		);
+
+		$args = wp_parse_args( $args, $defaults );
+
+		$this->query    = new WP_Query( $args );
+		$pagination     = $this->get_pagination();
+		$paginate_links = $this->get_paginate_links();
+		$collection     = array();
+
+		while ( $this->query->have_posts() ) {
+			$this->query->the_post();
+
+			global $post;
+
+			$collection[] = $this->get( $post );
+		}
+
+		wp_reset_postdata();
+
+		return [
+			'pagination'    => $pagination,
+			'paginate_link' => $paginate_links,
+			'items'         => $collection
+		];
+	}
+
+	/**
 	 * Finds all posts.
 	 *
-	 * @param  array  $args
+	 * @param array $args
 	 *
 	 * @return Post[]
 	 * @throws RepositoryNotInitialized
@@ -271,7 +311,7 @@ class PostRepository extends Repository {
 	/**
 	 * Finds all published posts.
 	 *
-	 * @param  array  $args
+	 * @param array $args
 	 *
 	 * @return Post[]
 	 * @throws RepositoryNotInitialized
@@ -290,7 +330,7 @@ class PostRepository extends Repository {
 	/**
 	 * Find all posts by the given term.
 	 *
-	 * @param  ModelInterface  $model
+	 * @param ModelInterface $model
 	 *
 	 * @return Post[]
 	 * @throws Exceptions\RepositoryNotFoundException
@@ -302,14 +342,14 @@ class PostRepository extends Repository {
 
 		if ( method_exists( $target_repository, 'taxonomy' ) ) {
 			return $this->find( array(
-				                    'tax_query' => array(
-					                    array(
-						                    'taxonomy' => $target_repository->taxonomy(),
-						                    'field'    => 'term_id',
-						                    'terms'    => array( $model->id ),
-					                    ),
-				                    ),
-			                    ) );
+				'tax_query' => array(
+					array(
+						'taxonomy' => $target_repository->taxonomy(),
+						'field'    => 'term_id',
+						'terms'    => array( $model->id ),
+					),
+				),
+			) );
 		}
 
 		throw new IncorrectRepositoryException( sprintf( 'The repository %s of model %s does not have a taxonomy method.', get_class( $target_repository ), get_class( $model ) ) );
@@ -318,22 +358,22 @@ class PostRepository extends Repository {
 	/**
 	 * Finds all posts that have the given post as a parent.
 	 *
-	 * @param  ModelInterface  $model
+	 * @param ModelInterface $model
 	 *
 	 * @return Post[]
 	 * @throws RepositoryNotInitialized
 	 */
 	public function find_child_posts_of( ModelInterface $model ): array {
 		return $this->find( array(
-			                    'post_parent' => $model->id,
-		                    ) );
+			'post_parent' => $model->id,
+		) );
 	}
 
 	/**
 	 * Find all posts with the given ids.
 	 *
-	 * @param  array  $ids
-	 * @param  array  $args
+	 * @param array $ids
+	 * @param array $args
 	 *
 	 * @return Post[]
 	 * @throws RepositoryNotInitialized
@@ -347,9 +387,9 @@ class PostRepository extends Repository {
 	/**
 	 * Assign the post to the terms
 	 *
-	 * @param  ModelInterface  $model
-	 * @param  Term[]  $terms
-	 * @param  bool  $append
+	 * @param ModelInterface $model
+	 * @param Term[] $terms
+	 * @param bool $append
 	 */
 	public function assign_post_to_term( ModelInterface $model, array $terms, bool $append = false ): void {
 		$to_assign = array();
@@ -364,11 +404,11 @@ class PostRepository extends Repository {
 
 		foreach ( $to_assign as $taxonomy => $assigns ) {
 			wp_set_post_terms( $model->id,
-			                   array_values( array_map( function ( $term ) {
-				                   return $term->id;
-			                   }, $assigns ) ),
-			                   $taxonomy,
-			                   $append );
+				array_values( array_map( function ( $term ) {
+					return $term->id;
+				}, $assigns ) ),
+				$taxonomy,
+				$append );
 		}
 	}
 }
