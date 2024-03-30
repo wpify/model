@@ -48,11 +48,13 @@ class PostRepository extends Repository {
 		}
 
 		if ( ! $wp_post && is_string( $source ) ) {
-			$wp_posts = get_posts( array(
-				'name'           => $source,
-				'post_type'      => $this->post_types(),
-				'posts_per_page' => 1,
-			) );
+			$wp_posts = get_posts(
+				array(
+					'name'           => $source,
+					'post_type'      => $this->post_types(),
+					'posts_per_page' => 1,
+				),
+			);
 
 			if ( ! is_wp_error( $wp_posts ) && count( $wp_posts ) > 0 ) {
 				$wp_post = $wp_posts[0];
@@ -177,13 +179,17 @@ class PostRepository extends Repository {
 	/**
 	 * Deletes the given post.
 	 *
-	 * @param Post $model The post to delete.
+	 * @param Post $model        The post to delete.
 	 * @param bool $force_delete Whether to force delete the post.
 	 *
 	 * @return bool
 	 */
 	public function delete( ModelInterface $model, bool $force_delete = true ): bool {
-		return boolval( wp_delete_post( $model->id, $force_delete ) );
+		if ( $force_delete ) {
+			return boolval( wp_delete_post( $model->id, $force_delete ) );
+		} else {
+			return boolval( wp_trash_post( $model->id ) );
+		}
 	}
 
 	/**
@@ -230,7 +236,7 @@ class PostRepository extends Repository {
 		$defaults = array(
 			'post_type'      => $this->post_types(),
 			'post_status'    => 'any',
-			'posts_per_page' => - 1,
+			'posts_per_page' => -1,
 		);
 
 		$args        = wp_parse_args( $args, $defaults );
@@ -263,7 +269,7 @@ class PostRepository extends Repository {
 			'paged'          => get_query_var( 'paged' ) ?: 1,
 			'post_type'      => $this->post_types(),
 			'post_status'    => 'any',
-			'posts_per_page' => - 1,
+			'posts_per_page' => -1,
 		);
 
 		$args = wp_parse_args( $args, $defaults );
@@ -286,7 +292,7 @@ class PostRepository extends Repository {
 		return [
 			'pagination'    => $pagination,
 			'paginate_link' => $paginate_links,
-			'items'         => $collection
+			'items'         => $collection,
 		];
 	}
 
@@ -300,7 +306,7 @@ class PostRepository extends Repository {
 	 */
 	public function find_all( array $args = array() ): array {
 		$defaults = array(
-			'posts_per_page' => - 1,
+			'posts_per_page' => -1,
 			'post_status'    => 'any',
 		);
 
@@ -319,7 +325,7 @@ class PostRepository extends Repository {
 	 */
 	public function find_published( array $args = array() ): array {
 		$defaults = array(
-			'posts_per_page' => - 1,
+			'posts_per_page' => -1,
 			'post_status'    => 'publish',
 		);
 
@@ -342,15 +348,17 @@ class PostRepository extends Repository {
 		$target_repository = $this->manager()->get_model_repository( get_class( $model ) );
 
 		if ( method_exists( $target_repository, 'taxonomy' ) ) {
-			return $this->find( array(
-				'tax_query' => array(
-					array(
-						'taxonomy' => $target_repository->taxonomy(),
-						'field'    => 'term_id',
-						'terms'    => array( $model->id ),
+			return $this->find(
+				array(
+					'tax_query' => array(
+						array(
+							'taxonomy' => $target_repository->taxonomy(),
+							'field'    => 'term_id',
+							'terms'    => array( $model->id ),
+						),
 					),
 				),
-			) );
+			);
 		}
 
 		throw new IncorrectRepositoryException( sprintf( 'The repository %s of model %s does not have a taxonomy method.', get_class( $target_repository ), get_class( $model ) ) );
@@ -365,9 +373,11 @@ class PostRepository extends Repository {
 	 * @throws RepositoryNotInitialized
 	 */
 	public function find_child_posts_of( ModelInterface $model ): array {
-		return $this->find( array(
-			'post_parent' => $model->id,
-		) );
+		return $this->find(
+			array(
+				'post_parent' => $model->id,
+			),
+		);
 	}
 
 	/**
@@ -389,8 +399,8 @@ class PostRepository extends Repository {
 	 * Assign the post to the terms
 	 *
 	 * @param ModelInterface $model
-	 * @param Term[] $terms
-	 * @param bool $append
+	 * @param Term[]         $terms
+	 * @param bool           $append
 	 */
 	public function assign_post_to_term( ModelInterface $model, array $terms, bool $append = false ): void {
 		$to_assign = array();
@@ -404,12 +414,17 @@ class PostRepository extends Repository {
 		}
 
 		foreach ( $to_assign as $taxonomy => $assigns ) {
-			wp_set_post_terms( $model->id,
-				array_values( array_map( function ( $term ) {
-					return $term->id;
-				}, $assigns ) ),
+			wp_set_post_terms(
+				$model->id,
+				array_values(
+					array_map(
+						fn( $term ) => $term->id,
+						$assigns,
+					),
+				),
 				$taxonomy,
-				$append );
+				$append,
+			);
 		}
 	}
 }
