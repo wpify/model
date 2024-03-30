@@ -7,7 +7,7 @@ namespace Wpify\Model;
  * @method Attachment|null get( mixed $source )
  * @method Attachment create( array $data )
  * @method Attachment save( Attachment $model )
- * @method bool delete( Attachment $model )
+ * @method bool delete( Attachment $model, bool $force_delete = true )
  * @method Attachment[] find( array $args = [] )
  * @method Attachment[] find_all( array $args = array() )
  * @method Attachment[] find_published( array $args = array() )

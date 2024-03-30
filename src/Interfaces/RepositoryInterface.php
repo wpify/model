@@ -20,7 +20,7 @@ interface RepositoryInterface {
 
 	public function save( ModelInterface $model ): ModelInterface;
 
-	public function delete( ModelInterface $model ): bool;
+	public function delete( ModelInterface $model, bool $force_delete = true ): bool;
 
 	public function find( array $args = [] ): array;
 

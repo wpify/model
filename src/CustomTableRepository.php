@@ -449,13 +449,14 @@ abstract class CustomTableRepository extends Repository {
 	 * Deletes a model from the database. The model must have a primary key.
 	 *
 	 * @param ModelInterface $model
+	 * @param bool           $force_delete Unused.
 	 *
 	 * @return bool
 	 * @throws PrimaryKeyException
 	 * @throws ReflectionException
 	 * @throws SqlException
 	 */
-	public function delete( ModelInterface $model ): bool {
+	public function delete( ModelInterface $model, bool $force_delete = true ): bool {
 		$this->auto_migrate();
 
 		if ( empty( $this->primary_key( $model ) ) ) {

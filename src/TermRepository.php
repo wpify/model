@@ -135,11 +135,12 @@ class TermRepository extends Repository {
 	/**
 	 * Deletes the given term.
 	 *
-	 * @param  Term  $model
+	 * @param Term $model
+	 * @param bool $force_delete Unused.
 	 *
 	 * @return bool
 	 */
-	public function delete( ModelInterface $model ): bool {
+	public function delete( ModelInterface $model, bool $force_delete = true ): bool {
 		return ! is_wp_error( wp_delete_term( $model->id, $model->taxonomy ?? $this->taxonomy() ) );
 	}
 

@@ -177,12 +177,13 @@ class PostRepository extends Repository {
 	/**
 	 * Deletes the given post.
 	 *
-	 * @param Post $model
+	 * @param Post $model The post to delete.
+	 * @param bool $force_delete Whether to force delete the post.
 	 *
 	 * @return bool
 	 */
-	public function delete( ModelInterface $model ): bool {
-		return boolval( wp_delete_post( $model->id, true ) );
+	public function delete( ModelInterface $model, bool $force_delete = true ): bool {
+		return boolval( wp_delete_post( $model->id, $force_delete ) );
 	}
 
 	/**

@@ -9,7 +9,7 @@ use Wpify\Model\Interfaces\ModelInterface;
  * @method Page|null get( mixed $source )
  * @method Page create( array $data )
  * @method Page save( Page $model )
- * @method bool delete( Page $model )
+ * @method bool delete( Page $model, bool $force_delete = true )
  * @method Page[] find( array $args = [] )
  * @method Page[] find_all( array $args = array() )
  * @method Page[] find_published( array $args = array() )

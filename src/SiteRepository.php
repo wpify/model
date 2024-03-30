@@ -98,10 +98,11 @@ class SiteRepository extends Repository {
 	 * Deletes the site from the database.
 	 *
 	 * @param ModelInterface $model
+	 * @param bool           $force_delete Unused.
 	 *
 	 * @return bool
 	 */
-	public function delete( ModelInterface $model ): bool {
+	public function delete( ModelInterface $model, bool $force_delete = true ): bool {
 		return ! is_wp_error( wp_delete_site( $model->id ) );
 	}
 

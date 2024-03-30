@@ -103,12 +103,13 @@ class CommentRepository extends Repository {
 	/**
 	 * Deletes the comment from the database.
 	 *
-	 * @param  ModelInterface  $model
+	 * @param ModelInterface $model
+	 * @param bool           $force_delete
 	 *
 	 * @return bool
 	 */
-	public function delete( ModelInterface $model ): bool {
-		return wp_delete_comment( $model->id, true );
+	public function delete( ModelInterface $model, bool $force_delete = true ): bool {
+		return wp_delete_comment( $model->id, $force_delete );
 	}
 
 	/**

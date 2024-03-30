@@ -8,7 +8,6 @@ use Wpify\Model\Exceptions\RepositoryNotInitialized;
 use Wpify\Model\Interfaces\RepositoryInterface;
 use Wpify\Model\Interfaces\ModelInterface;
 use Wpify\Model\Interfaces\SourceAttributeInterface;
-use Wpify\Model\Interfaces\StorageInterface;
 
 abstract class Repository implements RepositoryInterface {
 	private ?Manager $manager = null;

@@ -13,7 +13,7 @@ namespace Wpify\Model;
  * @method MenuItem|null get( mixed $source )
  * @method MenuItem create( array $data )
  * @method MenuItem save( MenuItem $model )
- * @method bool delete( MenuItem $model )
+ * @method bool delete( MenuItem $model, bool $force_delete = true )
  * @method MenuItem[] find( array $args = [] )
  * @method MenuItem[] find_all( array $args = array() )
  * @method MenuItem[] find_published( array $args = array() )

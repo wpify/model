@@ -94,12 +94,13 @@ class OrderRepository extends Repository {
 	/**
 	 * Deletes the given order.
 	 *
-	 * @param  Order  $model
+	 * @param Order $model
+	 * @param bool  $force_delete
 	 *
 	 * @return bool
 	 */
-	public function delete( ModelInterface $model ): bool {
-		return boolval( $model->source()->delete( true ) );
+	public function delete( ModelInterface $model, bool $force_delete = true ): bool {
+		return boolval( $model->source()->delete( $force_delete ) );
 	}
 
 

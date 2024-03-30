@@ -11,7 +11,7 @@ use Wpify\Model\Exceptions\RepositoryNotInitialized;
  *
  * @method Menu create( array $data )
  * @method Menu save( Menu $model )
- * @method bool delete( Menu $model )
+ * @method bool delete( Menu $model, bool $force_delete = true )
  * @method Menu[] find( array $args )
  * @method Menu[] find_all()
  * @method Menu[] find_not_empty( array $args = array() )

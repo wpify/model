@@ -7,7 +7,7 @@ namespace Wpify\Model;
  * @method Category create( array $data )
  * @method Category|null get( mixed $source )
  * @method Category save( Category $model )
- * @method bool delete( Category $model )
+ * @method bool delete( Category $model, bool $force_delete = true )
  * @method Category[] find( array $args )
  * @method Category[] find_all()
  * @method Category[] find_not_empty( array $args = array() )
