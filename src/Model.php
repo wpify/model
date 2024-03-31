@@ -174,7 +174,7 @@ abstract class Model implements ModelInterface, IteratorAggregate, ArrayAccess {
 		if ( method_exists( $this, 'set_' . $name ) ) {
 			$this->{'set_' . $name}( $value );
 		} else {
-			$this->_props[ $name ]['value'] = $value;
+			$this->_props[ $name ]['value'] = $this->_repository->maybe_convert_to_type( $this->_props[ $name ], $value );
 		}
 
 		if ( isset( $this->_props[$name]['source'] ) && $this->_props[$name]['source'] instanceof AccessorAttributeInterface ) {

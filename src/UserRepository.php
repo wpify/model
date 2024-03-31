@@ -93,7 +93,7 @@ class UserRepository extends Repository {
 		$data = array();
 
 		foreach ( $model->props() as $prop ) {
-			if ( empty( $prop['source'] ) || $prop['readonly'] ) {
+			if ( $prop['readonly'] ) {
 				continue;
 			}
 

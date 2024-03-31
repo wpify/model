@@ -108,7 +108,7 @@ class TermRepository extends Repository {
 		$term_id = is_array( $result ) ? $result['term_id'] : $result;
 
 		foreach ( $model->props() as $prop ) {
-			if ( empty( $prop['source'] ) || $prop['readonly'] ) {
+			if ( $prop['readonly'] ) {
 				continue;
 			}
 
