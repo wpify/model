@@ -30,7 +30,7 @@ The library uses a few types of objects:
 Install the library using composer:
 
 ```shell
-composer require prototype/model
+composer require wpify/model
 ```
 
 # Basic usage
@@ -137,6 +137,7 @@ All properties have a definition in the form of a PHP attribute. You can use the
 * `Attributes\Meta` - defines a meta field.
 * `Attributes\OrderItemsRelation` - retrieves order items. 
 * `Attributes\PostTermsRelation` - retrieves related terms by post ID. This attribute also persists the post-term relation.
+* `Attributes\PostTermRelation` - retrieves related term by post ID. This attribute also persists the post-term relation. Beware, that if the post has more than one term, only the first one will be returned or persisted.
 * `Attributes\SourceObject` - defines a value in a source object for the model (e.g. WP_Post property).
 * `Attributes\TermPostsRelation` - retrieves related posts of term (for term models only).
 
