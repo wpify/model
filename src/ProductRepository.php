@@ -36,6 +36,11 @@ class ProductRepository extends Repository {
 	public function get( mixed $source ): ?ModelInterface {
 		$wc_product = null;
 		$product    = null;
+		$model      = $this->model();
+
+		if ( $source instanceof $model ) {
+			return $source;
+		}
 
 		if ( $source instanceof WC_Product ) {
 			$wc_product = $source;
@@ -47,9 +52,9 @@ class ProductRepository extends Repository {
 
 		if ( ! $wc_product ) {
 			$wc_products = wc_get_products( array(
-				'sku'            => $source,
-				'posts_per_page' => 1,
-			) );
+				                                'sku'            => $source,
+				                                'posts_per_page' => 1,
+			                                ) );
 
 			if ( ! is_wp_error( $wc_products ) && count( $wc_products ) > 0 ) {
 				$wc_product = $wc_products[0];
@@ -173,7 +178,7 @@ class ProductRepository extends Repository {
 	 */
 	public function find_all( array $args = array() ): array {
 		$defaults = array(
-			'limit' => - 1,
+			'limit' => -1,
 		);
 
 		$args = wp_parse_args( $args, $defaults );
@@ -192,7 +197,7 @@ class ProductRepository extends Repository {
 	 */
 	public function find_by_ids( array $ids, array $args = array() ): array {
 		$defaults = array(
-			'limit'   => - 1,
+			'limit'   => -1,
 			'include' => $ids,
 		);
 
@@ -216,14 +221,14 @@ class ProductRepository extends Repository {
 
 		if ( method_exists( $target_repository, 'taxonomy' ) ) {
 			return $this->find( array(
-				'tax_query' => array(
-					array(
-						'taxonomy' => $target_repository->taxonomy(),
-						'field'    => 'term_id',
-						'terms'    => array( $model->id ),
-					),
-				),
-			) );
+				                    'tax_query' => array(
+					                    array(
+						                    'taxonomy' => $target_repository->taxonomy(),
+						                    'field'    => 'term_id',
+						                    'terms'    => array( $model->id ),
+					                    ),
+				                    ),
+			                    ) );
 		}
 
 		throw new IncorrectRepositoryException( sprintf( 'The repository %s of model %s does not have a taxonomy method.', get_class( $target_repository ), get_class( $model ) ) );

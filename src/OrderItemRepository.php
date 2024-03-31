@@ -34,6 +34,11 @@ class OrderItemRepository extends Repository {
 	public function get( mixed $source ): ?ModelInterface {
 		$wc_order_item = null;
 		$item          = null;
+		$model         = $this->model();
+
+		if ( $source instanceof $model ) {
+			return $source;
+		}
 
 		if ( $source instanceof \WC_Order_Item ) {
 			$wc_order_item = $source;

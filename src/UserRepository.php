@@ -27,7 +27,7 @@ class UserRepository extends Repository {
 	/**
 	 * Returns the User model by the WP_User object, id, login, email or slug
 	 *
-	 * @param  mixed  $source
+	 * @param mixed $source
 	 *
 	 * @return ?User
 	 * @throws RepositoryNotInitialized
@@ -35,6 +35,11 @@ class UserRepository extends Repository {
 	public function get( mixed $source ): ?ModelInterface {
 		$wp_user = null;
 		$user    = null;
+		$model   = $this->model();
+
+		if ( $source instanceof $model ) {
+			return $source;
+		}
 
 		if ( $source instanceof WP_User ) {
 			$wp_user = $source;
@@ -84,7 +89,7 @@ class UserRepository extends Repository {
 	/**
 	 * Saves the user to the database.
 	 *
-	 * @param  ModelInterface  $model
+	 * @param ModelInterface $model
 	 *
 	 * @return ModelInterface
 	 * @throws CouldNotSaveModelException
@@ -147,7 +152,7 @@ class UserRepository extends Repository {
 	 * Returns a collection of users.
 	 * @see https://developer.wordpress.org/reference/functions/get_users/
 	 *
-	 * @param  array  $args
+	 * @param array $args
 	 *
 	 * @return array
 	 * @throws RepositoryNotInitialized
@@ -168,7 +173,7 @@ class UserRepository extends Repository {
 	/**
 	 * Returns all users.
 	 *
-	 * @param  array  $args
+	 * @param array $args
 	 *
 	 * @return array
 	 * @throws RepositoryNotInitialized

@@ -25,7 +25,7 @@ class OrderRepository extends Repository {
 	/**
 	 * Returns the Post model by the WP_Post object, id, slug or URL.
 	 *
-	 * @param  mixed  $source
+	 * @param mixed $source
 	 *
 	 * @return ?Order
 	 * @throws RepositoryNotInitialized
@@ -33,6 +33,11 @@ class OrderRepository extends Repository {
 	public function get( mixed $source ): ?ModelInterface {
 		$wc_order = null;
 		$order    = null;
+		$model    = $this->model();
+
+		if ( $source instanceof $model ) {
+			return $source;
+		}
 
 		if ( $source instanceof WC_Order ) {
 			$wc_order = $source;
@@ -59,7 +64,7 @@ class OrderRepository extends Repository {
 	/**
 	 * Stores order into database.
 	 *
-	 * @param  Order  $model
+	 * @param Order $model
 	 *
 	 * @return Order
 	 * @throws CouldNotSaveModelException
@@ -107,7 +112,7 @@ class OrderRepository extends Repository {
 	/**
 	 * Finds orders matching the given arguments.
 	 *
-	 * @param  array  $args
+	 * @param array $args
 	 *
 	 * @return Order[]
 	 * @throws RepositoryNotInitialized
@@ -126,14 +131,14 @@ class OrderRepository extends Repository {
 	/**
 	 * Finds all orders.
 	 *
-	 * @param  array  $args
+	 * @param array $args
 	 *
 	 * @return Order[]
 	 * @throws RepositoryNotInitialized
 	 */
 	public function find_all( array $args = array() ): array {
 		$defaults = array(
-			'limit' => - 1,
+			'limit' => -1,
 		);
 
 		$args = wp_parse_args( $args, $defaults );
@@ -144,7 +149,7 @@ class OrderRepository extends Repository {
 	/**
 	 * Finds orders by ids.
 	 *
-	 * @param  array  $ids
+	 * @param array $ids
 	 *
 	 * @return array
 	 * @throws RepositoryNotInitialized

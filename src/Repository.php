@@ -4,6 +4,7 @@ declare( strict_types=1 );
 
 namespace Wpify\Model;
 
+use Wpify\Model\Exceptions\RepositoryNotFoundException;
 use Wpify\Model\Exceptions\RepositoryNotInitialized;
 use Wpify\Model\Interfaces\RepositoryInterface;
 use Wpify\Model\Interfaces\ModelInterface;
@@ -107,6 +108,14 @@ abstract class Repository implements RepositoryInterface {
 
 		if ( $type === 'object' ) {
 			return (object) $value;
+		}
+
+		if ( is_string( $type ) && class_exists( $type ) ) {
+			try {
+				$repository = $this->manager()->get_model_repository( $type );
+				return $repository->get( $value );
+			} catch ( RepositoryNotFoundException $e ) {
+			}
 		}
 
 		return $value;

@@ -33,7 +33,7 @@ class TermRepository extends Repository {
 	/**
 	 * Returns the Term model by the WP_Term object, id, slug or name.
 	 *
-	 * @param  mixed  $source
+	 * @param mixed $source
 	 *
 	 * @return ?Term
 	 * @throws RepositoryNotInitialized
@@ -41,6 +41,11 @@ class TermRepository extends Repository {
 	public function get( mixed $source ): ?ModelInterface {
 		$wp_term = null;
 		$term    = null;
+		$model   = $this->model();
+
+		if ( $source instanceof $model ) {
+			return $source;
+		}
 
 		if ( $source instanceof \WP_Term ) {
 			$wp_term = $source;
@@ -71,7 +76,7 @@ class TermRepository extends Repository {
 	/**
 	 * Saves the term model.
 	 *
-	 * @param  Term  $model
+	 * @param Term $model
 	 *
 	 * @return Term
 	 * @throws CouldNotSaveModelException
@@ -147,7 +152,7 @@ class TermRepository extends Repository {
 	/**
 	 * Finds posts matching the given arguments.
 	 *
-	 * @param  array  $args
+	 * @param array $args
 	 *
 	 * @return Term[]
 	 * @throws RepositoryNotInitialized
@@ -173,7 +178,7 @@ class TermRepository extends Repository {
 	/**
 	 * Finds all terms whenever they are empty or not.
 	 *
-	 * @param  array  $args
+	 * @param array $args
 	 *
 	 * @return Term[]
 	 * @throws RepositoryNotInitialized
@@ -187,7 +192,7 @@ class TermRepository extends Repository {
 	/**
 	 * Finds all terms that are not empty.
 	 *
-	 * @param  array  $args
+	 * @param array $args
 	 *
 	 * @return Term[]
 	 * @throws RepositoryNotInitialized
@@ -201,8 +206,8 @@ class TermRepository extends Repository {
 	/**
 	 * Find all terms that are parent of the given term.
 	 *
-	 * @param  int  $parent_id
-	 * @param  array  $args
+	 * @param int   $parent_id
+	 * @param array $args
 	 *
 	 * @return Term[]
 	 * @throws RepositoryNotInitialized
@@ -220,7 +225,7 @@ class TermRepository extends Repository {
 	/**
 	 * Finds all terms that are assigned to the given post.
 	 *
-	 * @param  int  $post_id
+	 * @param int $post_id
 	 *
 	 * @return Term[]
 	 * @throws RepositoryNotInitialized
@@ -241,7 +246,7 @@ class TermRepository extends Repository {
 	/**
 	 * Finds all terms that are assigned as a children.
 	 *
-	 * @param  ModelInterface  $model
+	 * @param ModelInterface $model
 	 *
 	 * @return Term[]
 	 * @throws RepositoryNotInitialized
@@ -258,8 +263,8 @@ class TermRepository extends Repository {
 	/**
 	 * Find all terms with the given ids.
 	 *
-	 * @param  array  $ids
-	 * @param  array  $args
+	 * @param array $ids
+	 * @param array $args
 	 *
 	 * @return Term[]
 	 * @throws RepositoryNotInitialized

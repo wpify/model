@@ -27,7 +27,7 @@ abstract class CustomTableRepository extends Repository {
 
 	private array $primary_keys = [];
 
-	private string $version = '';
+	private string $version         = '';
 	private string $current_version = '';
 
 	private bool $migrated = false;
@@ -40,7 +40,7 @@ abstract class CustomTableRepository extends Repository {
 	 */
 	public function __construct(
 		private bool $auto_migrate = true,
-		private bool $use_prefix = true
+		private bool $use_prefix = true,
 	) {
 	}
 
@@ -98,9 +98,9 @@ abstract class CustomTableRepository extends Repository {
 						$column_name,
 						$this->db()->prefix . $settings[ Column::FOREIGN_TABLE ],
 						$settings[ Column::FOREIGN_COLUMN ],
-						$settings[ Column::FOREIGN_SETTINGS ] ?? ''
+						$settings[ Column::FOREIGN_SETTINGS ] ?? '',
 					);
-					$foreign_keys_counter ++;
+					$foreign_keys_counter++;
 				}
 			}
 
@@ -320,10 +320,12 @@ abstract class CustomTableRepository extends Repository {
 			return null;
 		}
 
-		$items = $this->find( array(
-			'where' => sprintf( '`%s` = \'%s\'', $this->primary_key(), esc_sql( $source ) ),
-			'limit' => 1,
-		) );
+		$items = $this->find(
+			array(
+				'where' => sprintf( '`%s` = \'%s\'', $this->primary_key(), esc_sql( $source ) ),
+				'limit' => 1,
+			),
+		);
 
 		foreach ( $items as $item ) {
 			return $item;
@@ -347,6 +349,12 @@ abstract class CustomTableRepository extends Repository {
 	public function get( mixed $source ): ?ModelInterface {
 		if ( empty( $source ) ) {
 			return null;
+		}
+
+		$model = $this->model();
+
+		if ( $source instanceof $model ) {
+			return $source;
 		}
 
 		if ( is_object( $source ) ) {
@@ -575,10 +583,7 @@ abstract class CustomTableRepository extends Repository {
 		foreach ( $conditions as $key => $condition ) {
 			$regex_select = "/^SELECT\s+/i";
 
-			if ( is_int( $key ) && is_string( $condition ) && in_array( strtoupper( $condition ), array(
-					'AND',
-					'OR'
-				) ) ) {
+			if ( is_int( $key ) && is_string( $condition ) && in_array( strtoupper( $condition ), array( 'AND', 'OR' ) ) ) {
 				// the condition is a glue, so we need to change the next used glue
 				$next_glue = strtoupper( $condition );
 
@@ -664,9 +669,9 @@ abstract class CustomTableRepository extends Repository {
 			$value = "'" . esc_sql( $value ) . "'";
 		} elseif ( is_array( $value ) ) {
 			$value = '(' . join( ',',
-					array_map( function ( $part ) {
-						return $this->convert_value_for_sql( $part );
-					}, $value )
+			                     array_map( function ( $part ) {
+				                     return $this->convert_value_for_sql( $part );
+			                     }, $value ),
 				) . ')';
 		} elseif ( is_null( $value ) ) {
 			$value = 'NULL';
@@ -698,10 +703,10 @@ abstract class CustomTableRepository extends Repository {
 		$primary_key = $this->primary_key();
 
 		return $this->find( array(
-			'where' => array(
-				"{$primary_key} IN (" . join( ',', $ids ) . ')',
-			),
-		) );
+			                    'where' => array(
+				                    "{$primary_key} IN (" . join( ',', $ids ) . ')',
+			                    ),
+		                    ) );
 	}
 
 	/**

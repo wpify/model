@@ -38,6 +38,11 @@ class PostRepository extends Repository {
 	public function get( mixed $source ): ?ModelInterface {
 		$wp_post = null;
 		$post    = null;
+		$model   = $this->model();
+
+		if ( $source instanceof $model ) {
+			return $source;
+		}
 
 		if ( $source instanceof WP_Post ) {
 			$wp_post = $source;

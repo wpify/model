@@ -31,6 +31,11 @@ class SiteRepository extends Repository {
 	public function get( mixed $source ): ?ModelInterface {
 		$wp_site = null;
 		$site    = null;
+		$model   = $this->model();
+
+		if ( $source instanceof $model ) {
+			return $source;
+		}
 
 		if ( $source instanceof WP_Site ) {
 			$wp_site = $source;

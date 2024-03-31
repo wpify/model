@@ -19,7 +19,7 @@ use Wpify\Model\Exceptions\RepositoryNotInitialized;
  * @method Menu[] find_terms_of_post( int $post_id )
  */
 class MenuRepository extends TermRepository {
-	public const RETURN_ARRAY = 'array';
+	public const RETURN_ARRAY   = 'array';
 	public const RETURN_OBJECTS = 'objects';
 
 	private array $menu_locations = array();
@@ -59,6 +59,10 @@ class MenuRepository extends TermRepository {
 		$wp_menu     = null;
 		$model_class = $this->model();
 
+		if ( $source instanceof $model_class ) {
+			return $source;
+		}
+
 		if ( is_string( $source ) && in_array( $source, array_keys( $this->menu_locations ) ) ) {
 			$wp_menu = wp_get_nav_menu_object( $this->menu_locations[ $source ] );
 		}
@@ -78,7 +82,7 @@ class MenuRepository extends TermRepository {
 	/**
 	 * Returns the menu items by location, WP_Term object, id, slug or name.
 	 *
-	 * @param mixed $source Menu location, WP_Term object, id, slug or name.
+	 * @param mixed  $source Menu location, WP_Term object, id, slug or name.
 	 * @param string $return Return type, can be MenuRepository::RETURN_OBJECTS or MenuRepository::RETURN_ARRAY.
 	 *
 	 * @return array|MenuItem[]

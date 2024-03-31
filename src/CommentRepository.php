@@ -23,7 +23,7 @@ class CommentRepository extends Repository {
 	/**
 	 * Returns the Comment model by the WP_Comment object or id.
 	 *
-	 * @param  mixed  $source
+	 * @param mixed $source
 	 *
 	 * @return ModelInterface|null
 	 * @throws Exceptions\RepositoryNotInitialized
@@ -31,6 +31,11 @@ class CommentRepository extends Repository {
 	public function get( mixed $source ): ?ModelInterface {
 		$wp_comment = null;
 		$comment    = null;
+		$model      = $this->model();
+
+		if ( $source instanceof $model ) {
+			return $source;
+		}
 
 		if ( $source instanceof WP_Comment ) {
 			$wp_comment = $source;
@@ -53,7 +58,7 @@ class CommentRepository extends Repository {
 	/**
 	 * Saves the comment to the database.
 	 *
-	 * @param  ModelInterface  $model
+	 * @param ModelInterface $model
 	 *
 	 * @return ModelInterface
 	 * @throws CouldNotSaveModelException
@@ -116,7 +121,7 @@ class CommentRepository extends Repository {
 	 * Returns a collection of comments.
 	 * @see https://developer.wordpress.org/reference/functions/get_comments/
 	 *
-	 * @param  array  $args
+	 * @param array $args
 	 *
 	 * @return array
 	 * @throws Exceptions\RepositoryNotInitialized
@@ -135,7 +140,7 @@ class CommentRepository extends Repository {
 	/**
 	 * Returns a collection of comments by the post id.
 	 *
-	 * @param  int  $post_id
+	 * @param int $post_id
 	 *
 	 * @return array
 	 * @throws Exceptions\RepositoryNotInitialized
@@ -147,8 +152,8 @@ class CommentRepository extends Repository {
 	/**
 	 * Find all comments with the given ids.
 	 *
-	 * @param  array  $ids
-	 * @param  array  $args
+	 * @param array $ids
+	 * @param array $args
 	 *
 	 * @return Comment[]
 	 * @throws RepositoryNotInitialized
@@ -162,7 +167,7 @@ class CommentRepository extends Repository {
 	/**
 	 * Returns a collection of all comments.
 	 *
-	 * @param  array  $args
+	 * @param array $args
 	 *
 	 * @return array
 	 * @throws RepositoryNotInitialized
