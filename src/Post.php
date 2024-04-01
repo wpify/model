@@ -248,7 +248,7 @@ class Post extends Model {
 	 * @return int
 	 */
 	public function get_featured_image_id(): int {
-		return get_post_thumbnail_id( $this->id );
+		return intval( get_post_thumbnail_id( $this->id ) );
 	}
 
 	/**
