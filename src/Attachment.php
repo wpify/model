@@ -23,4 +23,11 @@ class Attachment extends Post {
 	 */
 	#[Meta( '_wp_attachment_image_alt' )]
 	public ?string $alt;
+
+	public string $url = '';
+
+	public function get_url() {
+		return wp_get_attachment_url( $this->id );
+	}
+
 }
