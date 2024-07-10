@@ -59,6 +59,11 @@ class OrderItem extends Model {
 	 */
 	public float $vat_rate;
 
+	/**
+	 * Order item vat rate id.
+	 */
+	public int $vat_rate_id;
+
 
 	public ?WC_Order_Item $wc_order_item;
 
@@ -90,9 +95,9 @@ class OrderItem extends Model {
 
 		if ( is_callable( array( $this->wc_order_item, 'get_total' ) ) && $this->wc_order_item->get_quantity() ) {
 			if ( $inc_tax ) {
-				$total = ( $this->wc_order_item->get_total() + $this->wc_order_item->get_total_tax() ) / $this->wc_order_item->get_quantity();
+				$total = ( floatval( $this->wc_order_item->get_total() ) + floatval( $this->wc_order_item->get_total_tax() ) ) / floatval( $this->wc_order_item->get_quantity() );
 			} else {
-				$total = floatval( $this->wc_order_item->get_total() ) / $this->wc_order_item->get_quantity();
+				$total = floatval( $this->wc_order_item->get_total() ) / floatval( $this->wc_order_item->get_quantity() );
 			}
 		}
 
@@ -115,27 +120,38 @@ class OrderItem extends Model {
 	 */
 	public function get_vat_rate(): float {
 		$rate = 0;
-
 		if ( $this->wc_order_item?->get_tax_status() == 'taxable' ) {
-			$item_data = $this->wc_order_item->get_data();
-
-			foreach ( $item_data['taxes']['total'] as $item_tax_id => $item_tax_total ) {
-				$used_item_tax_id = $item_tax_total ? $item_tax_id : null;
-
-				foreach ( $this->wc_order_item->get_order()->get_items( 'tax' ) as $item_tax ) {
-					$tax_data = $item_tax->get_data();
-
-					if ( $tax_data['rate_id'] === $used_item_tax_id ) {
-						$rate = $tax_data['rate_percent'];
-					}
+			foreach ( $this->wc_order_item->get_order()->get_items( 'tax' ) as $item_tax ) {
+				$tax_data = $item_tax->get_data();
+				if ( $tax_data['rate_id'] === $this->vat_rate_id ) {
+					$rate = $tax_data['rate_percent'];
 				}
-			}
-
-			if ( ! $rate && $this->wc_order_item?->get_total_tax() ) {
-				$rate = round( $this->wc_order_item->get_total_tax() / ( $this->wc_order_item->get_total() / 100 ) );
+				if ( ! $rate && $this->wc_order_item?->get_total_tax() ) {
+					$rate = \round( $this->wc_order_item->get_total_tax() / ( $this->wc_order_item->get_total() / 100 ) );
+				}
 			}
 		}
 
-		return floatval( $rate );
+		return \floatval( $rate );
+	}
+
+	/**
+	 * Get VAT rate id
+	 *
+	 * @return int
+	 */
+	public function get_vat_rate_id(): int {
+		$rate_id = 0;
+		if ( $this->wc_order_item?->get_tax_status() == 'taxable' ) {
+			$item_data = $this->wc_order_item->get_data();
+			foreach ( $item_data['taxes']['total'] as $item_tax_id => $item_tax_total ) {
+				if ( $item_tax_total ) {
+					$rate_id = $item_tax_id;
+					break;
+				}
+			}
+		}
+
+		return $rate_id;
 	}
 }
