@@ -21,6 +21,7 @@ class PostRepository extends Repository {
 
 	/**
 	 * Returns the model class name.
+	 *
 	 * @return string
 	 */
 	public function model(): string {
@@ -86,6 +87,7 @@ class PostRepository extends Repository {
 
 	/**
 	 * Returns post types for the repository.
+	 *
 	 * @return string[]
 	 */
 	public function post_types(): array {
@@ -199,6 +201,7 @@ class PostRepository extends Repository {
 
 	/**
 	 * Retrieves paginated links for archive post pages.
+	 *
 	 * @see https://developer.wordpress.org/reference/functions/paginate_links/
 	 *
 	 * @param array $args
@@ -217,6 +220,7 @@ class PostRepository extends Repository {
 
 	/**
 	 * Retrieves information about pagination from the last query.
+	 *
 	 * @return array
 	 */
 	public function get_pagination(): array {
@@ -230,6 +234,7 @@ class PostRepository extends Repository {
 
 	/**
 	 * Finds posts matching the given arguments.
+	 *
 	 * @see https://developer.wordpress.org/reference/classes/wp_query/
 	 *
 	 * @param array $args
@@ -241,7 +246,7 @@ class PostRepository extends Repository {
 		$defaults = array(
 			'post_type'      => $this->post_types(),
 			'post_status'    => 'any',
-			'posts_per_page' => -1,
+			'posts_per_page' => - 1,
 		);
 
 		$args        = wp_parse_args( $args, $defaults );
@@ -261,6 +266,33 @@ class PostRepository extends Repository {
 		return $collection;
 	}
 
+
+	/**
+	 * Finds posts matching the given arguments using get_posts.
+	 *
+	 * @see https://developer.wordpress.org/reference/classes/wp_query/
+	 *
+	 * @param array $args
+	 *
+	 * @return Post[]
+	 * @throws RepositoryNotInitialized
+	 */
+	public function find_without_pagination( array $args = array() ): array {
+		$defaults   = array(
+			'post_type'      => $this->post_types(),
+			'post_status'    => 'any',
+			'posts_per_page' => - 1,
+		);
+		$args       = wp_parse_args( $args, $defaults );
+		$collection = array();
+		$posts      = get_posts( $args );
+		foreach ( $posts as $item ) {
+			$collection[] = $this->get( $item );
+		}
+
+		return $collection;
+	}
+
 	/**
 	 * Find paginated posts matching the given arguments.
 	 *
@@ -274,7 +306,7 @@ class PostRepository extends Repository {
 			'paged'          => get_query_var( 'paged' ) ?: 1,
 			'post_type'      => $this->post_types(),
 			'post_status'    => 'any',
-			'posts_per_page' => -1,
+			'posts_per_page' => - 1,
 		);
 
 		$args = wp_parse_args( $args, $defaults );
@@ -311,7 +343,7 @@ class PostRepository extends Repository {
 	 */
 	public function find_all( array $args = array() ): array {
 		$defaults = array(
-			'posts_per_page' => -1,
+			'posts_per_page' => - 1,
 			'post_status'    => 'any',
 		);
 
@@ -330,7 +362,7 @@ class PostRepository extends Repository {
 	 */
 	public function find_published( array $args = array() ): array {
 		$defaults = array(
-			'posts_per_page' => -1,
+			'posts_per_page' => - 1,
 			'post_status'    => 'publish',
 		);
 
