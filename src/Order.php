@@ -4,6 +4,7 @@ declare( strict_types=1 );
 
 namespace Wpify\Model;
 
+use WC_Abstract_Order;
 use WC_Order;
 use Wpify\Model\Attributes\AccessorObject;
 use Wpify\Model\Attributes\OrderItemsRelation;
@@ -44,7 +45,7 @@ class Order extends Model {
 	 * WC Order.
 	 */
 	#[ReadOnlyProperty]
-	public ?WC_Order $wc_order = null;
+	public ?WC_Abstract_Order $wc_order = null;
 
 	/**
 	 * Order line items.
@@ -74,9 +75,9 @@ class Order extends Model {
 	/**
 	 * Get WC Order.
 	 *
-	 * @return WC_Order|null
+	 * @return WC_Abstract_Order|null
 	 */
-	public function get_wc_order(): WC_Order|null {
+	public function get_wc_order(): WC_Abstract_Order|null {
 		return $this->source();
 	}
 
