@@ -175,7 +175,7 @@ class Product extends Model {
 		$vat_rate = null;
 		$product = $this->get_wc_product();
 		if ($product->is_taxable()) {
-			$vat_rates_data = WC_Tax::find_rates(array('country' => $country_code, 'tax_class' => $product->get_tax_class()));
+			$vat_rates_data = \WC_Tax::find_rates(array('country' => $country_code, 'tax_class' => $product->get_tax_class()));
 			if (!empty($vat_rates_data)) {
 				$vat_rate = \reset($vat_rates_data)['rate'];
 			}
