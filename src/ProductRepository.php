@@ -143,6 +143,10 @@ class ProductRepository extends Repository {
 
 		remove_filter( 'woocommerce_product_data_store_cpt_get_products_query', array( $this, 'tax_query_filter' ), 10, 2 );
 
+		if ( isset( $args['return'] ) && 'ids' === $args['return'] ) {
+			return $items;
+		}
+
 		$collection = array();
 
 		foreach ( $items as $item ) {
