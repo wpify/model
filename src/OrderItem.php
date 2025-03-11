@@ -35,7 +35,7 @@ class OrderItem extends Model {
 	/**
 	 * Order item tax total.
 	 */
-	#[AccessorObject]
+	#[AccessorObject('total_tax')]
 	public float $tax_total;
 
 	/**
@@ -130,6 +130,10 @@ class OrderItem extends Model {
 					$rate = \round( $this->wc_order_item->get_total_tax() / ( $this->wc_order_item->get_total() / 100 ) );
 				}
 			}
+		}
+
+		if ( ! $rate && $this->tax_total && $this->unit_price_tax_excluded !== $this->unit_price_tax_included ) {
+			$rate = \round( $this->tax_total / ( $this->wc_order_item->get_total() / 100 ) );
 		}
 
 		return \floatval( $rate );
