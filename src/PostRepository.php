@@ -137,7 +137,7 @@ class PostRepository extends Repository {
 				continue;
 			}
 
-			$source = $prop['source'];
+			$source = $prop['source'] ?? null;
 			$key    = $source->key ?? $prop['name'];
 
 			if ( method_exists( $model, 'persist_' . $prop['name'] ) ) {
