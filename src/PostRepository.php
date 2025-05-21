@@ -17,7 +17,7 @@ use Wpify\Model\Interfaces\ModelInterface;
  * Repository for Post models.
  */
 class PostRepository extends Repository {
-	private ?WP_Query $query;
+	protected ?WP_Query $query;
 
 	/**
 	 * Returns the model class name.
