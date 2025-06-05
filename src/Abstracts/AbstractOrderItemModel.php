@@ -78,7 +78,7 @@ abstract class AbstractOrderItemModel extends AbstractModel {
 	public function get_unit_price( $inc_tax = true ) {
 		if ( \is_callable( array( $this->source_object(), 'get_total' ) ) && $this->source_object()->get_quantity() ) {
 			if ( $inc_tax ) {
-				$total = ( $this->source_object()->get_total() + $this->source_object()->get_total_tax() ) / $this->source_object()->get_quantity();
+				$total = ( floatval($this->source_object()->get_total()) + ($this->source_object()->get_total_tax()) ) / $this->source_object()->get_quantity();
 			} else {
 				$total = \floatval( $this->source_object()->get_total() ) / $this->source_object()->get_quantity();
 			}
