@@ -91,7 +91,7 @@ class TermRepository extends Repository {
 				'slug'        => $model->slug,
 				'term_group'  => $model->group,
 				'description' => $model->description,
-				'parent'      => $model->parent,
+				'parent'      => $model->parent_id,
 				'alias_of'    => $model->alias_of,
 			) );
 			$action = 'update';
@@ -100,7 +100,7 @@ class TermRepository extends Repository {
 				'slug'        => $model->slug,
 				'term_group'  => $model->group,
 				'description' => $model->description,
-				'parent'      => $model->parent,
+				'parent'      => $model->parent_id,
 				'alias_of'    => $model->alias_of,
 			) );
 			$action = 'insert';

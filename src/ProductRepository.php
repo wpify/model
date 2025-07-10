@@ -201,7 +201,7 @@ class ProductRepository extends Repository {
 	 */
 	public function find_by_ids( array $ids, array $args = array() ): array {
 		$defaults = array(
-			'limit'   => -1,
+			'limit'   => - 1,
 			'include' => $ids,
 		);
 
@@ -224,15 +224,17 @@ class ProductRepository extends Repository {
 		$target_repository = $this->manager()->get_model_repository( get_class( $model ) );
 
 		if ( method_exists( $target_repository, 'taxonomy' ) ) {
-			return $this->find( array(
-				                    'tax_query' => array(
-					                    array(
-						                    'taxonomy' => $target_repository->taxonomy(),
-						                    'field'    => 'term_id',
-						                    'terms'    => array( $model->id ),
-					                    ),
-				                    ),
-			                    ) );
+			return $this->find(
+				array(
+					'tax_query' => array(
+						array(
+							'taxonomy' => $target_repository->taxonomy(),
+							'field'    => 'term_id',
+							'terms'    => array( $model->id ),
+						),
+					),
+				),
+			);
 		}
 
 		throw new IncorrectRepositoryException( sprintf( 'The repository %s of model %s does not have a taxonomy method.', get_class( $target_repository ), get_class( $model ) ) );
