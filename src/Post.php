@@ -65,7 +65,7 @@ class Post extends Model {
 	#[SourceObject( 'post_excerpt' )]
 	public string $excerpt = '';
 
-	public string $excerpt_rendered = '';
+	public string $rendered_excerpt = '';
 
 	/**
 	 * The post's status.
@@ -262,7 +262,7 @@ class Post extends Model {
 		set_post_thumbnail( $this->id, $featured_image_id );
 	}
 
-	public function excerpt_rendered() {
+	public function get_rendered_excerpt() {
 		return get_the_excerpt( $this->id );
 	}
 }
