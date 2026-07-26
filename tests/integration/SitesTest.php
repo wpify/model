@@ -81,10 +81,14 @@ class SitesTest extends TestCase {
 	 * @see https://github.com/wpify/model/issues/28
 	 */
 	public function test_save_throws_on_duplicate_site(): void {
+		// Duplicate the main site's domain+path so the fixture holds on any
+		// tests domain (example.org locally, localhost under wp-env).
+		$main = get_site( get_main_site_id() );
+
 		$duplicate = $this->sites()->create( array(
-			'domain'  => 'example.org',
-			'path'    => '/',
-			'site_id' => get_current_network_id(),
+			'domain'  => $main->domain,
+			'path'    => $main->path,
+			'site_id' => (int) $main->network_id,
 		) );
 
 		$this->expectException( CouldNotSaveModelException::class );
