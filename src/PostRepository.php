@@ -6,8 +6,6 @@ namespace Wpify\Model;
 
 use WP_Post;
 use WP_Query;
-use Wpify\Model\Attributes\Meta;
-use Wpify\Model\Attributes\SourceObject;
 use Wpify\Model\Exceptions\CouldNotSaveModelException;
 use Wpify\Model\Exceptions\IncorrectRepositoryException;
 use Wpify\Model\Exceptions\RepositoryNotInitialized;
@@ -130,24 +128,10 @@ class PostRepository extends Repository {
 	 * @throws CouldNotSaveModelException
 	 */
 	public function save( ModelInterface $model ): ModelInterface {
-		$data = array();
+		[ 'data' => $data, 'meta' => $meta ] = $this->collect_persistable_props( $model );
 
-		foreach ( $model->props() as $prop ) {
-			if ( $prop['readonly'] ) {
-				continue;
-			}
-
-			$source = $prop['source'] ?? null;
-
-			if ( method_exists( $model, 'persist_' . $prop['name'] ) ) {
-				$model->{'persist_' . $prop['name']}( $model->{$prop['name']} );
-			} elseif ( $source instanceof SourceObject ) {
-				$key          = $source->key ?? $prop['name'];
-				$data[ $key ] = $model->{$prop['name']};
-			} elseif ( $source instanceof Meta ) {
-				$key                        = $source->meta_key ?? $prop['name'];
-				$data['meta_input'][ $key ] = $model->{$prop['name']};
-			}
+		if ( $meta ) {
+			$data['meta_input'] = $meta;
 		}
 
 		if ( $data['ID'] > 0 ) {

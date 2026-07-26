@@ -23,40 +23,45 @@ class Meta implements SourceAttributeInterface {
 	public function get( ModelInterface $model, string $key ): mixed {
 		$meta_key = $this->meta_key ?? $key;
 
-		if ( $model instanceof Post ) {
-			return get_post_meta( $model->id, $meta_key, $this->single );
-		} elseif ( $model instanceof User ) {
-			return get_user_meta( $model->id, $meta_key, $this->single );
-		} elseif ( $model instanceof Term ) {
-			return get_term_meta( $model->id, $meta_key, $this->single );
-		} elseif ( $model instanceof Comment ) {
-			return get_comment_meta( $model->id, $meta_key, $this->single );
-		} elseif ( $model instanceof Product || $model instanceof OrderItem || $model instanceof Order ) {
-			return $model->source()->get_meta( $meta_key, $this->single );
-		} elseif ( $model instanceof Site ) {
-			if ( function_exists( 'is_site_meta_supported' ) && is_site_meta_supported() ) {
-				return get_site_meta( $model->id, $meta_key, $this->single );
-			}
-
-			return null;
-		}
-
-		return null;
+		return match ( $this->meta_type( $model ) ) {
+			'post'    => get_post_meta( $model->id, $meta_key, $this->single ),
+			'user'    => get_user_meta( $model->id, $meta_key, $this->single ),
+			'term'    => get_term_meta( $model->id, $meta_key, $this->single ),
+			'comment' => get_comment_meta( $model->id, $meta_key, $this->single ),
+			'wc'      => $model->source()->get_meta( $meta_key, $this->single ),
+			'site'    => $this->site_meta_supported() ? get_site_meta( $model->id, $meta_key, $this->single ) : null,
+			default   => null,
+		};
 	}
 
 	public function set( ModelInterface $model, string $key, mixed $value ): mixed {
 		$meta_key = $this->meta_key ?? $key;
 
-		if ( $model instanceof Product || $model instanceof OrderItem || $model instanceof Order ) {
-			return $model->source()->update_meta_data( $meta_key, $value );
-		} elseif ( $model instanceof Site ) {
-			if ( function_exists( 'is_site_meta_supported' ) && is_site_meta_supported() ) {
-				return update_site_meta( $model->id, $meta_key, $value );
-			}
+		return match ( $this->meta_type( $model ) ) {
+			'wc'    => $model->source()->update_meta_data( $meta_key, $value ),
+			'site'  => $this->site_meta_supported() ? update_site_meta( $model->id, $meta_key, $value ) : null,
+			default => null,
+		};
+	}
 
-			return null;
-		}
+	/**
+	 * Maps the model to the meta storage it reads from and writes to.
+	 */
+	private function meta_type( ModelInterface $model ): ?string {
+		return match ( true ) {
+			$model instanceof Post => 'post',
+			$model instanceof User => 'user',
+			$model instanceof Term => 'term',
+			$model instanceof Comment => 'comment',
+			$model instanceof Product,
+			$model instanceof OrderItem,
+			$model instanceof Order => 'wc',
+			$model instanceof Site => 'site',
+			default => null,
+		};
+	}
 
-		return null;
+	private function site_meta_supported(): bool {
+		return function_exists( 'is_site_meta_supported' ) && is_site_meta_supported();
 	}
 }

@@ -5,8 +5,6 @@ declare( strict_types=1 );
 namespace Wpify\Model;
 
 use WP_Comment;
-use Wpify\Model\Attributes\Meta;
-use Wpify\Model\Attributes\SourceObject;
 use Wpify\Model\Exceptions\CouldNotSaveModelException;
 use Wpify\Model\Exceptions\RepositoryNotInitialized;
 use Wpify\Model\Interfaces\ModelInterface;
@@ -64,24 +62,10 @@ class CommentRepository extends Repository {
 	 * @throws CouldNotSaveModelException
 	 */
 	public function save( ModelInterface $model ): ModelInterface {
-		$data = array();
+		[ 'data' => $data, 'meta' => $meta ] = $this->collect_persistable_props( $model );
 
-		foreach ( $model->props() as $prop ) {
-			if ( $prop['readonly'] ) {
-				continue;
-			}
-
-			$source = $prop['source'] ?? null;
-
-			if ( method_exists( $model, 'persist_' . $prop['name'] ) ) {
-				$model->{'persist_' . $prop['name']}( $model->{$prop['name']} );
-			} elseif ( $source instanceof SourceObject ) {
-				$key          = $source->key ?? $prop['name'];
-				$data[ $key ] = $model->{$prop['name']};
-			} elseif ( $source instanceof Meta ) {
-				$key                          = $source->meta_key ?? $prop['name'];
-				$data['comment_meta'][ $key ] = $model->{$prop['name']};
-			}
+		if ( $meta ) {
+			$data['comment_meta'] = $meta;
 		}
 
 		// wpdb stringifies booleans to '' instead of '0'/'1', which breaks

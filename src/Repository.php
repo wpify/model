@@ -4,6 +4,8 @@ declare( strict_types=1 );
 
 namespace Wpify\Model;
 
+use Wpify\Model\Attributes\Meta;
+use Wpify\Model\Attributes\SourceObject;
 use Wpify\Model\Exceptions\RepositoryNotFoundException;
 use Wpify\Model\Exceptions\RepositoryNotInitialized;
 use Wpify\Model\Interfaces\RepositoryInterface;
@@ -119,6 +121,41 @@ abstract class Repository implements RepositoryInterface {
 		}
 
 		return $value;
+	}
+
+	/**
+	 * Collects the writable prop values of a model for persistence.
+	 *
+	 * Calls the model's persist_* methods as a side effect, then splits the
+	 * remaining props into SourceObject values and Meta values, each keyed
+	 * by its storage key. Callers map the two buckets onto their own storage
+	 * (meta_input, comment_meta, update_term_meta, ...).
+	 *
+	 * @param  ModelInterface  $model
+	 *
+	 * @return array{data: array<string, mixed>, meta: array<string, mixed>}
+	 */
+	protected function collect_persistable_props( ModelInterface $model ): array {
+		$data = array();
+		$meta = array();
+
+		foreach ( $model->props() as $prop ) {
+			if ( $prop['readonly'] ) {
+				continue;
+			}
+
+			$source = $prop['source'] ?? null;
+
+			if ( method_exists( $model, 'persist_' . $prop['name'] ) ) {
+				$model->{'persist_' . $prop['name']}( $model->{$prop['name']} );
+			} elseif ( $source instanceof SourceObject ) {
+				$data[ $source->key ?? $prop['name'] ] = $model->{$prop['name']};
+			} elseif ( $source instanceof Meta ) {
+				$meta[ $source->meta_key ?? $prop['name'] ] = $model->{$prop['name']};
+			}
+		}
+
+		return array( 'data' => $data, 'meta' => $meta );
 	}
 
 	/**

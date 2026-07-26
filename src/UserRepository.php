@@ -5,8 +5,6 @@ declare( strict_types=1 );
 namespace Wpify\Model;
 
 use WP_User;
-use Wpify\Model\Attributes\Meta;
-use Wpify\Model\Attributes\SourceObject;
 use Wpify\Model\Exceptions\CouldNotSaveModelException;
 use Wpify\Model\Exceptions\RepositoryNotInitialized;
 use Wpify\Model\Interfaces\ModelInterface;
@@ -95,31 +93,18 @@ class UserRepository extends Repository {
 	 * @throws CouldNotSaveModelException
 	 */
 	public function save( ModelInterface $model ): ModelInterface {
+		[ 'data' => $collected, 'meta' => $meta ] = $this->collect_persistable_props( $model );
+
+		// WP_User exposes its fields under data.*; the user functions expect them bare.
 		$data = array();
 
-		foreach ( $model->props() as $prop ) {
-			if ( $prop['readonly'] ) {
-				continue;
-			}
+		foreach ( $collected as $key => $value ) {
+			$data[ preg_replace( '/^data\./', '', $key ) ] = $value;
+		}
 
-			$source = $prop['source'] ?? null;
-
-			if ( method_exists( $model, 'persist_' . $prop['name'] ) ) {
-				$model->{'persist_' . $prop['name']}( $model->{$prop['name']} );
-			} elseif ( $source instanceof SourceObject ) {
-				$key          = preg_replace( '/^data\./', '', $source->key ?? $prop['name'] );
-				$data[ $key ] = $model->{$prop['name']};
-			} elseif ( $source instanceof Meta ) {
-				$key   = $source->meta_key ?? $prop['name'];
-				$value = $model->{$prop['name']};
-
-				// WordPress stores boolean user meta as string 'true'/'false'
-				if ( is_bool( $value ) ) {
-					$value = $value ? 'true' : 'false';
-				}
-
-				$data['meta_input'][ $key ] = $value;
-			}
+		foreach ( $meta as $key => $value ) {
+			// WordPress stores boolean user meta as string 'true'/'false'
+			$data['meta_input'][ $key ] = is_bool( $value ) ? ( $value ? 'true' : 'false' ) : $value;
 		}
 
 		$is_update = ( $data['ID'] ?? 0 ) > 0;

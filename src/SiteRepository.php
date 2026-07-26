@@ -4,8 +4,6 @@ declare( strict_types=1 );
 namespace Wpify\Model;
 
 use WP_Site;
-use Wpify\Model\Attributes\Meta;
-use Wpify\Model\Attributes\SourceObject;
 use Wpify\Model\Exceptions\CouldNotSaveModelException;
 use Wpify\Model\Exceptions\RepositoryNotInitialized;
 use Wpify\Model\Interfaces\ModelInterface;
@@ -64,26 +62,7 @@ class SiteRepository extends Repository {
 	 * @throws CouldNotSaveModelException
 	 */
 	public function save( ModelInterface $model ): ModelInterface {
-		$data = array();
-		$meta = array();
-
-		foreach ( $model->props() as $prop ) {
-			if ( $prop['readonly'] ) {
-				continue;
-			}
-
-			$source = $prop['source'] ?? null;
-
-			if ( method_exists( $model, 'persist_' . $prop['name'] ) ) {
-				$model->{'persist_' . $prop['name']}( $model->{$prop['name']} );
-			} elseif ( $source instanceof SourceObject ) {
-				$key          = $source->key ?? $prop['name'];
-				$data[ $key ] = $model->{$prop['name']};
-			} elseif ( $source instanceof Meta ) {
-				$key          = $source->meta_key ?? $prop['name'];
-				$meta[ $key ] = $model->{$prop['name']};
-			}
-		}
+		[ 'data' => $data, 'meta' => $meta ] = $this->collect_persistable_props( $model );
 
 		// wp_insert_site()/wp_update_site() use the network id keyed as network_id
 		// and take the site id as a separate argument rather than in $data.

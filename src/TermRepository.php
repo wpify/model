@@ -4,7 +4,6 @@ declare( strict_types=1 );
 
 namespace Wpify\Model;
 
-use Wpify\Model\Attributes\Meta;
 use Wpify\Model\Exceptions\CouldNotSaveModelException;
 use Wpify\Model\Exceptions\RepositoryNotInitialized;
 use Wpify\Model\Interfaces\ModelInterface;
@@ -112,20 +111,10 @@ class TermRepository extends Repository {
 
 		$term_id = is_array( $result ) ? $result['term_id'] : $result;
 
-		foreach ( $model->props() as $prop ) {
-			if ( $prop['readonly'] ) {
-				continue;
-			}
+		$meta = $this->collect_persistable_props( $model )['meta'];
 
-			$source = $prop['source'] ?? null;
-
-			if ( method_exists( $model, 'persist_' . $prop['name'] ) ) {
-				$model->{'persist_' . $prop['name']}( $model->{$prop['name']} );
-			} elseif ( $source instanceof Meta ) {
-				$meta_key = $source->meta_key ?? $prop['name'];
-
-				update_term_meta( $term_id, $meta_key, $model->{$prop['name']} );
-			}
+		foreach ( $meta as $meta_key => $value ) {
+			update_term_meta( $term_id, $meta_key, $value );
 		}
 
 		if ( apply_filters( 'wpify_model_refresh_model_after_save', true, $model, $this ) ) {
