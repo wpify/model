@@ -106,7 +106,13 @@ class PostsTest extends TestCase {
 	 * @see https://github.com/wpify/model/issues/33
 	 */
 	public function test_save_persists_meta_props(): void {
-		$this->markTestSkipped( 'save() ignores Meta::meta_key when persisting — https://github.com/wpify/model/issues/33' );
+		$post                = $this->posts()->create();
+		$post->title         = 'Templated';
+		$post->page_template = 'templates/full-width.php';
+
+		$saved = $this->posts()->save( $post );
+
+		$this->assertSame( 'templates/full-width.php', get_post_meta( $saved->id, '_wp_page_template', true ) );
 	}
 
 	public function test_save_throws_when_update_fails(): void {
@@ -287,7 +293,13 @@ class PostsTest extends TestCase {
 	 * @see https://github.com/wpify/model/issues/29
 	 */
 	public function test_parent_relation_resolves_parent_post(): void {
-		$this->markTestSkipped( 'Post::parent uses undefined source key parent_post_id — https://github.com/wpify/model/issues/29' );
+		$parent_id = self::factory()->post->create();
+		$child_id  = self::factory()->post->create( array( 'post_parent' => $parent_id ) );
+
+		$child = $this->posts()->get( $child_id );
+
+		$this->assertInstanceOf( Post::class, $child->parent );
+		$this->assertSame( $parent_id, $child->parent->id );
 	}
 
 	public function test_post_getters(): void {

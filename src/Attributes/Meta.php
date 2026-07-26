@@ -11,6 +11,7 @@ use Wpify\Model\Interfaces\ModelInterface;
 use Wpify\Model\Comment;
 use Wpify\Model\Interfaces\SourceAttributeInterface;
 use Wpify\Model\Post;
+use Wpify\Model\Site;
 use Wpify\Model\Term;
 use Wpify\Model\User;
 
@@ -32,6 +33,12 @@ class Meta implements SourceAttributeInterface {
 			return get_comment_meta( $model->id, $meta_key, $this->single );
 		} elseif ( $model instanceof Product || $model instanceof OrderItem || $model instanceof Order ) {
 			return $model->source()->get_meta( $meta_key, $this->single );
+		} elseif ( $model instanceof Site ) {
+			if ( function_exists( 'is_site_meta_supported' ) && is_site_meta_supported() ) {
+				return get_site_meta( $model->id, $meta_key, $this->single );
+			}
+
+			return null;
 		}
 
 		return null;
@@ -42,6 +49,12 @@ class Meta implements SourceAttributeInterface {
 
 		if ( $model instanceof Product || $model instanceof OrderItem || $model instanceof Order ) {
 			return $model->source()->update_meta_data( $meta_key, $value );
+		} elseif ( $model instanceof Site ) {
+			if ( function_exists( 'is_site_meta_supported' ) && is_site_meta_supported() ) {
+				return update_site_meta( $model->id, $meta_key, $value );
+			}
+
+			return null;
 		}
 
 		return null;

@@ -45,7 +45,11 @@ class OrderItemRepository extends Repository {
 		}
 
 		if ( ! $wc_order_item && is_numeric( $source ) ) {
-			$wc_order_item = new \WC_Order_Item( $source );
+			$item_object = \WC_Order_Factory::get_order_item( $source );
+
+			if ( $item_object ) {
+				$wc_order_item = $item_object;
+			}
 		}
 
 		if ( $wc_order_item ) {
@@ -98,7 +102,7 @@ class OrderItemRepository extends Repository {
 			throw new CouldNotSaveModelException( $result->get_error_message() );
 		}
 
-		$model->refresh( $result );
+		$model->refresh();
 
 		return $model;
 	}

@@ -138,13 +138,14 @@ class PostRepository extends Repository {
 			}
 
 			$source = $prop['source'] ?? null;
-			$key    = $source->key ?? $prop['name'];
 
 			if ( method_exists( $model, 'persist_' . $prop['name'] ) ) {
 				$model->{'persist_' . $prop['name']}( $model->{$prop['name']} );
 			} elseif ( $source instanceof SourceObject ) {
+				$key          = $source->key ?? $prop['name'];
 				$data[ $key ] = $model->{$prop['name']};
 			} elseif ( $source instanceof Meta ) {
+				$key                        = $source->meta_key ?? $prop['name'];
 				$data['meta_input'][ $key ] = $model->{$prop['name']};
 			}
 		}

@@ -83,7 +83,7 @@ class TermRepository extends Repository {
 	 */
 	public function save( ModelInterface $model ): ModelInterface {
 		$data     = array();
-		$taxonomy = $model->taxonomy ?? $this->taxonomy();
+		$taxonomy = $model->taxonomy ?: $this->taxonomy();
 
 		if ( $model->id > 0 ) {
 			$result = wp_update_term( $model->id, $taxonomy, array(
@@ -117,12 +117,12 @@ class TermRepository extends Repository {
 				continue;
 			}
 
-			$source = $prop['source'];
+			$source = $prop['source'] ?? null;
 
 			if ( method_exists( $model, 'persist_' . $prop['name'] ) ) {
 				$model->{'persist_' . $prop['name']}( $model->{$prop['name']} );
 			} elseif ( $source instanceof Meta ) {
-				$meta_key = $source->key ?? $prop['name'];
+				$meta_key = $source->meta_key ?? $prop['name'];
 
 				update_term_meta( $term_id, $meta_key, $model->{$prop['name']} );
 			}
@@ -146,7 +146,7 @@ class TermRepository extends Repository {
 	 * @return bool
 	 */
 	public function delete( ModelInterface $model, bool $force_delete = true ): bool {
-		return ! is_wp_error( wp_delete_term( $model->id, $model->taxonomy ?? $this->taxonomy() ) );
+		return ! is_wp_error( wp_delete_term( $model->id, $model->taxonomy ?: $this->taxonomy() ) );
 	}
 
 	/**

@@ -15,6 +15,14 @@ class User extends Model {
 	public int $id = 0;
 
 	/**
+	 * User's password in plain text.
+	 *
+	 * Write-only: never populated from the source, only sent to wp_insert_user()
+	 * / wp_update_user() when explicitly set.
+	 */
+	public string $password = '';
+
+	/**
 	 * User's first name.
 	 */
 	#[Meta('first_name')]

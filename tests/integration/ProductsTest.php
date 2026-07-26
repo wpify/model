@@ -76,12 +76,25 @@ class ProductsTest extends TestCase {
 	}
 
 	/**
-	 * create() with data fatals for AccessorObject models without a source.
+	 * create() with data no longer fatals for AccessorObject models without a source.
 	 *
 	 * @see https://github.com/wpify/model/issues/39
 	 */
 	public function test_create_with_data(): void {
-		$this->markTestSkipped( 'create() with data fatals for sourceless accessor models — https://github.com/wpify/model/issues/39' );
+		$product = $this->products()->create( array( 'name' => 'Created' ) );
+
+		$this->assertInstanceOf( Product::class, $product );
+		$this->assertSame( 'Created', $product->name );
+
+		// The accessor write on create() had no source to reach, so attach one
+		// and set the name again before persisting.
+		$product->source( new \WC_Product_Simple() );
+		$product->name = 'Created';
+
+		$saved = $this->products()->save( $product );
+
+		$this->assertGreaterThan( 0, $saved->id );
+		$this->assertSame( 'Created', wc_get_product( $saved->id )->get_name() );
 	}
 
 	public function test_delete_removes_product(): void {

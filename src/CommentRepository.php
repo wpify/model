@@ -71,7 +71,7 @@ class CommentRepository extends Repository {
 				continue;
 			}
 
-			$source = $prop['source'];
+			$source = $prop['source'] ?? null;
 
 			if ( method_exists( $model, 'persist_' . $prop['name'] ) ) {
 				$model->{'persist_' . $prop['name']}( $model->{$prop['name']} );
@@ -79,12 +79,20 @@ class CommentRepository extends Repository {
 				$key          = $source->key ?? $prop['name'];
 				$data[ $key ] = $model->{$prop['name']};
 			} elseif ( $source instanceof Meta ) {
-				$key                          = $source->key ?? $prop['name'];
+				$key                          = $source->meta_key ?? $prop['name'];
 				$data['comment_meta'][ $key ] = $model->{$prop['name']};
 			}
 		}
 
-		if ( $data['comment_ID'] > 0 ) {
+		// wpdb stringifies booleans to '' instead of '0'/'1', which breaks
+		// comment status queries — cast them to int first.
+		foreach ( $data as $key => $value ) {
+			if ( is_bool( $value ) ) {
+				$data[ $key ] = (int) $value;
+			}
+		}
+
+		if ( ( $data['comment_ID'] ?? 0 ) > 0 ) {
 			$result = wp_update_comment( $data, true );
 			$action = 'update';
 		} else {
@@ -96,8 +104,16 @@ class CommentRepository extends Repository {
 			throw new CouldNotSaveModelException( $result->get_error_message() );
 		}
 
+		if ( false === $result ) {
+			throw new CouldNotSaveModelException( 'Could not save the comment.' );
+		}
+
+		if ( 'insert' === $action ) {
+			$model->id = $result;
+		}
+
 		if ( apply_filters( 'wpify_model_refresh_model_after_save', true, $model, $this ) ) {
-			$model->refresh( get_user_by( 'id', $result ) );
+			$model->refresh( get_comment( $model->id ) );
 		}
 
 		do_action( 'wpify_model_repository_save_' . $action, $model, $this );

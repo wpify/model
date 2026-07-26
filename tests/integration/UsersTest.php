@@ -61,16 +61,19 @@ class UsersTest extends TestCase {
 	}
 
 	public function test_save_inserts_user(): void {
-		$user        = $this->users()->create();
-		$user->login = 'inserted_user';
-		$user->email = 'inserted@example.org';
+		$user           = $this->users()->create();
+		$user->login    = 'inserted_user';
+		$user->email    = 'inserted@example.org';
+		$user->password = 'sup3r-s3cret-pass';
 
-		// @-suppression: the model has no password prop, so wp_insert_user()
-		// raises a user notice — https://github.com/wpify/model/issues/35
-		$saved = @$this->users()->save( $user );
+		$saved = $this->users()->save( $user );
 
 		$this->assertGreaterThan( 0, $saved->id );
 		$this->assertSame( 'inserted_user', get_user_by( 'id', $saved->id )->user_login );
+
+		$authenticated = wp_authenticate( 'inserted_user', 'sup3r-s3cret-pass' );
+		$this->assertInstanceOf( \WP_User::class, $authenticated );
+		$this->assertSame( $saved->id, $authenticated->ID );
 	}
 
 	public function test_save_updates_user_and_meta(): void {
@@ -87,9 +90,8 @@ class UsersTest extends TestCase {
 
 		$this->expectException( CouldNotSaveModelException::class );
 
-		// Empty login is rejected by wp_insert_user(); @ suppresses the
-		// missing-password notice — https://github.com/wpify/model/issues/35
-		@$this->users()->save( $user );
+		// Empty login is rejected by wp_insert_user().
+		$this->users()->save( $user );
 	}
 
 	public function test_delete_removes_user(): void {

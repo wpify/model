@@ -65,13 +65,14 @@ class SiteRepository extends Repository {
 	 */
 	public function save( ModelInterface $model ): ModelInterface {
 		$data = array();
+		$meta = array();
 
 		foreach ( $model->props() as $prop ) {
 			if ( $prop['readonly'] ) {
 				continue;
 			}
 
-			$source = $prop['source'];
+			$source = $prop['source'] ?? null;
 
 			if ( method_exists( $model, 'persist_' . $prop['name'] ) ) {
 				$model->{'persist_' . $prop['name']}( $model->{$prop['name']} );
@@ -79,22 +80,45 @@ class SiteRepository extends Repository {
 				$key          = $source->key ?? $prop['name'];
 				$data[ $key ] = $model->{$prop['name']};
 			} elseif ( $source instanceof Meta ) {
-				$key                  = $source->key ?? $prop['name'];
-				$data['meta'][ $key ] = $model->{$prop['name']};
+				$key          = $source->meta_key ?? $prop['name'];
+				$meta[ $key ] = $model->{$prop['name']};
 			}
 		}
 
-		if ( $data['blog_id'] > 0 ) {
-			$result = wp_update_comment( $data, true );
+		// wp_insert_site()/wp_update_site() use the network id keyed as network_id
+		// and take the site id as a separate argument rather than in $data.
+		unset( $data['blog_id'] );
+
+		if ( isset( $data['site_id'] ) ) {
+			$data['network_id'] = $data['site_id'];
+			unset( $data['site_id'] );
+		}
+
+		if ( $model->id > 0 ) {
+			$result = wp_update_site( $model->id, $data );
+			$action = 'update';
 		} else {
-			$result = wp_insert_comment( $data );
+			$result = wp_insert_site( $data );
+			$action = 'insert';
 		}
 
 		if ( is_wp_error( $result ) ) {
-			throw new CouldNotSaveModelException( $result->get_error_message() );
+			throw new CouldNotSaveModelException( $result->get_error_message(), 0, $result );
 		}
 
-		$model->refresh( get_user_by( 'id', $result ) );
+		$site_id = (int) $result;
+
+		if ( function_exists( 'is_site_meta_supported' ) && is_site_meta_supported() ) {
+			foreach ( $meta as $meta_key => $value ) {
+				update_site_meta( $site_id, $meta_key, $value );
+			}
+		}
+
+		if ( apply_filters( 'wpify_model_refresh_model_after_save', true, $model, $this ) ) {
+			$model->refresh( get_site( $site_id ) );
+		}
+
+		do_action( 'wpify_model_repository_save_' . $action, $model, $this );
 
 		return $model;
 	}

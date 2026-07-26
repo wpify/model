@@ -52,7 +52,6 @@ class Column implements SourceAttributeInterface {
 
 	public function create_column_sql( string $key, string $type ): string {
 		$key = $this->name ?: $key;
-		$sql = "{$key} {$this->type}";
 
 		if ( empty( $this->type ) ) {
 			if ( $type === 'bool' ) {
@@ -67,6 +66,8 @@ class Column implements SourceAttributeInterface {
 				$this->type = self::TEXT;
 			}
 		}
+
+		$sql = "{$key} {$this->type}";
 
 		if ( empty( $this->params ) ) {
 			if ( $this->type === self::VARCHAR ) {

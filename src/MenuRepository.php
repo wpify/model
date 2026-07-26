@@ -70,10 +70,7 @@ class MenuRepository extends TermRepository {
 		if ( $wp_menu ) {
 			$menu = parent::get( $wp_menu );
 		} else {
-			$term = parent::get( $source );
-			$menu = $term ? new $model_class( $this->manager() ) : null;
-
-			$menu->source( $term->source() );
+			$menu = parent::get( $source );
 		}
 
 		return $menu;

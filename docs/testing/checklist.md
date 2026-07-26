@@ -222,8 +222,8 @@ _No declared public methods — covered via `Model` and `CommentRepository`._
 
 ## Coverage: menus and menu items ([#22](https://github.com/wpify/model/issues/22))
 
-Known related bug: [Menu error when not assigned](https://github.com/wpify/model/issues/1) — a test exposing
-it gets skipped with that link, per the bug protocol.
+Bug [#1](https://github.com/wpify/model/issues/1) (menu error when not assigned) is fixed; the exposing test
+now passes as a regression test.
 
 ### MenuRepository
 
@@ -372,15 +372,15 @@ and their repositories.
 
 ## Coverage: multisite sites ([#26](https://github.com/wpify/model/issues/26))
 
-Known related bug: [SiteRepository::save() uses comment and user functions](https://github.com/wpify/model/issues/28)
-— affected tests get skipped with that link, per the bug protocol.
+Bug [#28](https://github.com/wpify/model/issues/28) (save used comment/user functions) is fixed; save tests
+now pass as regression tests.
 
 ### SiteRepository
 
 - [x] `SiteRepository::model()`
 - [x] `SiteRepository::get()`
-- [ ] `SiteRepository::save()` — **blocked by bug** [#28](https://github.com/wpify/model/issues/28); test skipped with link
-- [ ] `SiteRepository::save()` — throws `CouldNotSaveModelException` when the underlying call returns `WP_Error` — **blocked by bug** [#28](https://github.com/wpify/model/issues/28)
+- [x] `SiteRepository::save()`
+- [x] `SiteRepository::save()` — throws `CouldNotSaveModelException` when the underlying call returns `WP_Error`
 - [x] `SiteRepository::delete()`
 - [x] `SiteRepository::find()`
 - [x] `SiteRepository::find_all()`
@@ -434,3 +434,9 @@ plus pre-existing [#1](https://github.com/wpify/model/issues/1).
 Dead code flagged for cleanup (no test possible): `KeyNotFoundException` and `ModelNotFoundException`
 are never thrown; `Manager.php` imports nonexistent `Factories\DefaultStorageFactory` and
 `Interfaces\StorageFactoryInterface`.
+
+## Post-fix update (2026-07-26)
+
+Bugs #1 and #28–#41 are fixed; every previously skipped test is now a passing regression test.
+Suite: **168 single-site + 8 multisite tests, 0 skips**. The only unchecked items left are the
+3 unreachable WooCommerce `WP_Error` branches noted above.

@@ -43,15 +43,24 @@ class CommentsTest extends TestCase {
 		$comment->author_email = 'tester@example.org';
 		$comment->date         = current_time( 'mysql' );
 		$comment->date_gmt     = current_time( 'mysql', true );
-		// Default approved=false persists as '' and hides the comment from
-		// status queries — https://github.com/wpify/model/issues/36
-		$comment->approved = true;
+		$comment->approved     = true;
 
 		$this->comments()->save( $comment );
 
 		$rows = get_comments( array( 'post_id' => $post_id ) );
 		$this->assertCount( 1, $rows );
 		$this->assertSame( 'Inserted comment', $rows[0]->comment_content );
+
+		// A comment saved with approved=false must persist comment_approved as '0'.
+		$unapproved              = $this->comments()->create();
+		$unapproved->post_id     = $post_id;
+		$unapproved->content     = 'Pending comment';
+		$unapproved->author_name = 'Tester';
+		$unapproved->approved    = false;
+
+		$saved = $this->comments()->save( $unapproved );
+
+		$this->assertSame( '0', get_comment( $saved->id )->comment_approved );
 	}
 
 	/**
@@ -61,7 +70,19 @@ class CommentsTest extends TestCase {
 	 * @see https://github.com/wpify/model/issues/30
 	 */
 	public function test_save_refreshes_model_with_created_comment(): void {
-		$this->markTestSkipped( 'CommentRepository::save() refreshes via get_user_by() — https://github.com/wpify/model/issues/30' );
+		$post_id = self::factory()->post->create();
+
+		$comment              = $this->comments()->create();
+		$comment->post_id     = $post_id;
+		$comment->content     = 'Refreshed comment';
+		$comment->author_name = 'Tester';
+		$comment->approved    = true;
+
+		$saved = $this->comments()->save( $comment );
+
+		$this->assertGreaterThan( 0, $saved->id );
+		$this->assertSame( 'Refreshed comment', get_comment( $saved->id )->comment_content );
+		$this->assertSame( 'Refreshed comment', $saved->content );
 	}
 
 	public function test_save_throws_when_update_fails(): void {

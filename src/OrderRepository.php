@@ -48,7 +48,11 @@ class OrderRepository extends Repository {
 		}
 
 		if ( ! $wc_order && is_string( $source ) ) {
-			$wc_order = wc_get_order_id_by_order_key( $source );
+			$order_id = wc_get_order_id_by_order_key( $source );
+
+			if ( $order_id ) {
+				$wc_order = wc_get_order( $order_id );
+			}
 		}
 
 		if ( $wc_order ) {

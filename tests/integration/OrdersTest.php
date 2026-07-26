@@ -49,13 +49,19 @@ class OrdersTest extends TestCase {
 	}
 
 	/**
-	 * get() by order key assigns the numeric id as the model source, so the
-	 * returned model fatals on property access.
+	 * get() by order key resolves the order object, so the returned model is usable.
 	 *
 	 * @see https://github.com/wpify/model/issues/38
 	 */
 	public function test_get_by_order_key(): void {
-		$this->markTestSkipped( 'OrderRepository::get() by order key sets an int source — https://github.com/wpify/model/issues/38' );
+		$wc_order = $this->make_wc_order();
+		$key      = $wc_order->get_order_key();
+
+		$model = $this->orders()->get( $key );
+
+		$this->assertInstanceOf( Order::class, $model );
+		$this->assertSame( $wc_order->get_id(), $model->id );
+		$this->assertSame( $wc_order->get_total(), $model->total );
 	}
 
 	public function test_save_updates_order(): void {
@@ -174,11 +180,9 @@ class OrdersTest extends TestCase {
 		$by_object = $repository->get( $items[0] );
 		$this->assertInstanceOf( OrderItem::class, $by_object );
 
-		// get() by id instantiates WC_Order_Item directly, which WC 9.9+
-		// flags — https://github.com/wpify/model/issues/41
-		$this->setExpectedIncorrectUsage( 'WC_Order_Item::__construct' );
 		$by_id = $repository->get( $items[0]->get_id() );
 		$this->assertInstanceOf( OrderItem::class, $by_id );
+		$this->assertInstanceOf( \WC_Order_Item_Product::class, $by_id->source() );
 
 		$this->assertSame( $by_object, $repository->get( $by_object ) );
 
@@ -206,13 +210,21 @@ class OrdersTest extends TestCase {
 	}
 
 	/**
-	 * save() refreshes the model with the item id instead of the item object,
-	 * so the saved model fatals on later property access.
+	 * save() keeps the item object as the model source, so the saved model stays usable.
 	 *
 	 * @see https://github.com/wpify/model/issues/40
 	 */
 	public function test_order_item_save_keeps_model_usable(): void {
-		$this->markTestSkipped( 'OrderItemRepository::save() refreshes with the item id — https://github.com/wpify/model/issues/40' );
+		$wc_order = $this->make_wc_order();
+		$items    = array_values( $wc_order->get_items() );
+
+		$repository = $this->repo( OrderItemLineRepository::class );
+		$item       = $repository->get( $items[0] );
+
+		$item->name = 'Kept usable';
+		$repository->save( $item );
+
+		$this->assertSame( 'Kept usable', $item->name );
 	}
 
 	public function test_order_item_delete(): void {

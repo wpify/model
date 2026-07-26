@@ -75,7 +75,9 @@ class MenusTest extends TestCase {
 	 * @see https://github.com/wpify/model/issues/1
 	 */
 	public function test_get_returns_null_for_missing_menu(): void {
-		$this->markTestSkipped( 'MenuRepository::get() fatals for unassigned/missing menus — https://github.com/wpify/model/issues/1' );
+		$this->assertNull( $this->menus()->get( 'nonexistent-location' ) );
+		$this->assertNull( $this->menus()->get( 999999 ) );
+		$this->assertNull( $this->menus()->get( 'no-such-slug' ) );
 	}
 
 	public function test_menu_items_relation_builds_sorted_tree(): void {

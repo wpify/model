@@ -254,13 +254,16 @@ class CustomTableTest extends TestCase {
 	}
 
 	/**
-	 * Deriving the SQL type from the PHP property type is broken: the SQL is
-	 * built before the derived type is assigned.
+	 * A #[Column] without an explicit type derives it from the PHP property type.
 	 *
 	 * @see https://github.com/wpify/model/issues/37
 	 */
 	public function test_create_column_sql_derives_type_from_php_type(): void {
-		$this->markTestSkipped( 'Column::create_column_sql() derives the type after embedding it — https://github.com/wpify/model/issues/37' );
+		$this->assertSame( 'quantity int(11) NOT NULL', ( new Column() )->create_column_sql( 'quantity', 'int' ) );
+		$this->assertSame( 'title varchar(255) NOT NULL', ( new Column() )->create_column_sql( 'title', 'string' ) );
+		$this->assertSame( 'flag boolean NOT NULL', ( new Column() )->create_column_sql( 'flag', 'bool' ) );
+		$this->assertSame( 'price decimal(65,10) NOT NULL', ( new Column() )->create_column_sql( 'price', 'float' ) );
+		$this->assertSame( 'payload text NOT NULL', ( new Column() )->create_column_sql( 'payload', 'array' ) );
 	}
 
 	public function test_column_get_reads_from_source_row(): void {

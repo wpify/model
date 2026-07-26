@@ -102,7 +102,7 @@ class UserRepository extends Repository {
 				continue;
 			}
 
-			$source = $prop['source'];
+			$source = $prop['source'] ?? null;
 
 			if ( method_exists( $model, 'persist_' . $prop['name'] ) ) {
 				$model->{'persist_' . $prop['name']}( $model->{$prop['name']} );
@@ -122,7 +122,16 @@ class UserRepository extends Repository {
 			}
 		}
 
-		if ( $data['ID'] > 0 ) {
+		$is_update = ( $data['ID'] ?? 0 ) > 0;
+
+		if ( '' !== $model->password ) {
+			$data['user_pass'] = $model->password;
+		} elseif ( ! $is_update ) {
+			// wp_insert_user() requires a password; generate one when none was set.
+			$data['user_pass'] = wp_generate_password( 24 );
+		}
+
+		if ( $is_update ) {
 			$result = wp_update_user( $data );
 			$action = 'update';
 		} else {

@@ -16,6 +16,10 @@ class AccessorObject implements AccessorAttributeInterface {
 		$key    = $this->key ?? $key;
 		$source = $model->source();
 
+		if ( ! is_object( $source ) ) {
+			return null;
+		}
+
 		if ( $this->getter ) {
 			$getter = $this->getter;
 		} else {
@@ -36,6 +40,10 @@ class AccessorObject implements AccessorAttributeInterface {
 	public function set( ModelInterface $model, string $key, mixed $value ): mixed {
 		$key    = $this->key ?? $key;
 		$source = $model->source();
+
+		if ( ! is_object( $source ) ) {
+			return null;
+		}
 
 		if ( $this->setter ) {
 			$setter = $this->setter;

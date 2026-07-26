@@ -139,7 +139,7 @@ class Post extends Model {
 	/**
 	 * Parent post.
 	 */
-	#[ManyToOneRelation( 'parent_post_id' )]
+	#[ManyToOneRelation( 'parent_id' )]
 	public ?Post $parent = null;
 
 	/**

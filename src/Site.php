@@ -110,7 +110,7 @@ class Site extends Model {
 	/**
 	 * The site's administrator's user object.
 	 */
-	#[ManyToOneRelation(User::class, 'admin_user_id')]
+	#[ManyToOneRelation( 'admin_user_id' )]
 	#[ReadOnlyProperty]
 	public ?User $admin_user;
 

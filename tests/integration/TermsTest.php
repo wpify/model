@@ -55,9 +55,7 @@ class TermsTest extends TestCase {
 	public function test_save_inserts_term(): void {
 		$term = $this->categories()->create( array( 'name' => 'Inserted cat', 'taxonomy' => 'category' ) );
 
-		// @-suppression: save() warns "Undefined array key source" for props
-		// without a source attribute — https://github.com/wpify/model/issues/34
-		$saved = @$this->categories()->save( $term );
+		$saved = $this->categories()->save( $term );
 
 		$this->assertGreaterThan( 0, $saved->id );
 		$this->assertSame( 'Inserted cat', get_term( $saved->id, 'category' )->name );
@@ -70,14 +68,19 @@ class TermsTest extends TestCase {
 	 * @see https://github.com/wpify/model/issues/31
 	 */
 	public function test_save_uses_repository_taxonomy_as_fallback(): void {
-		$this->markTestSkipped( 'TermRepository::save() taxonomy fallback never applies — https://github.com/wpify/model/issues/31' );
+		$term = $this->categories()->create( array( 'name' => 'Fallback cat' ) );
+
+		$saved = $this->categories()->save( $term );
+
+		$this->assertGreaterThan( 0, $saved->id );
+		$this->assertSame( 'category', get_term( $saved->id, 'category' )->taxonomy );
 	}
 
 	public function test_save_updates_term(): void {
 		$term = $this->categories()->get( self::factory()->category->create( array( 'name' => 'Before' ) ) );
 
 		$term->name = 'After';
-		@$this->categories()->save( $term ); // https://github.com/wpify/model/issues/34
+		$this->categories()->save( $term );
 
 		$this->assertSame( 'After', get_term( $term->id, 'category' )->name );
 	}
@@ -86,7 +89,7 @@ class TermsTest extends TestCase {
 		$term = $this->categories()->create( array( 'taxonomy' => 'category' ) );
 
 		try {
-			@$this->categories()->save( $term ); // https://github.com/wpify/model/issues/34
+			$this->categories()->save( $term );
 			$this->fail( 'Expected CouldNotSaveModelException' );
 		} catch ( CouldNotSaveModelException $exception ) {
 			$this->assertInstanceOf( \WP_Error::class, $exception->get_wp_error() );
