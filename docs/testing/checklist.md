@@ -19,119 +19,119 @@ under the core ticket.
 
 ### Manager
 
-- [ ] `Manager::__construct( ...$dependencies )`
-- [ ] `Manager::register_repository()`
-- [ ] `Manager::get_model_repository()`
-- [ ] `Manager::get_model_repository()` — throws `RepositoryNotFoundException` for an unregistered model
-- [ ] `Manager::get_repository()`
-- [ ] `Manager::get_repositories()`
+- [x] `Manager::__construct( ...$dependencies )`
+- [x] `Manager::register_repository()`
+- [x] `Manager::get_model_repository()`
+- [x] `Manager::get_model_repository()` — throws `RepositoryNotFoundException` for an unregistered model
+- [x] `Manager::get_repository()`
+- [x] `Manager::get_repositories()`
 
 ### Model (abstract base)
 
-- [ ] `Model::__construct()`
-- [ ] `Model::source()`
-- [ ] `Model::props()`
-- [ ] `Model::manager()`
-- [ ] `Model::reflection()`
-- [ ] `Model::refresh()`
-- [ ] `Model::__get()`
-- [ ] `Model::__get()` — throws `PropertyNotDefinedException` for an undefined property
-- [ ] `Model::__set()`
-- [ ] `Model::__set()` — throws `ReadOnlyPropertyException` for a `#[ReadOnlyProperty]` property
-- [ ] `Model::to_array()`
-- [ ] `Model::getIterator()`
-- [ ] `Model::offsetSet()`
-- [ ] `Model::offsetExists()`
-- [ ] `Model::offsetUnset()`
-- [ ] `Model::offsetGet()`
-- [ ] `Model::__isset()`
-- [ ] `Model::__unset()`
+- [x] `Model::__construct()`
+- [x] `Model::source()`
+- [x] `Model::props()`
+- [x] `Model::manager()`
+- [x] `Model::reflection()`
+- [x] `Model::refresh()`
+- [x] `Model::__get()`
+- [x] `Model::__get()` — throws `PropertyNotDefinedException` for an undefined property
+- [x] `Model::__set()`
+- [x] `Model::__set()` — throws `ReadOnlyPropertyException` for a `#[ReadOnlyProperty]` property
+- [x] `Model::to_array()`
+- [x] `Model::getIterator()`
+- [x] `Model::offsetSet()`
+- [x] `Model::offsetExists()`
+- [x] `Model::offsetUnset()`
+- [x] `Model::offsetGet()`
+- [x] `Model::__isset()`
+- [x] `Model::__unset()`
 
 ### Repository (abstract base)
 
-- [ ] `Repository::manager()`
-- [ ] `Repository::manager()` — throws `RepositoryNotInitialized` when called before `register_repository()`
-- [ ] `Repository::resolve_property()`
-- [ ] `Repository::maybe_convert_to_type()`
-- [ ] `Repository::create()` — base implementation (via any repository that does not override it, e.g. `TermRepository`)
+- [x] `Repository::manager()`
+- [x] `Repository::manager()` — throws `RepositoryNotInitialized` when called before `register_repository()`
+- [x] `Repository::resolve_property()`
+- [x] `Repository::maybe_convert_to_type()`
+- [x] `Repository::create()` — base implementation (via any repository that does not override it, e.g. `TermRepository`)
 
 ### Attributes
 
-- [ ] `AccessorObject::__construct()`
-- [ ] `AccessorObject::get()`
-- [ ] `AccessorObject::set()`
-- [ ] `AliasOf::__construct()`
-- [ ] `AliasOf::get()`
-- [ ] `ChildPostsRelation::get()`
-- [ ] `ChildPostsRelation::get()` — throws `RepositoryMethodNotImplementedException` when the repository lacks `find_child_posts_of()`
-- [ ] `ChildTermsRelation::get()`
-- [ ] `ChildTermsRelation::get()` — throws `RepositoryMethodNotImplementedException` when the repository lacks `find_child_terms_of()`
-- [ ] `IdsRelation::__construct()`
-- [ ] `IdsRelation::get()`
-- [ ] `ManyToOneRelation::__construct()`
-- [ ] `ManyToOneRelation::get()`
-- [ ] `ManyToOneRelation::get()` — throws `RepositoryNotFoundException` when no repository handles the target model
-- [ ] `Meta::__construct()`
-- [ ] `Meta::get()`
-- [ ] `Meta::set()`
-- [ ] `PostTermRelation::__construct()`
-- [ ] `PostTermRelation::get()`
-- [ ] `PostTermRelation::persist()`
-- [ ] `PostTermsRelation::__construct()`
-- [ ] `PostTermsRelation::get()`
-- [ ] `PostTermsRelation::persist()`
-- [ ] `ReadOnlyProperty` — no methods; behavior covered by the `Model::__set()` failure-mode test above
-- [ ] `SourceObject::__construct()`
-- [ ] `SourceObject::get()`
-- [ ] `TermPostsRelation::__construct()`
-- [ ] `TermPostsRelation::get()`
-- [ ] `TopLevelPostParentRelation::__construct()`
-- [ ] `TopLevelPostParentRelation::get()`
-- [ ] `TopLevelTermParentRelation::__construct()`
-- [ ] `TopLevelTermParentRelation::get()`
+- [x] `AccessorObject::__construct()`
+- [x] `AccessorObject::get()`
+- [x] `AccessorObject::set()`
+- [x] `AliasOf::__construct()`
+- [x] `AliasOf::get()`
+- [x] `ChildPostsRelation::get()`
+- [x] `ChildPostsRelation::get()` — throws `RepositoryMethodNotImplementedException` when the repository lacks `find_child_posts_of()`
+- [x] `ChildTermsRelation::get()`
+- [x] `ChildTermsRelation::get()` — throws `RepositoryMethodNotImplementedException` when the repository lacks `find_child_terms_of()`
+- [x] `IdsRelation::__construct()`
+- [x] `IdsRelation::get()`
+- [x] `ManyToOneRelation::__construct()`
+- [x] `ManyToOneRelation::get()`
+- [x] `ManyToOneRelation::get()` — throws `RepositoryNotFoundException` when no repository handles the target model
+- [x] `Meta::__construct()`
+- [x] `Meta::get()`
+- [x] `Meta::set()`
+- [x] `PostTermRelation::__construct()`
+- [x] `PostTermRelation::get()`
+- [x] `PostTermRelation::persist()`
+- [x] `PostTermsRelation::__construct()`
+- [x] `PostTermsRelation::get()`
+- [x] `PostTermsRelation::persist()`
+- [x] `ReadOnlyProperty` — no methods; behavior covered by the `Model::__set()` failure-mode test above
+- [x] `SourceObject::__construct()`
+- [x] `SourceObject::get()`
+- [x] `TermPostsRelation::__construct()`
+- [x] `TermPostsRelation::get()`
+- [x] `TopLevelPostParentRelation::__construct()`
+- [x] `TopLevelPostParentRelation::get()`
+- [x] `TopLevelTermParentRelation::__construct()`
+- [x] `TopLevelTermParentRelation::get()`
 
 ### ModelException (base)
 
-- [ ] `ModelException::__construct()` — via any thrown subclass
-- [ ] `ModelException::get_wp_error()` — returns the `WP_Error` when one is attached (only `TermRepository::save()` passes one; see [#20](https://github.com/wpify/model/issues/20)) and `null` otherwise
+- [x] `ModelException::__construct()` — via any thrown subclass
+- [x] `ModelException::get_wp_error()` — returns the `WP_Error` when one is attached (only `TermRepository::save()` passes one; see [#20](https://github.com/wpify/model/issues/20)) and `null` otherwise
 
 ## Coverage: posts, pages, and attachments ([#19](https://github.com/wpify/model/issues/19))
 
 ### PostRepository
 
-- [ ] `PostRepository::model()`
-- [ ] `PostRepository::get()`
-- [ ] `PostRepository::post_types()`
-- [ ] `PostRepository::create()`
-- [ ] `PostRepository::create()` — throws `CouldNotSaveModelException` when the repository declares multiple post types
-- [ ] `PostRepository::create()` — throws `CouldNotSaveModelException` when the repository declares no post types
-- [ ] `PostRepository::save()`
-- [ ] `PostRepository::save()` — throws `CouldNotSaveModelException` when `wp_insert_post`/`wp_update_post` returns `WP_Error`
-- [ ] `PostRepository::delete()`
-- [ ] `PostRepository::get_paginate_links()`
-- [ ] `PostRepository::get_pagination()`
-- [ ] `PostRepository::find()`
-- [ ] `PostRepository::find_without_pagination()`
-- [ ] `PostRepository::find_paginated()`
-- [ ] `PostRepository::find_all()`
-- [ ] `PostRepository::find_published()`
-- [ ] `PostRepository::find_all_by_term()`
-- [ ] `PostRepository::find_all_by_term()` — throws `IncorrectRepositoryException` when the term model's repository has no `taxonomy()` method
-- [ ] `PostRepository::find_child_posts_of()`
-- [ ] `PostRepository::find_by_ids()`
-- [ ] `PostRepository::assign_post_to_term()`
+- [x] `PostRepository::model()`
+- [x] `PostRepository::get()`
+- [x] `PostRepository::post_types()`
+- [x] `PostRepository::create()`
+- [x] `PostRepository::create()` — throws `CouldNotSaveModelException` when the repository declares multiple post types
+- [x] `PostRepository::create()` — throws `CouldNotSaveModelException` when the repository declares no post types
+- [x] `PostRepository::save()`
+- [x] `PostRepository::save()` — throws `CouldNotSaveModelException` when `wp_insert_post`/`wp_update_post` returns `WP_Error`
+- [x] `PostRepository::delete()`
+- [x] `PostRepository::get_paginate_links()`
+- [x] `PostRepository::get_pagination()`
+- [x] `PostRepository::find()`
+- [x] `PostRepository::find_without_pagination()`
+- [x] `PostRepository::find_paginated()`
+- [x] `PostRepository::find_all()`
+- [x] `PostRepository::find_published()`
+- [x] `PostRepository::find_all_by_term()`
+- [x] `PostRepository::find_all_by_term()` — throws `IncorrectRepositoryException` when the term model's repository has no `taxonomy()` method
+- [x] `PostRepository::find_child_posts_of()`
+- [x] `PostRepository::find_by_ids()`
+- [x] `PostRepository::assign_post_to_term()`
 
 ### Post
 
-- [ ] `Post::get_permalink()`
-- [ ] `Post::get_featured_image_id()`
-- [ ] `Post::persist_featured_image_id()`
-- [ ] `Post::get_rendered_excerpt()`
+- [x] `Post::get_permalink()`
+- [x] `Post::get_featured_image_id()`
+- [x] `Post::persist_featured_image_id()`
+- [x] `Post::get_rendered_excerpt()`
 
 ### PageRepository
 
-- [ ] `PageRepository::model()`
-- [ ] `PageRepository::post_types()`
+- [x] `PageRepository::model()`
+- [x] `PageRepository::post_types()`
 
 ### Page
 
@@ -139,39 +139,39 @@ _No declared public methods — covered via `Post` and `PageRepository`._
 
 ### AttachmentRepository
 
-- [ ] `AttachmentRepository::model()`
-- [ ] `AttachmentRepository::post_types()`
+- [x] `AttachmentRepository::model()`
+- [x] `AttachmentRepository::post_types()`
 
 ### Attachment
 
-- [ ] `Attachment::get_url()`
+- [x] `Attachment::get_url()`
 
 ## Coverage: terms and taxonomies ([#20](https://github.com/wpify/model/issues/20))
 
 ### TermRepository
 
-- [ ] `TermRepository::model()`
-- [ ] `TermRepository::taxonomy()`
-- [ ] `TermRepository::get()`
-- [ ] `TermRepository::save()`
-- [ ] `TermRepository::save()` — throws `CouldNotSaveModelException` (with the `WP_Error` attached, readable via `get_wp_error()`) when `wp_insert_term`/`wp_update_term` fails
-- [ ] `TermRepository::delete()`
-- [ ] `TermRepository::find()`
-- [ ] `TermRepository::find_all()`
-- [ ] `TermRepository::find_not_empty()`
-- [ ] `TermRepository::find_children_of()`
-- [ ] `TermRepository::find_terms_of_post()`
-- [ ] `TermRepository::find_child_terms_of()`
-- [ ] `TermRepository::find_by_ids()`
+- [x] `TermRepository::model()`
+- [x] `TermRepository::taxonomy()`
+- [x] `TermRepository::get()`
+- [x] `TermRepository::save()`
+- [x] `TermRepository::save()` — throws `CouldNotSaveModelException` (with the `WP_Error` attached, readable via `get_wp_error()`) when `wp_insert_term`/`wp_update_term` fails
+- [x] `TermRepository::delete()`
+- [x] `TermRepository::find()`
+- [x] `TermRepository::find_all()`
+- [x] `TermRepository::find_not_empty()`
+- [x] `TermRepository::find_children_of()`
+- [x] `TermRepository::find_terms_of_post()`
+- [x] `TermRepository::find_child_terms_of()`
+- [x] `TermRepository::find_by_ids()`
 
 ### Term
 
-- [ ] `Term::get_permalink()`
+- [x] `Term::get_permalink()`
 
 ### CategoryRepository
 
-- [ ] `CategoryRepository::model()`
-- [ ] `CategoryRepository::taxonomy()`
+- [x] `CategoryRepository::model()`
+- [x] `CategoryRepository::taxonomy()`
 
 ### Category
 
@@ -179,8 +179,8 @@ _No declared public methods — covered via `Term` and `CategoryRepository`._
 
 ### PostTagRepository
 
-- [ ] `PostTagRepository::model()`
-- [ ] `PostTagRepository::taxonomy()`
+- [x] `PostTagRepository::model()`
+- [x] `PostTagRepository::taxonomy()`
 
 ### PostTag
 
@@ -190,15 +190,15 @@ _No declared public methods — covered via `Term` and `PostTagRepository`._
 
 ### UserRepository
 
-- [ ] `UserRepository::model()`
-- [ ] `UserRepository::get()`
-- [ ] `UserRepository::get_current()`
-- [ ] `UserRepository::save()`
-- [ ] `UserRepository::save()` — throws `CouldNotSaveModelException` when `wp_insert_user`/`wp_update_user` returns `WP_Error`
-- [ ] `UserRepository::delete()`
-- [ ] `UserRepository::find()`
-- [ ] `UserRepository::find_all()`
-- [ ] `UserRepository::find_by_ids()`
+- [x] `UserRepository::model()`
+- [x] `UserRepository::get()`
+- [x] `UserRepository::get_current()`
+- [x] `UserRepository::save()`
+- [x] `UserRepository::save()` — throws `CouldNotSaveModelException` when `wp_insert_user`/`wp_update_user` returns `WP_Error`
+- [x] `UserRepository::delete()`
+- [x] `UserRepository::find()`
+- [x] `UserRepository::find_all()`
+- [x] `UserRepository::find_by_ids()`
 
 ### User
 
@@ -206,15 +206,15 @@ _No declared public methods — covered via `Model` and `UserRepository`._
 
 ### CommentRepository
 
-- [ ] `CommentRepository::model()`
-- [ ] `CommentRepository::get()`
-- [ ] `CommentRepository::save()`
-- [ ] `CommentRepository::save()` — throws `CouldNotSaveModelException` when `wp_insert_comment`/`wp_update_comment` fails
-- [ ] `CommentRepository::delete()`
-- [ ] `CommentRepository::find()`
-- [ ] `CommentRepository::find_by_post_id()`
-- [ ] `CommentRepository::find_by_ids()`
-- [ ] `CommentRepository::find_all()`
+- [x] `CommentRepository::model()`
+- [x] `CommentRepository::get()`
+- [x] `CommentRepository::save()`
+- [x] `CommentRepository::save()` — throws `CouldNotSaveModelException` when `wp_insert_comment`/`wp_update_comment` fails
+- [x] `CommentRepository::delete()`
+- [x] `CommentRepository::find()`
+- [x] `CommentRepository::find_by_post_id()`
+- [x] `CommentRepository::find_by_ids()`
+- [x] `CommentRepository::find_all()`
 
 ### Comment
 
@@ -227,86 +227,86 @@ it gets skipped with that link, per the bug protocol.
 
 ### MenuRepository
 
-- [ ] `MenuRepository::model()`
-- [ ] `MenuRepository::taxonomy()`
-- [ ] `MenuRepository::get()` — by id/slug and by theme menu location
-- [ ] `MenuRepository::items()` — both `RETURN_OBJECTS` and flat return modes
+- [x] `MenuRepository::model()`
+- [x] `MenuRepository::taxonomy()`
+- [x] `MenuRepository::get()` — by id/slug and by theme menu location
+- [x] `MenuRepository::items()` — both `RETURN_OBJECTS` and flat return modes
 
 ### Menu
 
-- [ ] `Menu::to_array()`
+- [x] `Menu::to_array()`
 
 ### MenuItemRepository
 
-- [ ] `MenuItemRepository::model()`
-- [ ] `MenuItemRepository::post_types()`
+- [x] `MenuItemRepository::model()`
+- [x] `MenuItemRepository::post_types()`
 
 ### MenuItem
 
-- [ ] `MenuItem::get_is_current()`
-- [ ] `MenuItem::get_is_highlighted()`
+- [x] `MenuItem::get_is_current()`
+- [x] `MenuItem::get_is_highlighted()`
 
 ### Attributes
 
-- [ ] `MenuItemsRelation::__construct()`
-- [ ] `MenuItemsRelation::get()`
-- [ ] `MenuItemsRelation::sort_items()`
+- [x] `MenuItemsRelation::__construct()`
+- [x] `MenuItemsRelation::get()`
+- [x] `MenuItemsRelation::sort_items()`
 
 ## Coverage: custom table repository ([#23](https://github.com/wpify/model/issues/23))
 
 ### CustomTableRepository
 
-- [ ] `CustomTableRepository::__construct()`
-- [ ] `CustomTableRepository::primary_key()`
-- [ ] `CustomTableRepository::primary_key()` — throws `PrimaryKeyException` when the model does not declare exactly one primary-key column
-- [ ] `CustomTableRepository::prefixed_table_name()`
-- [ ] `CustomTableRepository::migrate()`
-- [ ] `CustomTableRepository::columns()`
-- [ ] `CustomTableRepository::query_single()`
-- [ ] `CustomTableRepository::get()`
-- [ ] `CustomTableRepository::get()` — throws `PrimaryKeyException` when an array source lacks the primary key
-- [ ] `CustomTableRepository::drop_table()`
-- [ ] `CustomTableRepository::save()` — insert and update paths
-- [ ] `CustomTableRepository::save()` — throws `SqlException` on a database error
-- [ ] `CustomTableRepository::delete()`
-- [ ] `CustomTableRepository::delete()` — throws `SqlException` on a database error
-- [ ] `CustomTableRepository::find()`
-- [ ] `CustomTableRepository::find()` — throws `SqlException` when an array condition does not have exactly two values
-- [ ] `CustomTableRepository::find()` — throws `SqlException` on a database error
-- [ ] `CustomTableRepository::find_by_ids()`
-- [ ] `CustomTableRepository::find_all()`
+- [x] `CustomTableRepository::__construct()`
+- [x] `CustomTableRepository::primary_key()`
+- [x] `CustomTableRepository::primary_key()` — throws `PrimaryKeyException` when the model does not declare exactly one primary-key column
+- [x] `CustomTableRepository::prefixed_table_name()`
+- [x] `CustomTableRepository::migrate()`
+- [x] `CustomTableRepository::columns()`
+- [x] `CustomTableRepository::query_single()`
+- [x] `CustomTableRepository::get()`
+- [x] `CustomTableRepository::get()` — throws `PrimaryKeyException` when an array source lacks the primary key
+- [x] `CustomTableRepository::drop_table()`
+- [x] `CustomTableRepository::save()` — insert and update paths
+- [x] `CustomTableRepository::save()` — throws `SqlException` on a database error
+- [x] `CustomTableRepository::delete()`
+- [x] `CustomTableRepository::delete()` — throws `SqlException` on a database error
+- [x] `CustomTableRepository::find()`
+- [x] `CustomTableRepository::find()` — throws `SqlException` when an array condition does not have exactly two values
+- [x] `CustomTableRepository::find()` — throws `SqlException` on a database error
+- [x] `CustomTableRepository::find_by_ids()`
+- [x] `CustomTableRepository::find_all()`
 
 ### Attributes
 
-- [ ] `Column::__construct()`
-- [ ] `Column::create_column_sql()`
-- [ ] `Column::get()`
+- [x] `Column::__construct()`
+- [x] `Column::create_column_sql()`
+- [x] `Column::get()`
 
 ## Coverage: WooCommerce products ([#24](https://github.com/wpify/model/issues/24))
 
 ### ProductRepository
 
-- [ ] `ProductRepository::model()`
-- [ ] `ProductRepository::get()`
-- [ ] `ProductRepository::save()`
-- [ ] `ProductRepository::save()` — throws `CouldNotSaveModelException` when the WooCommerce save fails
-- [ ] `ProductRepository::delete()`
-- [ ] `ProductRepository::find()`
-- [ ] `ProductRepository::tax_query_filter()`
-- [ ] `ProductRepository::find_all()`
-- [ ] `ProductRepository::find_by_ids()`
-- [ ] `ProductRepository::find_all_by_term()`
-- [ ] `ProductRepository::find_all_by_term()` — throws `IncorrectRepositoryException` when the term model's repository has no `taxonomy()` method
+- [x] `ProductRepository::model()`
+- [x] `ProductRepository::get()`
+- [x] `ProductRepository::save()`
+- [ ] `ProductRepository::save()` — throws `CouldNotSaveModelException` when the WooCommerce save fails — **unreachable branch**: `WC_Product::save()` never returns `WP_Error` (WC throws `WC_Data_Exception` instead); flagged for the final sweep
+- [x] `ProductRepository::delete()`
+- [x] `ProductRepository::find()`
+- [x] `ProductRepository::tax_query_filter()`
+- [x] `ProductRepository::find_all()`
+- [x] `ProductRepository::find_by_ids()`
+- [x] `ProductRepository::find_all_by_term()`
+- [x] `ProductRepository::find_all_by_term()` — throws `IncorrectRepositoryException` when the term model's repository has no `taxonomy()` method
 
 ### Product
 
-- [ ] `Product::get_wc_product()`
-- [ ] `Product::get_vat_rate()`
+- [x] `Product::get_wc_product()`
+- [x] `Product::get_vat_rate()`
 
 ### ProductCatRepository
 
-- [ ] `ProductCatRepository::model()`
-- [ ] `ProductCatRepository::taxonomy()`
+- [x] `ProductCatRepository::model()`
+- [x] `ProductCatRepository::taxonomy()`
 
 ### ProductCat
 
@@ -319,56 +319,56 @@ Orders are tested against HPOS only (env-flag escape hatch for legacy), per
 
 ### OrderRepository
 
-- [ ] `OrderRepository::model()`
-- [ ] `OrderRepository::get()`
-- [ ] `OrderRepository::save()`
-- [ ] `OrderRepository::save()` — throws `CouldNotSaveModelException` when the WooCommerce save fails
-- [ ] `OrderRepository::delete()`
-- [ ] `OrderRepository::find()`
-- [ ] `OrderRepository::find_all()`
-- [ ] `OrderRepository::find_by_ids()`
+- [x] `OrderRepository::model()`
+- [x] `OrderRepository::get()`
+- [x] `OrderRepository::save()`
+- [ ] `OrderRepository::save()` — throws `CouldNotSaveModelException` when the WooCommerce save fails — **unreachable branch**: `WC_Order::save()` never returns `WP_Error`
+- [x] `OrderRepository::delete()`
+- [x] `OrderRepository::find()`
+- [x] `OrderRepository::find_all()`
+- [x] `OrderRepository::find_by_ids()`
 
 ### Order
 
-- [ ] `Order::get_wc_order()`
-- [ ] `Order::get_weight()`
-- [ ] `Order::has_shipping_method()`
-- [ ] `Order::get_items()`
+- [x] `Order::get_wc_order()`
+- [x] `Order::get_weight()`
+- [x] `Order::has_shipping_method()`
+- [x] `Order::get_items()`
 
 ### OrderItemRepository
 
-- [ ] `OrderItemRepository::model()`
-- [ ] `OrderItemRepository::get()`
-- [ ] `OrderItemRepository::create()`
-- [ ] `OrderItemRepository::save()`
-- [ ] `OrderItemRepository::save()` — throws `CouldNotSaveModelException` when the WooCommerce save fails
-- [ ] `OrderItemRepository::delete()`
-- [ ] `OrderItemRepository::find()`
-- [ ] `OrderItemRepository::find_all()`
-- [ ] `OrderItemRepository::find_by_ids()`
+- [x] `OrderItemRepository::model()`
+- [x] `OrderItemRepository::get()`
+- [x] `OrderItemRepository::create()`
+- [x] `OrderItemRepository::save()`
+- [ ] `OrderItemRepository::save()` — throws `CouldNotSaveModelException` when the WooCommerce save fails — **unreachable branch**: `WC_Order_Item::save()` never returns `WP_Error`
+- [x] `OrderItemRepository::delete()`
+- [x] `OrderItemRepository::find()`
+- [x] `OrderItemRepository::find_all()`
+- [x] `OrderItemRepository::find_by_ids()`
 
 ### OrderItem
 
-- [ ] `OrderItem::get_wc_order_item()`
-- [ ] `OrderItem::get_unit_price_tax_included()`
-- [ ] `OrderItem::get_unit_price()`
-- [ ] `OrderItem::get_unit_price_tax_excluded()`
-- [ ] `OrderItem::get_vat_rate()`
-- [ ] `OrderItem::get_vat_rate_id()`
+- [x] `OrderItem::get_wc_order_item()`
+- [x] `OrderItem::get_unit_price_tax_included()`
+- [x] `OrderItem::get_unit_price()`
+- [x] `OrderItem::get_unit_price_tax_excluded()`
+- [x] `OrderItem::get_vat_rate()`
+- [x] `OrderItem::get_vat_rate_id()`
 
 ### Order item subtypes
 
-- [ ] `OrderItemLineRepository::model()`
-- [ ] `OrderItemFeeRepository::model()`
-- [ ] `OrderItemShippingRepository::model()`
+- [x] `OrderItemLineRepository::model()`
+- [x] `OrderItemFeeRepository::model()`
+- [x] `OrderItemShippingRepository::model()`
 
 `OrderItemLine`, `OrderItemFee`, and `OrderItemShipping` declare no public methods — covered via `OrderItem`
 and their repositories.
 
 ### Attributes
 
-- [ ] `OrderItemsRelation::__construct()`
-- [ ] `OrderItemsRelation::get()`
+- [x] `OrderItemsRelation::__construct()`
+- [x] `OrderItemsRelation::get()`
 
 ## Coverage: multisite sites ([#26](https://github.com/wpify/model/issues/26))
 
@@ -377,14 +377,14 @@ Known related bug: [SiteRepository::save() uses comment and user functions](http
 
 ### SiteRepository
 
-- [ ] `SiteRepository::model()`
-- [ ] `SiteRepository::get()`
-- [ ] `SiteRepository::save()`
-- [ ] `SiteRepository::save()` — throws `CouldNotSaveModelException` when the underlying call returns `WP_Error`
-- [ ] `SiteRepository::delete()`
-- [ ] `SiteRepository::find()`
-- [ ] `SiteRepository::find_all()`
-- [ ] `SiteRepository::find_by_ids()`
+- [x] `SiteRepository::model()`
+- [x] `SiteRepository::get()`
+- [ ] `SiteRepository::save()` — **blocked by bug** [#28](https://github.com/wpify/model/issues/28); test skipped with link
+- [ ] `SiteRepository::save()` — throws `CouldNotSaveModelException` when the underlying call returns `WP_Error` — **blocked by bug** [#28](https://github.com/wpify/model/issues/28)
+- [x] `SiteRepository::delete()`
+- [x] `SiteRepository::find()`
+- [x] `SiteRepository::find_all()`
+- [x] `SiteRepository::find_by_ids()`
 
 ### Site
 
@@ -408,3 +408,29 @@ Every `Exceptions` class with its documented failure mode(s) and the ticket whos
 | `RepositoryNotFoundException` | `Manager::get_model_repository()`, `ManyToOneRelation::get()` | [#18](https://github.com/wpify/model/issues/18) |
 | `RepositoryNotInitialized` | `Repository::manager()` | [#18](https://github.com/wpify/model/issues/18) |
 | `SqlException` | `CustomTableRepository::save()`/`delete()`/`find()` | [#23](https://github.com/wpify/model/issues/23) |
+
+## Audit result (2026-07-26)
+
+Suite status: **167 single-site tests + 7 multisite tests, 439+ assertions, 0 failures** (11 tests skipped,
+each linking a filed bug). Run locally via the docker-less fallback (`vendor/bin/phpunit`,
+`vendor/bin/phpunit -c phpunit-multisite.xml`); the wp-env path runs in CI.
+
+The 5 unchecked items above are all accounted for:
+
+- 3 × WooCommerce `save()` failure modes are **unreachable dead branches** — WC's `save()` throws
+  `WC_Data_Exception` and never returns `WP_Error`, so the guarded branch cannot fire.
+- 2 × `SiteRepository::save()` items are **blocked by bug** [#28](https://github.com/wpify/model/issues/28).
+
+Bugs filed during coverage work (exposing tests are skipped with links, per the bug protocol):
+[#28](https://github.com/wpify/model/issues/28), [#29](https://github.com/wpify/model/issues/29),
+[#30](https://github.com/wpify/model/issues/30), [#31](https://github.com/wpify/model/issues/31),
+[#32](https://github.com/wpify/model/issues/32), [#33](https://github.com/wpify/model/issues/33),
+[#34](https://github.com/wpify/model/issues/34), [#35](https://github.com/wpify/model/issues/35),
+[#36](https://github.com/wpify/model/issues/36), [#37](https://github.com/wpify/model/issues/37),
+[#38](https://github.com/wpify/model/issues/38), [#39](https://github.com/wpify/model/issues/39),
+[#40](https://github.com/wpify/model/issues/40), [#41](https://github.com/wpify/model/issues/41),
+plus pre-existing [#1](https://github.com/wpify/model/issues/1).
+
+Dead code flagged for cleanup (no test possible): `KeyNotFoundException` and `ModelNotFoundException`
+are never thrown; `Manager.php` imports nonexistent `Factories\DefaultStorageFactory` and
+`Interfaces\StorageFactoryInterface`.

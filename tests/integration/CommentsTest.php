@@ -64,6 +64,16 @@ class CommentsTest extends TestCase {
 		$this->markTestSkipped( 'CommentRepository::save() refreshes via get_user_by() — https://github.com/wpify/model/issues/30' );
 	}
 
+	public function test_save_throws_when_update_fails(): void {
+		$comment = $this->comments()->get( (int) self::factory()->comment->create() );
+
+		$comment['id'] = 999999;
+
+		$this->expectException( \Wpify\Model\Exceptions\CouldNotSaveModelException::class );
+
+		$this->comments()->save( $comment );
+	}
+
 	public function test_save_updates_comment(): void {
 		$comment_id = (int) self::factory()->comment->create( array( 'comment_content' => 'Before' ) );
 		$comment    = $this->comments()->get( $comment_id );
