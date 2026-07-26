@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.6/phpunit.xsd"
+	bootstrap="tests/bootstrap.php"
+	colors="true"
+	beStrictAboutTestsThatDoNotTestAnything="false">
+	<php>
+		<const name="WP_TESTS_MULTISITE" value="1" />
+		<!-- Fallback for docker-less runs; wp-env's real WP_TESTS_DIR env var wins. -->
+		<env name="WP_PHPUNIT__DIR" value="vendor/wp-phpunit/wp-phpunit" />
+		<env name="WP_PHPUNIT__TESTS_CONFIG" value="tests/wp-tests-config.php" />
+	</php>
+	<testsuites>
+		<testsuite name="multisite">
+			<directory>tests/integration</directory>
+		</testsuite>
+	</testsuites>
+	<groups>
+		<include>
+			<group>ms-required</group>
+		</include>
+	</groups>
+	<coverage>
+		<include>
+			<directory suffix=".php">src</directory>
+		</include>
+	</coverage>
+</phpunit>

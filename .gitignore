@@ -1,6 +1,11 @@
 /.idea/
 /vendor/
 /composer.lock
+/node_modules/
+/package-lock.json
+/coverage.xml
+/coverage/
 .DS_Store
 ._*
 .phpdoc
+/wordpress/

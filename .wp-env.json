@@ -1,0 +1,13 @@
+{
+	"core": null,
+	"phpVersion": "8.2",
+	"plugins": [
+		"https://downloads.wordpress.org/plugin/woocommerce.10.9.4.zip"
+	],
+	"mappings": {
+		"wp-content/wpify-model": "."
+	},
+	"config": {
+		"WP_DEBUG": true
+	}
+}

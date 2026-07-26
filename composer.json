@@ -14,11 +14,28 @@
       "Wpify\\Model\\": "src/"
     }
   },
+  "autoload-dev": {
+    "psr-4": {
+      "Wpify\\Model\\Tests\\": "tests/"
+    }
+  },
   "scripts": {
+    "test": "wp-env run tests-cli --env-cwd=wp-content/wpify-model vendor/bin/phpunit",
+    "test:multisite": "wp-env run tests-cli --env-cwd=wp-content/wpify-model vendor/bin/phpunit -c phpunit-multisite.xml",
+    "test:coverage": "wp-env run tests-cli --env-cwd=wp-content/wpify-model vendor/bin/phpunit --coverage-clover coverage.xml"
   },
   "require": {
     "php": ">=8.0.0"
   },
   "require-dev": {
+    "phpunit/phpunit": "^9.6",
+    "yoast/phpunit-polyfills": "^1.1",
+    "roots/wordpress": "~7.0.2",
+    "wp-phpunit/wp-phpunit": "~7.0.2"
+  },
+  "config": {
+    "allow-plugins": {
+      "roots/wordpress-core-installer": true
+    }
   }
 }

@@ -1,0 +1,14 @@
+{
+  "name": "wpify-model-dev",
+  "private": true,
+  "description": "Dev tooling for the wpify/model test suite (wp-env).",
+  "devDependencies": {
+    "@wordpress/env": "^10.39.0"
+  },
+  "scripts": {
+    "env:start": "wp-env start",
+    "env:start:coverage": "wp-env start --xdebug=coverage",
+    "env:stop": "wp-env stop",
+    "env:destroy": "wp-env destroy"
+  }
+}

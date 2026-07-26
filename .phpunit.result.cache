@@ -1,0 +1,1 @@
+{"version":1,"defects":[],"times":{"Wpify\\Model\\Tests\\Integration\\SmokeTest::test_core_wordpress_is_loaded_and_library_autoloads":0.013,"Wpify\\Model\\Tests\\Integration\\SmokeTest::test_woocommerce_is_installed":0.025,"Wpify\\Model\\Tests\\Integration\\SmokeTest::test_multisite_bootstrap":0.006}}
